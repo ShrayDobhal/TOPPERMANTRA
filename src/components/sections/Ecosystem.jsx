@@ -153,15 +153,12 @@ function InteractiveNetwork() {
             style={{ 
               left: `${50 + node.x}%`, 
               top: `${50 + node.y}%`,
-              x: useTransform(mouseX, val => val * (1 + i * 0.05)),
-              y: useTransform(mouseY, val => val * (1 + i * 0.05))
+              transform: "translate(-50%, -50%)"
             }}
             onMouseEnter={() => setHoveredNode(node.id)}
             onMouseLeave={() => setHoveredNode(null)}
           >
-            <motion.div 
-              animate={{ y: [-4, 4, -4] }}
-              transition={{ duration: 4 + i % 3, repeat: Infinity, ease: "easeInOut" }}
+            <div 
               className="relative group cursor-pointer flex flex-col items-center"
             >
               {/* Node Icon */}
@@ -193,7 +190,7 @@ function InteractiveNetwork() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           </motion.div>
         ))}
 
