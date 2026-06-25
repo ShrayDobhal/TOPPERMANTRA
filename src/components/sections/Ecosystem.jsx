@@ -271,7 +271,7 @@ export default function EcosystemSection() {
           variants={staggerContainer}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"
         >
-          {nodesData.map((node, i) => (
+          {nodesData.slice(0, 5).map((node, i) => (
             <motion.div 
               key={i}
               variants={fadeUp}
@@ -283,9 +283,6 @@ export default function EcosystemSection() {
               </div>
               <h4 className="font-heading font-bold text-[#0F172A] mb-2">{node.label}</h4>
               <p className="text-sm text-[#64748B] leading-relaxed mb-6 flex-1">{node.desc}</p>
-              <div className="flex items-center text-sm font-semibold text-[#FF5722] group-hover:gap-2 transition-all duration-300 mt-auto">
-                Explore {node.label.split(' ')[0]} <ArrowRight size={14} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-              </div>
             </motion.div>
           ))}
         </motion.div>
