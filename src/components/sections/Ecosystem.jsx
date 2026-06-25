@@ -43,12 +43,18 @@ const nodesData = [
 
 // Helper to determine interconnected lines
 const connections = [
-  { from: "projects", to: "mentorship" },
-  { from: "projects", to: "community" },
+  { from: "mentorship", to: "projects" },
+  { from: "projects", to: "roadmaps" },
+  { from: "roadmaps", to: "community" },
+  { from: "community", to: "hackathons" },
   { from: "hackathons", to: "internships" },
+  { from: "internships", to: "startup" },
   { from: "startup", to: "leadership" },
-  { from: "community", to: "projects" },
-  { from: "drone", to: "startup" }
+  { from: "leadership", to: "mentorship" },
+  { from: "drone", to: "hackathons" },
+  { from: "drone", to: "roadmaps" },
+  { from: "projects", to: "internships" },
+  { from: "leadership", to: "community" }
 ];
 
 function InteractiveNetwork() {
@@ -69,7 +75,7 @@ function InteractiveNetwork() {
         className="absolute w-[500px] h-[500px] bg-[#FF5722]/5 rounded-full blur-[100px]" 
       />
 
-      <div className="relative w-full max-w-[800px] aspect-square flex items-center justify-center">
+      <div className="relative w-full max-w-[600px] aspect-square flex items-center justify-center">
         
         {/* SVG Connections */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
@@ -259,7 +265,7 @@ export default function EcosystemSection() {
           </div>
 
           {/* Right Side: Interactive Visual (55%) */}
-          <div className="w-full lg:w-[55%] lg:h-[800px] flex items-center justify-center">
+          <div className="w-full lg:w-[55%] lg:h-[600px] flex items-center justify-center">
             <InteractiveNetwork />
           </div>
         </div>
