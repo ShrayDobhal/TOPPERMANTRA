@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Users, Rocket, Trophy, Briefcase, Cpu, Laptop } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn } from '../../lib/utils';
 
 export default function HeroVisualization() {
   const nodes = [

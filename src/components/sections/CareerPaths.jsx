@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { fadeUp, staggerContainer, fadeRight } from "../lib/animations";
-import { cn } from "../lib/utils";
-import { Badge, Tag } from "./ui/Misc";
-import { Button } from "./ui/Button";
+import { fadeUp, staggerContainer, fadeRight } from '../../lib/animations';
+import { cn } from '../../lib/utils';
+import { Badge, Tag } from '../ui/Misc';
+import { Button } from '../ui/Button';
 import { 
   BrainCircuit, Code2, LineChart, Target, Palette, 
   ShieldCheck, Cloud, Link, Rocket, Zap, Check, ArrowRight 

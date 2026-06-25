@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { fadeUp, staggerContainer } from "../lib/animations";
-import { Button } from "./ui/Button";
+import { fadeUp, staggerContainer } from '../../lib/animations';
+import { Button } from '../ui/Button';
 
 // Avatar Mock Data
 const avatars = [

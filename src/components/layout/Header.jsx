@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "../lib/utils";
-import { Button } from "./ui/Button";
+import { cn } from '../../lib/utils';
+import { Button } from '../ui/Button';
 
 const navLinks = [
   { name: "Home", id: "hero" },

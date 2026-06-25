@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence } from "framer-motion";
-import { fadeUp, staggerContainer, fadeRight, scaleIn } from "../lib/animations";
-import { cn } from "../lib/utils";
-import { Button } from "./ui/Button";
-import { Badge } from "./ui/Misc";
+import { fadeUp, staggerContainer, fadeRight, scaleIn } from '../../lib/animations';
+import { cn } from '../../lib/utils';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Misc';
 import { 
   Network, Code, Map, Users, Trophy, Briefcase, 
   Rocket, Lightbulb, Compass, ArrowRight, ChevronDown, Zap

@@ -1,12 +1,12 @@
 import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
-import { fadeUp, staggerContainer, fadeRight, scaleIn } from "../lib/animations";
-import { cn } from "../lib/utils";
+import { fadeUp, staggerContainer, fadeRight, scaleIn } from '../../lib/animations';
+import { cn } from '../../lib/utils';
 import { 
   Users, UserX, Network, Briefcase, Map, Rocket, 
   ChevronDown, ArrowRight, XCircle, AlertCircle
 } from "lucide-react";
-import { Badge } from "./ui/Misc";
+import { Badge } from '../ui/Misc';
 
 const problems = [
   { icon: <UserX size={20} />, title: "No Mentorship", desc: "Many students never meet people already working in the careers they dream about." },

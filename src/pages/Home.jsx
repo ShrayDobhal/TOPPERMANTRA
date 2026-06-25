@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Misc";
-import HeroVisualization from "../components/HeroVisualization";
-import OpportunityGap from "../components/OpportunityGap";
-import EcosystemSection from "../components/Ecosystem";
-import CareerPaths from "../components/CareerPaths";
-import Roadmap from "../components/Roadmap";
-import ProjectsSection from "../components/ProjectsSection";
-import MentorsSection from "../components/MentorsSection";
-import OpportunitiesSection from "../components/OpportunitiesSection";
-import FinalCta from "../components/FinalCta";
+import HeroVisualization from "../components/common/HeroVisualization";
+import OpportunityGap from "../components/sections/OpportunityGap";
+import EcosystemSection from "../components/sections/Ecosystem";
+import CareerPaths from "../components/sections/CareerPaths";
+import Roadmap from "../components/sections/Roadmap";
+import ProjectsSection from "../components/sections/ProjectsSection";
+import MentorsSection from "../components/sections/MentorsSection";
+import OpportunitiesSection from "../components/sections/OpportunitiesSection";
+import FinalCta from "../components/sections/FinalCta";
 import { fadeUp, staggerContainer, fadeRight } from "../lib/animations";
 import { ChevronDown, Users, CheckCircle, Code, Trophy, Target } from "lucide-react";
 

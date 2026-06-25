@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { fadeUp, staggerContainer, fadeRight, scaleIn } from "../lib/animations";
-import { cn } from "../lib/utils";
-import { Badge, AnimatedCounter, Tag } from "./ui/Misc";
-import { Button } from "./ui/Button";
+import { fadeUp, staggerContainer, fadeRight, scaleIn } from '../../lib/animations';
+import { cn } from '../../lib/utils';
+import { Badge, AnimatedCounter, Tag } from '../ui/Misc';
+import { Button } from '../ui/Button';
 import { 
   Rocket, Code, Users, PlayCircle, Star, GitBranch, ExternalLink,
   ChevronRight, ArrowRight, ShieldCheck, CheckCircle2, 
