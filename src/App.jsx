@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
+import DashboardLayout from './layouts/DashboardLayout'
 import Home from './pages/Home'
 import About from './pages/About'
 import Mentors from './pages/Mentors'
@@ -24,8 +25,11 @@ export default function App() {
           <Route path="projects" element={<Projects />} />
           <Route path="entrepreneurship" element={<Entrepreneurship />} />
           <Route path="opportunities" element={<Opportunities />} />
-          <Route path="dashboard" element={<Dashboard />} />
           <Route path="contact" element={<Contact />} />
+        </Route>
+
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} />
         </Route>
       </Routes>
     </Router>
