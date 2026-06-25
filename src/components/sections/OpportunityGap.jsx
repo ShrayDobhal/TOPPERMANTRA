@@ -61,11 +61,7 @@ function InteractiveComparison() {
             <Users size={24} />
           </motion.div>
 
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
-          >
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
             {/* SVG Spiderweb Lines */}
             <svg className="absolute w-[300px] h-[300px] pointer-events-none z-0" viewBox="-150 -150 300 300">
               {/* Lines from center to nodes */}
@@ -98,19 +94,14 @@ function InteractiveComparison() {
                   className="absolute" 
                   style={{ transform: `translate(${x}px, ${y}px)` }}
                 >
-                  <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-                  >
-                    <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#E9ECEF] px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 whitespace-nowrap grayscale pointer-events-auto">
-                      <div className="text-[#64748B] scale-[0.6]">{problem.icon}</div>
-                      <span className="text-[9px] font-bold text-[#64748B]">{problem.title}</span>
-                    </div>
-                  </motion.div>
+                  <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#E9ECEF] px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 whitespace-nowrap grayscale pointer-events-auto">
+                    <div className="text-[#64748B] scale-[0.6]">{problem.icon}</div>
+                    <span className="text-[9px] font-bold text-[#64748B]">{problem.title}</span>
+                  </div>
                 </div>
               );
             })}
-          </motion.div>
+          </div>
         </div>
       </div>
 
