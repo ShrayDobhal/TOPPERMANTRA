@@ -40,7 +40,7 @@ function InteractiveComparison() {
   const mouseY = useSpring(mousePos.y, springConfig);
 
   return (
-    <div ref={ref} className="relative w-full h-full min-h-[600px] flex items-center justify-center rounded-3xl bg-white border border-[#E9ECEF] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden">
+    <div ref={ref} className="relative w-full h-full min-h-[450px] flex items-center justify-center rounded-3xl bg-white border border-[#E9ECEF] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] overflow-hidden">
       
       {/* Background Layer */}
       <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-[#FF5722]/5"></div>
@@ -179,7 +179,7 @@ export default function OpportunityGap() {
   };
 
   return (
-    <section className="relative py-12 md:py-20 bg-white overflow-hidden">
+    <section className="relative pt-12 md:pt-20 pb-0 bg-white overflow-hidden">
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Split Screen Layout */}
@@ -219,28 +219,12 @@ export default function OpportunityGap() {
           </div>
 
           {/* Right Side: Interactive Visual (65%) */}
-          <div className="w-full lg:w-[65%] h-[500px] lg:h-[650px] flex items-center">
+          <div className="w-full lg:w-[65%] h-[450px] lg:h-[500px] flex items-center">
             <InteractiveComparison />
           </div>
         </div>
 
-        {/* Bottom Transition */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-          className="mt-16 text-center max-w-3xl mx-auto"
-        >
-          <motion.div 
-            variants={fadeUp}
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="flex justify-center text-[#E9ECEF]"
-          >
-            <ArrowRight className="w-8 h-8 rotate-90" />
-          </motion.div>
-        </motion.div>
+
 
       </div>
     </section>
