@@ -116,7 +116,11 @@ function InteractiveComparison() {
       <div className="absolute right-0 top-0 bottom-0 w-1/2 flex flex-col items-center justify-center p-8 bg-gradient-to-r from-transparent to-[#FF5722]/5">
         <h4 className="absolute top-8 text-[#FF5722] font-semibold tracking-widest text-xs uppercase z-20 px-2">Topper Mantra</h4>
         
-        {/* Replaced dashed ring with static web logic inside the inset-0 container */}
+        <motion.div 
+          animate={{ rotate: -360 }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          className="absolute w-[180px] h-[180px] rounded-full border border-dashed border-[#FF5722]/30" 
+        />
 
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div 
@@ -126,60 +130,43 @@ function InteractiveComparison() {
             <Users size={32} />
           </motion.div>
 
-          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-            {/* SVG Spiderweb Lines */}
-            <svg className="absolute w-[400px] h-[400px] pointer-events-none z-0" viewBox="-200 -200 400 400">
-              {/* Lines from center to nodes */}
-              {[
-                { x: 120, y: -90 },
-                { x: 120, y: 90 },
-                { x: -120, y: 90 },
-                { x: -120, y: -90 }
-              ].map((pos, i) => (
-                <line key={`center-${i}`} x1="0" y1="0" x2={pos.x} y2={pos.y} stroke="#FF5722" strokeOpacity="0.3" strokeWidth="1.5" />
-              ))}
-              {/* Interconnections between nodes */}
-              {[
-                { x: 120, y: -90 },
-                { x: 120, y: 90 },
-                { x: -120, y: 90 },
-                { x: -120, y: -90 }
-              ].map((pos, i, arr) => {
-                const nextPos = arr[(i + 1) % arr.length];
-                return (
-                  <line key={`conn-${i}`} x1={pos.x} y1={pos.y} x2={nextPos.x} y2={nextPos.y} stroke="#FF5722" strokeOpacity="0.3" strokeWidth="1" strokeDasharray="4 4" />
-                );
-              })}
-            </svg>
-
+          {/* Orbiting Connected Nodes */}
+          <motion.div
+            animate={{ rotate: -360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
+          >
             {[
               { icon: <Briefcase size={16} />, label: "Projects", color: "text-[#22C55E]" },
               { icon: <Rocket size={16} />, label: "Startups", color: "text-[#3B82F6]" },
               { icon: <Network size={16} />, label: "Mentors", color: "text-[#FACC15]" },
               { icon: <Map size={16} />, label: "Roadmaps", color: "text-[#06B6D4]" },
-            ].map((node, i) => {
-              const pos = [
-                { x: 120, y: -90 },
-                { x: 120, y: 90 },
-                { x: -120, y: 90 },
-                { x: -120, y: -90 }
-              ][i];
+            ].map((node, i, arr) => {
+              const angle = (i * 360) / arr.length;
+              const radius = 90;
+              const x = Math.cos(angle * Math.PI / 180) * radius;
+              const y = Math.sin(angle * Math.PI / 180) * radius;
 
               return (
                 <div 
                   key={i} 
                   className="absolute" 
-                  style={{ transform: `translate(${pos.x}px, ${pos.y}px)` }}
+                  style={{ transform: `translate(${x}px, ${y}px)` }}
                 >
-                  <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#FF5722]/10 px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-2 whitespace-nowrap pointer-events-auto">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#FF5722]/5 to-[#FE6D4D]/5 rounded-xl opacity-0 hover:opacity-100 transition-opacity"></div>
-                    <span className={node.color}>{node.icon}</span>
-                    <span className="text-[11px] font-bold text-[#0F172A]">{node.label}</span>
-                  </div>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#FF5722]/10 px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-2 whitespace-nowrap pointer-events-auto">
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#FF5722]/5 to-[#FE6D4D]/5 rounded-xl opacity-0 hover:opacity-100 transition-opacity"></div>
+                      <span className={node.color}>{node.icon}</span>
+                      <span className="text-[11px] font-bold text-[#0F172A]">{node.label}</span>
+                    </div>
+                  </motion.div>
                 </div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </div>
 
