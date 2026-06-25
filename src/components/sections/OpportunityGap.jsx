@@ -52,7 +52,7 @@ function InteractiveComparison() {
         <motion.div 
           animate={{ rotate: 360 }}
           transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-          className="absolute w-[240px] h-[240px] rounded-full border border-dashed border-[#E9ECEF]" 
+          className="absolute w-[180px] h-[180px] rounded-full border border-dashed border-[#E9ECEF]" 
         />
 
         <div className="relative w-full h-full flex items-center justify-center">
@@ -72,7 +72,7 @@ function InteractiveComparison() {
           >
             {problems.map((problem, i) => {
               const angle = (i * 360) / problems.length;
-              const radius = 120;
+              const radius = 90;
               const x = Math.cos(angle * Math.PI / 180) * radius;
               const y = Math.sin(angle * Math.PI / 180) * radius;
 
@@ -105,7 +105,7 @@ function InteractiveComparison() {
         <motion.div 
           animate={{ rotate: -360 }}
           transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          className="absolute w-[240px] h-[240px] rounded-full border border-dashed border-[#FF5722]/30" 
+          className="absolute w-[180px] h-[180px] rounded-full border border-dashed border-[#FF5722]/30" 
         />
 
         <div className="relative w-full h-full flex items-center justify-center">
@@ -131,7 +131,7 @@ function InteractiveComparison() {
               { icon: <Map size={16} />, label: "Roadmaps", color: "text-[#06B6D4]" },
             ].map((node, i, arr) => {
               const angle = (i * 360) / arr.length;
-              const radius = 120;
+              const radius = 90;
               const x = Math.cos(angle * Math.PI / 180) * radius;
               const y = Math.sin(angle * Math.PI / 180) * radius;
 
@@ -158,16 +158,7 @@ function InteractiveComparison() {
         </div>
       </div>
 
-      {/* Center Bridge */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8, delay: 0.8 }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-[#0F172A] text-white px-6 py-3 rounded-2xl shadow-2xl font-heading font-bold tracking-widest text-sm whitespace-nowrap overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FF5722]/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
-        THE BRIDGE
-      </motion.div>
+
     </div>
   );
 }
