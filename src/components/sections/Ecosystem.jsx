@@ -64,6 +64,21 @@ function InteractiveNetwork() {
   const mouseX = useSpring(mousePos.x, springConfig);
   const mouseY = useSpring(mousePos.y, springConfig);
 
+  // Use mathematically perfect radius of 42% for all nodes
+  const R = 42;
+  const D = R * Math.cos(Math.PI / 4); // ~ 29.7
+
+  const orbitNodes = [
+    { id: "mentorship", label: "Mentorship", icon: <Users size={20} />, x: -D, y: -D, color: "#FF5722", desc: "Learn directly from professionals who have already walked the path." },
+    { id: "projects", label: "Projects", icon: <Code size={20} />, x: 0, y: -R, color: "#22C55E", desc: "Build real-world applications with teammates and mentors while creating a portfolio employers value." },
+    { id: "roadmaps", label: "Roadmaps", icon: <Map size={20} />, x: D, y: -D, color: "#3B82F6", desc: "Structured learning paths tailored to your career goals." },
+    { id: "community", label: "Community", icon: <Network size={20} />, x: R, y: 0, color: "#FACC15", desc: "Meet ambitious students from across India." },
+    { id: "hackathons", label: "Hackathons", icon: <Trophy size={20} />, x: D, y: D, color: "#EC4899", desc: "Compete, innovate and solve real-world challenges." },
+    { id: "internships", label: "Internships", icon: <Briefcase size={20} />, x: 0, y: R, color: "#8B5CF6", desc: "Internships, jobs, fellowships and research programs curated for you." },
+    { id: "startup", label: "Startup Incubator", icon: <Rocket size={20} />, x: -D, y: D, color: "#14B8A6", desc: "Turn your ideas into startups with mentorship, validation and resources." },
+    { id: "leadership", label: "Leadership", icon: <Lightbulb size={20} />, x: -R, y: 0, color: "#F97316", desc: "Develop communication, teamwork and management skills through active participation." }
+  ];
+
   return (
     <div ref={containerRef} className="relative w-full h-[600px] lg:h-full flex items-center justify-center">
       {/* Background Glow */}
@@ -74,61 +89,17 @@ function InteractiveNetwork() {
 
       <div className="relative w-full max-w-[600px] aspect-square flex items-center justify-center">
         
-        {/* Rotating Web Container */}
+        {/* Orbit Path (The line of orbiting) */}
+        <div className="absolute w-[84%] h-[84%] rounded-full border-2 border-dashed border-[#FF5722]/30 pointer-events-none z-0" />
+
+        {/* Rotating Orbit Container */}
         <motion.div 
           className="absolute inset-0 pointer-events-none z-10"
           animate={{ rotate: 360 }}
           transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
         >
-          {/* SVG Connections */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FF5722" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#FE6D4D" stopOpacity="0.1" />
-              </linearGradient>
-              <linearGradient id="activeLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FF5722" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#FE6D4D" stopOpacity="0.5" />
-              </linearGradient>
-            </defs>
-
-            {/* Lines to center */}
-            {nodesData.map((node, i) => (
-              <motion.line
-                key={`center-line-${i}`}
-                x1="50" y1="50" x2={50 + node.x} y2={50 + node.y}
-                stroke={hoveredNode === node.id ? "url(#activeLineGrad)" : "url(#lineGrad)"}
-                strokeWidth={hoveredNode === node.id ? "0.6" : "0.2"}
-                initial={{ pathLength: 0 }}
-                animate={inView ? { pathLength: 1 } : {}}
-                transition={{ duration: 1.5, delay: 0.5 + i * 0.1 }}
-              />
-            ))}
-
-            {/* Interconnections */}
-            {connections.map((conn, i) => {
-              const fromNode = nodesData.find(n => n.id === conn.from);
-              const toNode = nodesData.find(n => n.id === conn.to);
-              if (!fromNode || !toNode) return null;
-              const isHovered = hoveredNode === fromNode.id || hoveredNode === toNode.id;
-              return (
-                <motion.line
-                  key={`conn-${i}`}
-                  x1={50 + fromNode.x} y1={50 + fromNode.y} x2={50 + toNode.x} y2={50 + toNode.y}
-                  stroke={isHovered ? "url(#activeLineGrad)" : "url(#lineGrad)"}
-                  strokeWidth={isHovered ? "0.4" : "0.1"}
-                  strokeDasharray="1 1"
-                  initial={{ pathLength: 0 }}
-                  animate={inView ? { pathLength: 1 } : {}}
-                  transition={{ duration: 1.5, delay: 1.5 + i * 0.1 }}
-                />
-              )
-            })}
-          </svg>
-
           {/* Floating Nodes */}
-          {nodesData.map((node, i) => (
+          {orbitNodes.map((node, i) => (
             <motion.div
               key={i}
               initial={{ scale: 0, opacity: 0 }}
@@ -232,7 +203,6 @@ function InteractiveNetwork() {
     </div>
   );
 }
-
 export default function EcosystemSection() {
   const lineVariants = {
     hidden: { opacity: 0, y: 20 },
