@@ -225,7 +225,7 @@ export default function EcosystemSection() {
   };
 
   return (
-    <section className="relative pt-0 pb-12 md:pb-20 bg-white overflow-hidden">
+    <section className="relative pt-8 md:pt-12 pb-12 md:pb-20 bg-white overflow-hidden">
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Split Screen Layout */}
