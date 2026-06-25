@@ -68,7 +68,7 @@ export default function Home() {
 
             {/* Subtitle */}
             <motion.p variants={fadeUp} className="text-[18px] md:text-[20px] text-[#64748B] mb-10 leading-relaxed max-w-xl text-balance font-sans">
-              Join India's fastest-growing ecosystem where ambitious students build projects, find mentors, join startups, win hackathons, and unlock career opportunities beyond the classroom.
+              India's student growth ecosystem that connects ambitious Tier 2 and Tier 3 students with mentors, projects, internships, hackathons, startups, and career opportunities—bringing the ecosystem of top institutions to every campus.
             </motion.p>
 
             {/* CTAs */}
