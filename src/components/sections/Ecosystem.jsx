@@ -37,8 +37,7 @@ const nodesData = [
   { id: "hackathons", label: "Hackathons", icon: <Trophy size={20} />, x: 35, y: 35, color: "#EC4899", desc: "Compete, innovate and solve real-world challenges." },
   { id: "internships", label: "Internships", icon: <Briefcase size={20} />, x: 0, y: 45, color: "#8B5CF6", desc: "Internships, jobs, fellowships and research programs curated for you." },
   { id: "startup", label: "Startup Incubator", icon: <Rocket size={20} />, x: -35, y: 35, color: "#14B8A6", desc: "Turn your ideas into startups with mentorship, validation and resources." },
-  { id: "leadership", label: "Leadership", icon: <Lightbulb size={20} />, x: -45, y: 0, color: "#F97316", desc: "Develop communication, teamwork and management skills through active participation." },
-  { id: "drone", label: "Drone Innovation", icon: <Zap size={20} />, x: 20, y: 20, color: "#64748B", desc: "Coming Soon — Explore future technologies, drone competitions and innovation labs." }
+  { id: "leadership", label: "Leadership", icon: <Lightbulb size={20} />, x: -45, y: 0, color: "#F97316", desc: "Develop communication, teamwork and management skills through active participation." }
 ];
 
 // Helper to determine interconnected lines
@@ -51,8 +50,6 @@ const connections = [
   { from: "internships", to: "startup" },
   { from: "startup", to: "leadership" },
   { from: "leadership", to: "mentorship" },
-  { from: "drone", to: "hackathons" },
-  { from: "drone", to: "roadmaps" },
   { from: "projects", to: "internships" },
   { from: "leadership", to: "community" }
 ];
