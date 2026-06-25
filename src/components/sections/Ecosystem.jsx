@@ -159,20 +159,18 @@ function InteractiveNetwork() {
             onMouseLeave={() => setHoveredNode(null)}
           >
             <div 
-              className="relative group cursor-pointer flex flex-col items-center"
+              className={cn(
+                "relative group cursor-pointer flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-lg backdrop-blur-xl border transition-all duration-300",
+                hoveredNode === node.id ? "scale-110 bg-white border-[#FF5722]/50 shadow-[0_0_20px_rgba(255,87,34,0.3)]" : "bg-white/90 border-[#E9ECEF]"
+              )}
             >
               {/* Node Icon */}
-              <div 
-                className={cn(
-                  "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-xl border transition-all duration-300",
-                  hoveredNode === node.id ? "scale-125 bg-white border-[#FF5722]/50 shadow-[0_0_30px_rgba(255,87,34,0.3)]" : "bg-white/80 border-[#E9ECEF]"
-                )}
-              >
-                <div style={{ color: hoveredNode === node.id ? "#FF5722" : node.color }}>{node.icon}</div>
+              <div style={{ color: hoveredNode === node.id ? "#FF5722" : node.color }} className="shrink-0 scale-90 md:scale-100">
+                {node.icon}
               </div>
               
               {/* Node Label */}
-              <div className="mt-2 text-xs font-bold text-[#0F172A] bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-[#E9ECEF] shadow-sm whitespace-nowrap">
+              <div className="text-[10px] md:text-xs font-bold text-[#0F172A] whitespace-nowrap">
                 {node.label}
               </div>
 
