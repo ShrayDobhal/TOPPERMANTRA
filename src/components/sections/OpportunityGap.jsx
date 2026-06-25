@@ -55,7 +55,7 @@ function InteractiveComparison() {
           className="absolute w-[180px] h-[180px] rounded-full border border-dashed border-[#E9ECEF]" 
         />
 
-        <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
@@ -68,7 +68,7 @@ function InteractiveComparison() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-            className="absolute flex items-center justify-center z-20"
+            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
           >
             {problems.map((problem, i) => {
               const angle = (i * 360) / problems.length;
@@ -86,7 +86,7 @@ function InteractiveComparison() {
                     animate={{ rotate: -360 }}
                     transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
                   >
-                    <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#E9ECEF] px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 whitespace-nowrap grayscale">
+                    <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#E9ECEF] px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 whitespace-nowrap grayscale pointer-events-auto">
                       <div className="text-[#64748B] scale-[0.6]">{problem.icon}</div>
                       <span className="text-[9px] font-bold text-[#64748B]">{problem.title}</span>
                     </div>
@@ -108,7 +108,7 @@ function InteractiveComparison() {
           className="absolute w-[180px] h-[180px] rounded-full border border-dashed border-[#FF5722]/30" 
         />
 
-        <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center">
           <motion.div 
             className="w-20 h-20 rounded-full bg-white shadow-2xl border-4 border-[#FF5722]/20 flex items-center justify-center text-[#FF5722] z-20 relative"
           >
@@ -120,7 +120,7 @@ function InteractiveComparison() {
           <motion.div
             animate={{ rotate: -360 }}
             transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-            className="absolute flex items-center justify-center z-20"
+            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
           >
             {[
               { icon: <Briefcase size={16} />, label: "Projects", color: "text-[#22C55E]" },
@@ -145,7 +145,7 @@ function InteractiveComparison() {
                     animate={{ rotate: 360 }}
                     transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
                   >
-                    <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#FF5722]/10 px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-2 whitespace-nowrap relative">
+                    <div className="absolute -translate-x-1/2 -translate-y-1/2 bg-white border border-[#FF5722]/10 px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-2 whitespace-nowrap pointer-events-auto">
                       <div className="absolute inset-0 bg-gradient-to-r from-[#FF5722]/5 to-[#FE6D4D]/5 rounded-xl opacity-0 hover:opacity-100 transition-opacity"></div>
                       <span className={node.color}>{node.icon}</span>
                       <span className="text-[11px] font-bold text-[#0F172A]">{node.label}</span>
