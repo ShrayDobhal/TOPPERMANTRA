@@ -161,7 +161,7 @@ function InteractiveNetwork() {
             <div 
               className={cn(
                 "relative group cursor-pointer flex items-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-xl shadow-lg backdrop-blur-xl border transition-all duration-300",
-                node.x <= 0 ? "flex-row-reverse" : "",
+                node.x < 0 ? "flex-row-reverse" : "",
                 hoveredNode === node.id ? "scale-110 bg-white border-[#FF5722]/50 shadow-[0_0_20px_rgba(255,87,34,0.3)]" : "bg-white/90 border-[#E9ECEF]"
               )}
             >
