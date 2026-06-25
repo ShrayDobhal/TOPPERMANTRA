@@ -153,7 +153,7 @@ function InteractiveNetwork() {
             style={{ 
               left: `${50 + node.x}%`, 
               top: `${50 + node.y}%`,
-              transform: "translate(-50%, -50%)"
+              transform: `translate(${node.x < 0 ? '-100%' : node.x > 0 ? '0%' : '-50%'}, ${node.y < 0 && node.x === 0 ? '-100%' : node.y > 0 && node.x === 0 ? '0%' : '-50%'})`
             }}
             onMouseEnter={() => setHoveredNode(node.id)}
             onMouseLeave={() => setHoveredNode(null)}
