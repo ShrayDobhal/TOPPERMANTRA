@@ -146,14 +146,23 @@ function InteractiveNetwork() {
         {nodesData.map((node, i) => (
           <motion.div
             key={i}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={inView ? { scale: 1, opacity: 1 } : {}}
+            initial={{ 
+              scale: 0, 
+              opacity: 0,
+              x: node.x < 0 ? '-100%' : node.x > 0 ? '0%' : '-50%',
+              y: node.y < 0 && node.x === 0 ? '-100%' : node.y > 0 && node.x === 0 ? '0%' : '-50%'
+            }}
+            animate={inView ? { 
+              scale: 1, 
+              opacity: 1,
+              x: node.x < 0 ? '-100%' : node.x > 0 ? '0%' : '-50%',
+              y: node.y < 0 && node.x === 0 ? '-100%' : node.y > 0 && node.x === 0 ? '0%' : '-50%'
+            } : {}}
             transition={{ duration: 0.8, delay: 0.8 + i * 0.1, type: "spring" }}
             className="absolute z-30"
             style={{ 
               left: `${50 + node.x}%`, 
-              top: `${50 + node.y}%`,
-              transform: `translate(${node.x < 0 ? '-100%' : node.x > 0 ? '0%' : '-50%'}, ${node.y < 0 && node.x === 0 ? '-100%' : node.y > 0 && node.x === 0 ? '0%' : '-50%'})`
+              top: `${50 + node.y}%`
             }}
             onMouseEnter={() => setHoveredNode(node.id)}
             onMouseLeave={() => setHoveredNode(null)}
