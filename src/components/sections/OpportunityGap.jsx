@@ -110,7 +110,6 @@ function InteractiveComparison() {
 
         <div className="relative w-full h-full flex items-center justify-center">
           <motion.div 
-            style={{ x: mouseX, y: mouseY }}
             className="w-20 h-20 rounded-full bg-white shadow-2xl border-4 border-[#FF5722]/20 flex items-center justify-center text-[#FF5722] z-20 relative"
           >
             <div className="absolute inset-0 rounded-full bg-[#FF5722]/20 animate-ping"></div>
@@ -129,6 +128,7 @@ function InteractiveComparison() {
               { icon: <Network size={16} />, label: "Mentors", color: "text-[#FACC15]" },
               { icon: <Users size={16} />, label: "Community", color: "text-[#A855F7]" },
               { icon: <Map size={16} />, label: "Roadmaps", color: "text-[#06B6D4]" },
+              { icon: <Rocket size={16} />, label: "Hackathons", color: "text-[#EC4899]" },
             ].map((node, i, arr) => {
               const angle = (i * 360) / arr.length;
               const radius = 90;

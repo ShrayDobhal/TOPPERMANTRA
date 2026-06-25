@@ -30,14 +30,14 @@ function useMousePosition(ref) {
 }
 
 const nodesData = [
-  { id: "mentorship", label: "Mentorship", icon: <Users size={20} />, x: -35, y: -35, color: "#FF5722", desc: "Learn directly from professionals who have already walked the path." },
-  { id: "projects", label: "Projects", icon: <Code size={20} />, x: 0, y: -45, color: "#22C55E", desc: "Build real-world applications with teammates and mentors while creating a portfolio employers value." },
-  { id: "roadmaps", label: "Roadmaps", icon: <Map size={20} />, x: 35, y: -35, color: "#3B82F6", desc: "Structured learning paths tailored to your career goals." },
-  { id: "community", label: "Community", icon: <Network size={20} />, x: 45, y: 0, color: "#FACC15", desc: "Meet ambitious students from across India." },
-  { id: "hackathons", label: "Hackathons", icon: <Trophy size={20} />, x: 35, y: 35, color: "#EC4899", desc: "Compete, innovate and solve real-world challenges." },
-  { id: "internships", label: "Internships", icon: <Briefcase size={20} />, x: 0, y: 45, color: "#8B5CF6", desc: "Internships, jobs, fellowships and research programs curated for you." },
-  { id: "startup", label: "Startup Incubator", icon: <Rocket size={20} />, x: -35, y: 35, color: "#14B8A6", desc: "Turn your ideas into startups with mentorship, validation and resources." },
-  { id: "leadership", label: "Leadership", icon: <Lightbulb size={20} />, x: -45, y: 0, color: "#F97316", desc: "Develop communication, teamwork and management skills through active participation." }
+  { id: "mentorship", label: "Mentorship", icon: <Users size={20} />, x: -30, y: -30, color: "#FF5722", desc: "Learn directly from professionals who have already walked the path." },
+  { id: "projects", label: "Projects", icon: <Code size={20} />, x: 0, y: -42, color: "#22C55E", desc: "Build real-world applications with teammates and mentors while creating a portfolio employers value." },
+  { id: "roadmaps", label: "Roadmaps", icon: <Map size={20} />, x: 30, y: -30, color: "#3B82F6", desc: "Structured learning paths tailored to your career goals." },
+  { id: "community", label: "Community", icon: <Network size={20} />, x: 42, y: 0, color: "#FACC15", desc: "Meet ambitious students from across India." },
+  { id: "hackathons", label: "Hackathons", icon: <Trophy size={20} />, x: 30, y: 30, color: "#EC4899", desc: "Compete, innovate and solve real-world challenges." },
+  { id: "internships", label: "Internships", icon: <Briefcase size={20} />, x: 0, y: 42, color: "#8B5CF6", desc: "Internships, jobs, fellowships and research programs curated for you." },
+  { id: "startup", label: "Startup Incubator", icon: <Rocket size={20} />, x: -30, y: 30, color: "#14B8A6", desc: "Turn your ideas into startups with mentorship, validation and resources." },
+  { id: "leadership", label: "Leadership", icon: <Lightbulb size={20} />, x: -42, y: 0, color: "#F97316", desc: "Develop communication, teamwork and management skills through active participation." }
 ];
 
 // Helper to determine interconnected lines
