@@ -49,7 +49,7 @@ function InteractiveComparison() {
       <div className="absolute left-0 top-0 bottom-0 w-1/2 flex flex-col items-center justify-center p-8 border-r border-dashed border-[#E9ECEF] bg-white">
         <h4 className="absolute top-8 text-[#64748B] font-semibold tracking-widest text-xs uppercase bg-white px-2 z-20">Tier 2/3 College</h4>
         
-        {/* Orbit Ring Removed, replaced with SVG Web */}
+        <div className="absolute w-[180px] h-[180px] rounded-full border border-dashed border-[#E9ECEF]" />
 
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div 
@@ -62,28 +62,8 @@ function InteractiveComparison() {
           </motion.div>
 
           <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-            {/* SVG Spiderweb Lines */}
-            <svg className="absolute w-[300px] h-[300px] pointer-events-none z-0" viewBox="-150 -150 300 300">
-              {/* Lines from center to nodes */}
-              {problems.map((_, i) => {
-                const angle = (i * 360) / problems.length;
-                const x = Math.cos(angle * Math.PI / 180) * 90;
-                const y = Math.sin(angle * Math.PI / 180) * 90;
-                return <line key={`center-${i}`} x1="0" y1="0" x2={x} y2={y} stroke="#E9ECEF" strokeWidth="1.5" />
-              })}
-              {/* Interconnections between nodes */}
-              {problems.map((_, i) => {
-                const angle1 = (i * 360) / problems.length;
-                const x1 = Math.cos(angle1 * Math.PI / 180) * 90;
-                const y1 = Math.sin(angle1 * Math.PI / 180) * 90;
-                const angle2 = (((i + 1) % problems.length) * 360) / problems.length;
-                const x2 = Math.cos(angle2 * Math.PI / 180) * 90;
-                const y2 = Math.sin(angle2 * Math.PI / 180) * 90;
-                return <line key={`conn-${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#E9ECEF" strokeWidth="1" strokeDasharray="3 3" />
-              })}
-            </svg>
-            {problems.map((problem, i) => {
-              const angle = (i * 360) / problems.length;
+            {problems.slice(0, 4).map((problem, i, arr) => {
+              const angle = (i * 360) / arr.length;
               const radius = 90;
               const x = Math.cos(angle * Math.PI / 180) * radius;
               const y = Math.sin(angle * Math.PI / 180) * radius;
@@ -133,9 +113,7 @@ function InteractiveComparison() {
               { icon: <Briefcase size={16} />, label: "Projects", color: "text-[#22C55E]" },
               { icon: <Rocket size={16} />, label: "Startups", color: "text-[#3B82F6]" },
               { icon: <Network size={16} />, label: "Mentors", color: "text-[#FACC15]" },
-              { icon: <Users size={16} />, label: "Community", color: "text-[#A855F7]" },
               { icon: <Map size={16} />, label: "Roadmaps", color: "text-[#06B6D4]" },
-              { icon: <Rocket size={16} />, label: "Hackathons", color: "text-[#EC4899]" },
             ].map((node, i, arr) => {
               const angle = (i * 360) / arr.length;
               const radius = 90;
