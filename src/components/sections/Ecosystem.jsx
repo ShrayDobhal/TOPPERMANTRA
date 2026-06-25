@@ -74,52 +74,118 @@ function InteractiveNetwork() {
 
       <div className="relative w-full max-w-[600px] aspect-square flex items-center justify-center">
         
-        {/* SVG Connections */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF5722" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#FE6D4D" stopOpacity="0.1" />
-            </linearGradient>
-            <linearGradient id="activeLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF5722" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#FE6D4D" stopOpacity="0.5" />
-            </linearGradient>
-          </defs>
+        {/* Rotating Web Container */}
+        <motion.div 
+          className="absolute inset-0 pointer-events-none z-10"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        >
+          {/* SVG Connections */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FF5722" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#FE6D4D" stopOpacity="0.1" />
+              </linearGradient>
+              <linearGradient id="activeLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FF5722" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#FE6D4D" stopOpacity="0.5" />
+              </linearGradient>
+            </defs>
 
-          {/* Lines to center */}
-          {nodesData.map((node, i) => (
-            <motion.line
-              key={`center-line-${i}`}
-              x1="50" y1="50" x2={50 + node.x} y2={50 + node.y}
-              stroke={hoveredNode === node.id ? "url(#activeLineGrad)" : "url(#lineGrad)"}
-              strokeWidth={hoveredNode === node.id ? "0.6" : "0.2"}
-              initial={{ pathLength: 0 }}
-              animate={inView ? { pathLength: 1 } : {}}
-              transition={{ duration: 1.5, delay: 0.5 + i * 0.1 }}
-            />
-          ))}
-
-          {/* Interconnections */}
-          {connections.map((conn, i) => {
-            const fromNode = nodesData.find(n => n.id === conn.from);
-            const toNode = nodesData.find(n => n.id === conn.to);
-            if (!fromNode || !toNode) return null;
-            const isHovered = hoveredNode === fromNode.id || hoveredNode === toNode.id;
-            return (
+            {/* Lines to center */}
+            {nodesData.map((node, i) => (
               <motion.line
-                key={`conn-${i}`}
-                x1={50 + fromNode.x} y1={50 + fromNode.y} x2={50 + toNode.x} y2={50 + toNode.y}
-                stroke={isHovered ? "url(#activeLineGrad)" : "url(#lineGrad)"}
-                strokeWidth={isHovered ? "0.4" : "0.1"}
-                strokeDasharray="1 1"
+                key={`center-line-${i}`}
+                x1="50" y1="50" x2={50 + node.x} y2={50 + node.y}
+                stroke={hoveredNode === node.id ? "url(#activeLineGrad)" : "url(#lineGrad)"}
+                strokeWidth={hoveredNode === node.id ? "0.6" : "0.2"}
                 initial={{ pathLength: 0 }}
                 animate={inView ? { pathLength: 1 } : {}}
-                transition={{ duration: 1.5, delay: 1.5 + i * 0.1 }}
+                transition={{ duration: 1.5, delay: 0.5 + i * 0.1 }}
               />
-            )
-          })}
-        </svg>
+            ))}
+
+            {/* Interconnections */}
+            {connections.map((conn, i) => {
+              const fromNode = nodesData.find(n => n.id === conn.from);
+              const toNode = nodesData.find(n => n.id === conn.to);
+              if (!fromNode || !toNode) return null;
+              const isHovered = hoveredNode === fromNode.id || hoveredNode === toNode.id;
+              return (
+                <motion.line
+                  key={`conn-${i}`}
+                  x1={50 + fromNode.x} y1={50 + fromNode.y} x2={50 + toNode.x} y2={50 + toNode.y}
+                  stroke={isHovered ? "url(#activeLineGrad)" : "url(#lineGrad)"}
+                  strokeWidth={isHovered ? "0.4" : "0.1"}
+                  strokeDasharray="1 1"
+                  initial={{ pathLength: 0 }}
+                  animate={inView ? { pathLength: 1 } : {}}
+                  transition={{ duration: 1.5, delay: 1.5 + i * 0.1 }}
+                />
+              )
+            })}
+          </svg>
+
+          {/* Floating Nodes */}
+          {nodesData.map((node, i) => (
+            <motion.div
+              key={i}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={inView ? { scale: 1, opacity: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.8 + i * 0.1, type: "spring" }}
+              className="absolute z-30 -translate-x-1/2 -translate-y-1/2 pointer-events-auto"
+              style={{ 
+                left: `${50 + node.x}%`, 
+                top: `${50 + node.y}%`
+              }}
+              onMouseEnter={() => setHoveredNode(node.id)}
+              onMouseLeave={() => setHoveredNode(null)}
+            >
+              {/* Counter-rotation to keep the cards upright */}
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+              >
+                <motion.div 
+                  animate={{ y: [-4, 4, -4] }}
+                  transition={{ duration: 4 + i % 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative group cursor-pointer flex flex-col items-center"
+                >
+                  {/* Node Icon */}
+                  <div 
+                    className={cn(
+                      "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-xl border transition-all duration-300",
+                      hoveredNode === node.id ? "scale-125 bg-white border-[#FF5722]/50 shadow-[0_0_30px_rgba(255,87,34,0.3)]" : "bg-white/80 border-[#E9ECEF]"
+                    )}
+                  >
+                    <div style={{ color: hoveredNode === node.id ? "#FF5722" : node.color }}>{node.icon}</div>
+                  </div>
+                  
+                  {/* Node Label */}
+                  <div className="mt-2 text-xs font-bold text-[#0F172A] bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-[#E9ECEF] shadow-sm whitespace-nowrap">
+                    {node.label}
+                  </div>
+
+                  {/* Popup */}
+                  <AnimatePresence>
+                    {hoveredNode === node.id && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                        className="absolute top-full mt-4 w-48 bg-[#0F172A] text-white p-4 rounded-2xl shadow-2xl z-50 pointer-events-none"
+                      >
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#0F172A] rotate-45"></div>
+                        <p className="text-xs leading-relaxed relative z-10">{node.desc}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Central Node */}
         <motion.div 
@@ -129,7 +195,7 @@ function InteractiveNetwork() {
           style={{ x: mouseX, y: mouseY }}
           className="absolute z-20 flex flex-col items-center justify-center"
         >
-          <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-white shadow-2xl border border-[#E9ECEF] flex flex-col items-center justify-center p-6 text-center group cursor-pointer overflow-hidden">
+          <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-white shadow-2xl border border-[#E9ECEF] flex flex-col items-center justify-center p-6 text-center group cursor-pointer overflow-hidden pointer-events-auto">
             <div className="absolute inset-0 bg-[#FF5722]/5 animate-[spin_10s_linear_infinite]"></div>
             <div className="absolute inset-0 rounded-full border-2 border-dashed border-[#FF5722]/20 animate-[spin_20s_linear_infinite_reverse]"></div>
             
@@ -141,61 +207,6 @@ function InteractiveNetwork() {
             </div>
           </div>
         </motion.div>
-
-        {/* Floating Nodes */}
-        {nodesData.map((node, i) => (
-          <motion.div
-            key={i}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={inView ? { scale: 1, opacity: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.8 + i * 0.1, type: "spring" }}
-            className="absolute z-30"
-            style={{ 
-              left: `${50 + node.x}%`, 
-              top: `${50 + node.y}%`,
-              x: useTransform(mouseX, val => val * (1 + i * 0.05)),
-              y: useTransform(mouseY, val => val * (1 + i * 0.05))
-            }}
-            onMouseEnter={() => setHoveredNode(node.id)}
-            onMouseLeave={() => setHoveredNode(null)}
-          >
-            <motion.div 
-              animate={{ y: [-4, 4, -4] }}
-              transition={{ duration: 4 + i % 3, repeat: Infinity, ease: "easeInOut" }}
-              className="relative group cursor-pointer flex flex-col items-center"
-            >
-              {/* Node Icon */}
-              <div 
-                className={cn(
-                  "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-xl border transition-all duration-300",
-                  hoveredNode === node.id ? "scale-125 bg-white border-[#FF5722]/50 shadow-[0_0_30px_rgba(255,87,34,0.3)]" : "bg-white/80 border-[#E9ECEF]"
-                )}
-              >
-                <div style={{ color: hoveredNode === node.id ? "#FF5722" : node.color }}>{node.icon}</div>
-              </div>
-              
-              {/* Node Label */}
-              <div className="mt-2 text-xs font-bold text-[#0F172A] bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-[#E9ECEF] shadow-sm whitespace-nowrap">
-                {node.label}
-              </div>
-
-              {/* Popup */}
-              <AnimatePresence>
-                {hoveredNode === node.id && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                    className="absolute top-full mt-4 w-48 bg-[#0F172A] text-white p-4 rounded-2xl shadow-2xl z-50 pointer-events-none"
-                  >
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#0F172A] rotate-45"></div>
-                    <p className="text-xs leading-relaxed relative z-10">{node.desc}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </motion.div>
-        ))}
 
         {/* Particles */}
         {[...Array(20)].map((_, i) => (
