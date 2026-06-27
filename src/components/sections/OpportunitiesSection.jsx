@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import { Link } from "react-router-dom";
 import { fadeUp, staggerContainer, fadeRight } from '../../lib/animations';
 import { cn } from '../../lib/utils';
 import { Badge, Tag } from '../ui/Misc';
@@ -199,12 +200,16 @@ function OpportunityCard({ opp }) {
         </div>
 
         <div className="flex items-center gap-2 mt-auto border-t border-[#E9ECEF] pt-4">
-          <Button variant="outline" className="flex-1 text-xs h-10 border-[#E9ECEF] text-[#0F172A] hover:border-[#0F172A]">
-            View Details
-          </Button>
-          <Button variant="primary" className="flex-1 text-xs h-10 shadow-md">
-            Apply
-          </Button>
+          <Link to="/signup" className="flex-1">
+            <Button variant="outline" className="w-full text-xs h-10 border-[#E9ECEF] text-[#0F172A] hover:border-[#0F172A]">
+              View Details
+            </Button>
+          </Link>
+          <Link to="/signup" className="flex-1">
+            <Button variant="primary" className="w-full text-xs h-10 shadow-md">
+              Apply
+            </Button>
+          </Link>
         </div>
       </div>
     </motion.div>
@@ -341,9 +346,11 @@ export default function OpportunitiesSection() {
               </div>
 
               <div className="flex items-center gap-4">
-                <Button variant="primary" className="h-14 px-10 text-base font-bold bg-[#FF5722] hover:bg-[#E64A19] border-none">
-                  Apply Now <ArrowRight size={18} className="ml-2" />
-                </Button>
+                <Link to="/signup">
+                  <Button variant="primary" className="h-14 px-10 text-base font-bold bg-[#FF5722] hover:bg-[#E64A19] border-none">
+                    Apply Now <ArrowRight size={18} className="ml-2" />
+                  </Button>
+                </Link>
                 <button className="h-14 w-14 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
                   <Bookmark size={20} />
                 </button>

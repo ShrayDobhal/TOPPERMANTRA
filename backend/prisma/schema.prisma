@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @id @default(uuid())
+  clerkId        String         @unique
+  email          String         @unique
+  fullName       String
+  profileImage   String?
+  bio            String?
+  college        String?
+  university     String?
+  branch         String?
+  year           String?
+  city           String?
+  state          String?
+  country        String?
+  careerGoal     String?
+  experienceLevel String?
+  linkedin       String?
+  github         String?
+  portfolio      String?
+  resume         String?
+  xp             Int            @default(0)
+  level          Int            @default(1)
+  streak         Int            @default(0)
+  communityScore Int            @default(0)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  interests      UserInterest[]
+  skills         UserSkill[]
+  notifications  Notification[]
+}
+
+model UserInterest {
+  id       String @id @default(uuid())
+  userId   String
+  interest String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserSkill {
+  id          String @id @default(uuid())
+  userId      String
+  skill       String
+  proficiency String?
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  description String
+  type        String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

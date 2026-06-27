@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Misc";
 import HeroVisualization from "../components/common/HeroVisualization";
@@ -73,12 +74,16 @@ export default function Home() {
 
             {/* CTAs */}
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-16">
-              <Button variant="primary" className="h-14 px-8 text-lg font-bold">
-                Start Your Journey
-              </Button>
-              <Button variant="outline" className="h-14 px-8 text-lg font-bold bg-white/50 backdrop-blur-sm">
-                Explore the Ecosystem
-              </Button>
+              <Link to="/signup">
+                <Button variant="primary" className="h-14 w-full sm:w-auto px-8 text-lg font-bold">
+                  Start Your Journey
+                </Button>
+              </Link>
+              <a href="#ecosystem">
+                <Button variant="outline" className="h-14 w-full sm:w-auto px-8 text-lg font-bold bg-white/50 backdrop-blur-sm">
+                  Explore the Ecosystem
+                </Button>
+              </a>
             </motion.div>
 
             {/* Trust Badges */}

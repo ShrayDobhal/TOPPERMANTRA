@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { 
   Trophy, Flame, Target, ChevronRight, CheckCircle2, Circle, 
   Search, Users, Briefcase, Calendar, Star, Clock, ArrowRight,
-  TrendingUp, Award, Activity
+  TrendingUp, Award, Activity, Loader2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import api from '../lib/api';
 
 // Mock Data
 const journeySteps = [
@@ -63,14 +65,54 @@ const staggerContainer = {
 };
 
 export default function Dashboard() {
+  const { data: dashboardData, isLoading, error } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: async () => {
+      try {
+        const response = await api.get('/dashboard');
+        return response.data.data;
+      } catch (err) {
+        // Fallback to mock data since backend is not connected yet
+        console.warn("Backend not available, using mock dashboard data");
+        return {
+          profile: { level: 2, streak: 5, careerGoal: 'Full Stack Developer', xp: 1250, communityScore: 450, progressPercentage: 65 },
+          todayTasks: initialTasks,
+          recommendations: recommendations
+        };
+      }
+    },
+    retry: false // Don't retry if it fails, just use mock data immediately
+  });
+
   const [tasks, setTasks] = useState(initialTasks);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 text-[#FF5722] animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <p className="text-red-500 font-bold mb-2">Error loading dashboard</p>
+        <p className="text-gray-500 text-sm">Please try refreshing the page.</p>
+      </div>
+    );
+  }
+
+  const profile = dashboardData?.profile || {};
+  const todayTasks = dashboardData?.todayTasks || tasks;
+  const recommended = dashboardData?.recommendations || recommendations;
 
   const toggleTask = (id) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
   };
 
-  const completedTasksCount = tasks.filter(t => t.completed).length;
-  const progressPercentage = Math.round((completedTasksCount / tasks.length) * 100);
+  const completedTasksCount = todayTasks.filter(t => t.completed).length;
+  const progressPercentage = profile.progressPercentage || Math.round((completedTasksCount / todayTasks.length) * 100) || 0;
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
@@ -100,7 +142,7 @@ export default function Dashboard() {
                 <span className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-1">Level</span>
                 <div className="flex items-center gap-1.5">
                   <Star size={16} className="text-[#F59E0B] fill-[#F59E0B]" />
-                  <span className="text-base font-bold text-[#0F172A]">8 Builder</span>
+                  <span className="text-base font-bold text-[#0F172A]">{profile.level || 1} Builder</span>
                 </div>
               </div>
               <div className="w-px bg-[#E9ECEF]"></div>
@@ -108,7 +150,7 @@ export default function Dashboard() {
                 <span className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-1">Streak</span>
                 <div className="flex items-center gap-1.5">
                   <Flame size={16} className="text-[#EF4444] fill-[#EF4444]" />
-                  <span className="text-base font-bold text-[#0F172A]">21 Days</span>
+                  <span className="text-base font-bold text-[#0F172A]">{profile.streak || 0} Days</span>
                 </div>
               </div>
             </div>
@@ -118,11 +160,11 @@ export default function Dashboard() {
             <div className="flex justify-between items-end mb-3">
               <div>
                 <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">Current Goal</p>
-                <p className="text-base font-bold text-[#0F172A]">AI Engineer</p>
+                <p className="text-base font-bold text-[#0F172A]">{profile.careerGoal || 'AI Engineer'}</p>
               </div>
               <div className="text-right">
-                <span className="text-2xl font-extrabold text-[#FF5722]">68%</span>
-                <p className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider">2450 XP</p>
+                <span className="text-2xl font-extrabold text-[#FF5722]">{progressPercentage}%</span>
+                <p className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider">{profile.xp || 0} XP</p>
               </div>
             </div>
             
@@ -218,7 +260,7 @@ export default function Dashboard() {
             </div>
             
             <div className="space-y-3 flex-1">
-              {tasks.map(task => (
+              {todayTasks.map(task => (
                 <div 
                   key={task.id} 
                   onClick={() => toggleTask(task.id)}
@@ -249,10 +291,10 @@ export default function Dashboard() {
           <motion.div variants={fadeUp} className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E9ECEF] shadow-sm flex flex-col">
             <h2 className="text-xl font-bold font-heading text-[#0F172A] mb-6">Recommended For You</h2>
             <div className="space-y-4 flex-1">
-              {recommendations.map((rec, i) => (
+              {recommended.map((rec, i) => (
                 <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-[#E9ECEF] hover:shadow-md transition-shadow group cursor-pointer bg-white">
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", rec.bg, rec.color)}>
-                    {rec.icon}
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", rec.bg || 'bg-blue-50', rec.color || 'text-blue-500')}>
+                    {rec.icon || <Star size={16} />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{rec.type}</p>
@@ -289,7 +331,7 @@ export default function Dashboard() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF5722]/20 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
             <div className="relative z-10">
               <span className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider block mb-1">Community Score</span>
-              <span className="text-3xl font-extrabold text-[#FF5722]">620<span className="text-lg text-white/50 ml-1">pts</span></span>
+              <span className="text-3xl font-extrabold text-[#FF5722]">{profile.communityScore || 0}<span className="text-lg text-white/50 ml-1">pts</span></span>
             </div>
             <div className="relative z-10 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
               <TrendingUp size={24} className="text-[#22C55E]" />

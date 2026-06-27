@@ -125,7 +125,7 @@ export default function Header() {
           <Link to="/login" className="text-[15px] font-sans font-bold text-[#64748B] hover:text-[#0F172A] transition-colors px-4 py-2">
             Login
           </Link>
-          <Link to="/join">
+          <Link to="/signup">
             <Button variant="primary" className="py-2.5 px-6 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] hover:shadow-[0_6px_20px_rgba(255,87,34,0.23)]">
               Join Ecosystem
             </Button>
@@ -169,7 +169,7 @@ export default function Header() {
                 <Link to="/login" onClick={() => setMobileOpen(false)} className="text-center font-bold text-[#64748B] py-2 hover:text-[#0F172A] transition-colors">
                   Login
                 </Link>
-                <Link to="/join" onClick={() => setMobileOpen(false)}>
+                <Link to="/signup" onClick={() => setMobileOpen(false)}>
                   <Button variant="primary" className="w-full h-12 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)]">Join Ecosystem</Button>
                 </Link>
               </div>

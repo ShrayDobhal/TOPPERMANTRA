@@ -9,9 +9,8 @@ import {
 import { cn } from '../lib/utils';
 
 const sidebarLinks = [
-  { icon: <Home size={20} />, label: "Dashboard", path: "/dashboard" },
   { icon: <Compass size={20} />, label: "My Journey", path: "/dashboard/journey" },
-  { icon: <Map size={20} />, label: "Roadmaps", path: "/dashboard/roadmaps" },
+  { icon: <Home size={20} />, label: "Dashboard", path: "/dashboard" },
   { icon: <Briefcase size={20} />, label: "Projects", path: "/dashboard/projects" },
   { icon: <Users size={20} />, label: "Mentors", path: "/dashboard/mentors" },
   { icon: <Target size={20} />, label: "Opportunities", path: "/dashboard/opportunities" },
@@ -68,7 +67,9 @@ export default function DashboardLayout() {
         <div className="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">
           <div className="space-y-1">
             {sidebarLinks.map((link) => {
-              const isActive = location.pathname === link.path;
+              const isActive = link.path === '/dashboard' 
+                ? location.pathname === '/dashboard' 
+                : location.pathname.startsWith(link.path);
               return (
                 <Link
                   key={link.path}

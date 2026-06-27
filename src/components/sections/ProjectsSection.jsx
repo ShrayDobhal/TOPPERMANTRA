@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import { Link } from "react-router-dom";
 import { fadeUp, staggerContainer, fadeRight, scaleIn } from '../../lib/animations';
 import { cn } from '../../lib/utils';
 import { Badge, AnimatedCounter, Tag } from '../ui/Misc';
@@ -226,17 +227,19 @@ function ProjectModal({ project, onClose }) {
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1 flex items-center justify-center gap-2">
+                <Button variant="outline" className="flex-1 flex items-center justify-center gap-2" onClick={() => window.location.href='/signup'}>
                   <GitBranch size={16} /> Repo
                 </Button>
-                <Button variant="outline" className="flex-1 flex items-center justify-center gap-2">
+                <Button variant="outline" className="flex-1 flex items-center justify-center gap-2" onClick={() => window.location.href='/signup'}>
                   <ExternalLink size={16} /> Demo
                 </Button>
               </div>
 
-              <Button variant="primary" className="w-full" disabled={project.openPositions === 0}>
-                {project.openPositions > 0 ? "Apply to Join Team" : "Team Full"}
-              </Button>
+              <Link to="/signup" className="w-full block">
+                <Button variant="primary" className="w-full" disabled={project.openPositions === 0}>
+                  {project.openPositions > 0 ? "Apply to Join Team" : "Team Full"}
+                </Button>
+              </Link>
             </div>
           </div>
         </motion.div>
@@ -484,12 +487,16 @@ export default function ProjectsSection() {
             Join projects, collaborate with talented students, receive mentor guidance and build products that demonstrate your abilities.
           </motion.p>
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 relative z-10 w-full sm:w-auto">
-            <Button variant="primary" className="h-14 px-8 text-lg font-bold w-full sm:w-auto">
-              Explore Projects
-            </Button>
-            <Button variant="outline" className="h-14 px-8 text-lg font-bold w-full sm:w-auto bg-white hover:bg-[#E9ECEF]/50">
-              Start Your Own Project
-            </Button>
+            <Link to="/signup" className="w-full sm:w-auto">
+              <Button variant="primary" className="h-14 px-8 text-lg font-bold w-full sm:w-auto">
+                Explore Projects
+              </Button>
+            </Link>
+            <Link to="/signup" className="w-full sm:w-auto">
+              <Button variant="outline" className="h-14 px-8 text-lg font-bold w-full sm:w-auto bg-white hover:bg-[#E9ECEF]/50">
+                Start Your Own Project
+              </Button>
+            </Link>
           </motion.div>
         </motion.div>
 
