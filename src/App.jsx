@@ -6,14 +6,11 @@ import { setTokenProvider } from './lib/api'
 import MainLayout from './layouts/MainLayout'
 import DashboardLayout from './layouts/DashboardLayout'
 import Home from './pages/Home'
-import About from './pages/About'
 import Mentors from './pages/Mentors'
-import Community from './pages/Community'
-import Hackathons from './pages/Hackathons'
 import Projects from './pages/Projects'
-import Entrepreneurship from './pages/Entrepreneurship'
-import Opportunities from './pages/Opportunities'
-import Dashboard from './pages/Dashboard'
+import Community from './pages/Community'
+import Discover from './pages/Discover'
+import Dashboard from './modules/dashboard/pages/Dashboard'
 import Contact from './pages/Contact'
 import Login from './pages/auth/Login'
 import Signup from './pages/auth/Signup'
@@ -22,14 +19,29 @@ import ResetPassword from './pages/auth/ResetPassword'
 import VerifyEmail from './pages/auth/VerifyEmail'
 import Welcome from './pages/onboarding/Welcome'
 import Onboarding from './pages/onboarding/Onboarding'
-import Journey from './pages/Journey'
-import ProjectHub from './pages/projects/ProjectHub'
-import ProjectDetail from './pages/projects/ProjectDetail'
-import ProjectBoard from './pages/projects/ProjectBoard'
-import CommunityHub from './pages/community/CommunityHub'
-import CommunityDetail from './pages/community/CommunityDetail'
-import DiscussionDetail from './pages/community/DiscussionDetail'
-import ComingSoon from './pages/dashboard/ComingSoon'
+import Journey from './modules/journey/pages/Journey'
+import ProjectHub from './modules/projects/pages/ProjectHub'
+import ProjectWorkspace from './modules/projects/pages/ProjectWorkspace'
+import ProjectLayout from './modules/projects/layouts/ProjectLayout'
+import ProjectDetail from './modules/projects/pages/ProjectDetail'
+import ProjectCreationWizard from './modules/projects/pages/ProjectCreationWizard'
+import CommunityHub from './modules/community/pages/CommunityHub'
+import CommunitySpace from './modules/community/pages/CommunitySpace'
+import CommunityLayout from './modules/community/layouts/CommunityLayout'
+import SpaceWorkspace from './modules/spaces/pages/SpaceWorkspace'
+import SpaceLayout from './modules/spaces/layouts/SpaceLayout'
+import DiscoverLayout from './modules/opportunities/layouts/DiscoverLayout'
+import DiscoverHub from './modules/opportunities/pages/DiscoverHub'
+import OpportunityDetail from './modules/opportunities/pages/OpportunityDetail'
+import ApplicationTracker from './modules/opportunities/pages/ApplicationTracker'
+import MentorLayout from './modules/mentors/layouts/MentorLayout'
+import MentorHub from './modules/mentors/pages/MentorHub'
+import SessionDashboard from './modules/mentors/pages/SessionDashboard'
+import MentorProfile from './modules/mentors/pages/MentorProfile'
+import PortfolioDashboard from './modules/portfolio/pages/PortfolioDashboard'
+import ResumeBuilder from './modules/portfolio/pages/ResumeBuilder'
+import PublicProfile from './modules/portfolio/pages/PublicProfile'
+import ComingSoon from './components/shared/ComingSoon'
 
 export default function App() {
   const { getToken } = useAuth();
@@ -44,13 +56,13 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
-          <Route path="about" element={<About />} />
           <Route path="mentors" element={<Mentors />} />
-          <Route path="community" element={<Community />} />
-          <Route path="hackathons" element={<Hackathons />} />
           <Route path="projects" element={<Projects />} />
-          <Route path="entrepreneurship" element={<Entrepreneurship />} />
-          <Route path="opportunities" element={<Opportunities />} />
+          <Route path="projects/:id" element={<ProjectDetail />} />
+          <Route path="community" element={<Community />} />
+          <Route path="discover" element={<Discover />} />
+          <Route path="discover/:id" element={<OpportunityDetail />} />
+          {/* Public routes only */}
           <Route path="contact" element={<Contact />} />
         </Route>
 
@@ -65,32 +77,47 @@ export default function App() {
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/onboarding" element={<Onboarding />} />
 
+        {/* Standalone Dashboard/Project Routes */}
+        <Route path="/dashboard/projects/create" element={<ProjectCreationWizard />} />
+        <Route path="/dashboard/projects/:id" element={<ProjectWorkspace />} />
+
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="journey" element={<Journey />} />
-          <Route path="projects">
+          <Route path="projects" element={<ProjectLayout />}>
             <Route index element={<ProjectHub />} />
-            <Route path=":id" element={<ProjectDetail />} />
-            <Route path=":id/board" element={<ProjectBoard />} />
           </Route>
-          <Route path="community">
+          <Route path="community" element={<CommunityLayout />}>
             <Route index element={<CommunityHub />} />
-            <Route path="c/:id" element={<CommunityDetail />} />
-            <Route path="post/:id" element={<DiscussionDetail />} />
+            <Route path="c/:id" element={<CommunitySpace />} />
+          </Route>
+          <Route path="spaces" element={<SpaceLayout />}>
+            <Route path=":id" element={<SpaceWorkspace />} />
           </Route>
           
           {/* Coming Soon / Placeholder Routes */}
-          <Route path="mentors" element={<ComingSoon />} />
-          <Route path="opportunities" element={<ComingSoon />} />
+          <Route path="mentors" element={<MentorLayout />}>
+            <Route index element={<MentorHub />} />
+            <Route path="sessions" element={<SessionDashboard />} />
+            <Route path=":id" element={<MentorProfile />} />
+          </Route>
+          <Route path="opportunities" element={<DiscoverLayout />}>
+            <Route index element={<DiscoverHub />} />
+            <Route path="tracker" element={<ApplicationTracker />} />
+            <Route path=":id" element={<OpportunityDetail />} />
+          </Route>
           <Route path="hackathons" element={<ComingSoon />} />
-          <Route path="portfolio" element={<ComingSoon />} />
-          <Route path="resume" element={<ComingSoon />} />
+          <Route path="portfolio" element={<PortfolioDashboard />} />
+          <Route path="resume" element={<ResumeBuilder />} />
           <Route path="certificates" element={<ComingSoon />} />
           <Route path="events" element={<ComingSoon />} />
           <Route path="messages" element={<ComingSoon />} />
           <Route path="notifications" element={<ComingSoon />} />
           <Route path="settings" element={<ComingSoon />} />
         </Route>
+
+        {/* Public Portfolio Route */}
+        <Route path="/@:username" element={<PublicProfile />} />
       </Routes>
     </Router>
   )

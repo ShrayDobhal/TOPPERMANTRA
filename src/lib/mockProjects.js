@@ -1,121 +1,154 @@
 export const mockProjects = [
   {
-    id: "proj-1",
-    title: "EcoVision AI",
-    tagline: "AI-powered waste management classification and tracking system.",
-    description: "EcoVision is an open-source project aimed at helping municipalities automatically classify waste using computer vision. Built with PyTorch and React, it features real-time classification, a dashboard for tracking analytics, and a mobile app for citizens to report illegal dumping.",
-    coverImage: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=800",
-    category: "Artificial Intelligence",
-    difficulty: "Advanced",
-    status: "in-progress",
-    technologies: ["React", "Python", "PyTorch", "Node.js", "MongoDB"],
-    duration: "12 Weeks",
-    likes: 342,
-    bookmarks: 89,
-    githubUrl: "https://github.com/toppermantra/ecovision",
-    demoUrl: "https://ecovision.demo.com",
-    githubStats: {
-      stars: 128,
-      forks: 34,
-      issues: 12,
-      commits: 456
-    },
-    team: [
-      { name: "Shray Dobhal", role: "Owner & AI Engineer", avatar: "S" },
-      { name: "Priya Singh", role: "Frontend Developer", avatar: "P" },
-      { name: "Rahul Sharma", role: "Data Scientist", avatar: "R" }
+    id: "p1",
+    title: "AI Resume Analyzer",
+    shortDescription: "An ATS-friendly resume scanner that uses LLMs to provide actionable feedback for tier-3 college students.",
+    bannerUrl: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80",
+    techStack: ["React", "FastAPI", "OpenAI", "PostgreSQL"],
+    domain: "AI", // AI, Web Development, Cyber Security, etc.
+    difficulty: "Advanced", // Beginner, Intermediate, Advanced
+    status: "Recruiting", // Recruiting, In Progress, Completed
+    category: "Featured Projects", // Featured, Startup, Hackathon, Open Source, etc.
+    mentor: { name: "Rahul Sharma", role: "IIT Delhi Alumni", avatar: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=150" },
+    organization: "Topper Mantra Labs",
+    teamSize: { current: 6, max: 10 },
+    openRoles: ["Frontend Developer", "AI Engineer", "UI/UX Designer"],
+    progress: 78, // percentage
+    estimatedCompletion: "Nov 2026",
+    metrics: { stars: 245, views: 1200, bookmarks: 89 },
+    overview: "Tier-3 college students often face immediate rejection by Applicant Tracking Systems (ATS) because they don't know how to format their resumes or use the right keywords. We are building an open-source tool that simulates a FAANG ATS and provides direct, actionable feedback powered by OpenAI.",
+    problemStatement: "Over 80% of student resumes are rejected before human review. Existing tools are expensive or generic. We need a free, highly specialized tool for tech roles.",
+    github: "github.com/toppermantra/ai-resume",
+    tasks: [
+      { id: "t1", title: "Setup FastAPI backend", status: "Completed", assignee: "Rahul S." },
+      { id: "t2", title: "Integrate OpenAI structured outputs", status: "In Progress", assignee: "Priya D." },
+      { id: "t3", title: "Design Landing Page", status: "To Do", assignee: "Unassigned" },
     ],
-    openRoles: [
-      { role: "UX Designer", description: "Design the citizen mobile app interfaces." },
-      { role: "Backend Developer", description: "Help scale the Node.js API." }
-    ],
-    mentors: [
-      { name: "Dr. Arvind Gupta", role: "AI Researcher at Microsoft" }
-    ],
-    milestones: [
-      { title: "Dataset Collection", status: "completed", date: "Oct 1" },
-      { title: "Model Training", status: "completed", date: "Oct 15" },
-      { title: "API Integration", status: "in-progress", date: "Nov 5" },
-      { title: "Beta Launch", status: "pending", date: "Dec 1" }
+    members: [
+      { name: "Priya Das", role: "Backend Lead", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" },
+      { name: "Karan Singh", role: "Fullstack", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" },
     ]
   },
   {
-    id: "proj-2",
-    title: "CampusConnect",
-    tagline: "A unified social network for college campus events and clubs.",
-    description: "CampusConnect solves the problem of fragmented communication across WhatsApp, Telegram, and Discord by providing a single platform for all college clubs to post events, manage memberships, and broadcast announcements.",
-    coverImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800",
-    category: "Web Development",
+    id: "p2",
+    title: "OpenCampus Decentralized Voting",
+    shortDescription: "A blockchain-based secure voting system for university student council elections.",
+    bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f4fc083?auto=format&fit=crop&w=800&q=80",
+    techStack: ["Solidity", "Next.js", "Ethers.js", "Tailwind"],
+    domain: "Blockchain",
     difficulty: "Intermediate",
-    status: "completed",
-    technologies: ["Next.js", "TailwindCSS", "Supabase", "Vercel"],
-    duration: "8 Weeks",
-    likes: 512,
-    bookmarks: 145,
-    githubUrl: "https://github.com/toppermantra/campusconnect",
-    demoUrl: "https://campusconnect.demo.com",
-    githubStats: {
-      stars: 45,
-      forks: 12,
-      issues: 3,
-      commits: 210
-    },
-    team: [
-      { name: "Ananya Patel", role: "Full Stack Developer", avatar: "A" },
-      { name: "Karan Mehta", role: "UI/UX Designer", avatar: "K" }
-    ],
+    status: "In Progress",
+    category: "Hackathon Projects",
+    mentor: { name: "Neha Kapoor", role: "Web3 Researcher", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" },
+    organization: "ETHIndia Build",
+    teamSize: { current: 4, max: 4 },
     openRoles: [],
-    mentors: [],
-    milestones: [
-      { title: "Design System", status: "completed", date: "Aug 10" },
-      { title: "Auth & DB Setup", status: "completed", date: "Aug 20" },
-      { title: "Feed Implementation", status: "completed", date: "Sep 5" },
-      { title: "Production Launch", status: "completed", date: "Sep 20" }
-    ]
+    progress: 95,
+    estimatedCompletion: "Oct 2026",
+    metrics: { stars: 120, views: 500, bookmarks: 34 },
+    overview: "College elections are often plagued by inefficiencies and lack of transparency. OpenCampus uses smart contracts to ensure 100% transparent and immutable voting records.",
+    problemStatement: "Provide a trustless system for student elections.",
+    github: "github.com/opencampus/voting",
+    tasks: [],
+    members: []
   },
   {
-    id: "proj-3",
-    title: "DeFi Locker",
-    tagline: "Secure smart contract for time-locked crypto assets.",
-    description: "A decentralized application (dApp) that allows users to lock their ERC-20 tokens for a specific period. Useful for team token vesting and forced hodling.",
-    coverImage: "https://images.unsplash.com/photo-1639762681485-074b7f4ec67e?auto=format&fit=crop&q=80&w=800",
-    category: "Blockchain",
+    id: "p3",
+    title: "EcoTrack Mobile App",
+    shortDescription: "React Native app that helps users track their carbon footprint through gamification.",
+    bannerUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80",
+    techStack: ["React Native", "Firebase", "Node.js"],
+    domain: "App Development",
+    difficulty: "Beginner",
+    status: "Recruiting",
+    category: "Open Source",
+    mentor: { name: "Arjun Reddy", role: "Startup Founder", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150" },
+    organization: "GreenTech Open Source",
+    teamSize: { current: 2, max: 5 },
+    openRoles: ["Mobile Developer", "QA Tester"],
+    progress: 15,
+    estimatedCompletion: "Jan 2027",
+    metrics: { stars: 89, views: 300, bookmarks: 12 },
+    overview: "Making climate action fun and engaging through daily challenges, leaderboards, and real-world rewards.",
+    problemStatement: "Climate apps are boring. We need gamification to drive habit changes.",
+    github: "github.com/greentech/ecotrack",
+    tasks: [],
+    members: []
+  },
+  {
+    id: "p4",
+    title: "NeuraDesk - AI Customer Support",
+    shortDescription: "An intelligent customer support ticket router that classifies and auto-responds to common queries.",
+    bannerUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+    techStack: ["Python", "FastAPI", "HuggingFace", "React"],
+    domain: "Machine Learning",
     difficulty: "Advanced",
-    status: "in-progress",
-    technologies: ["Solidity", "React", "Hardhat", "Ethers.js"],
-    duration: "6 Weeks",
-    likes: 189,
-    bookmarks: 45,
-    githubUrl: "https://github.com/toppermantra/defilocker",
-    demoUrl: null,
-    githubStats: {
-      stars: 89,
-      forks: 22,
-      issues: 8,
-      commits: 134
-    },
-    team: [
-      { name: "Vikram Reddy", role: "Smart Contract Dev", avatar: "V" }
-    ],
-    openRoles: [
-      { role: "Frontend Developer", description: "Build the Web3 integration UI." },
-      { role: "Smart Contract Auditor", description: "Review Solidity code for vulnerabilities." }
-    ],
-    mentors: [],
-    milestones: [
-      { title: "Contract Writing", status: "completed", date: "Nov 1" },
-      { title: "Testnet Deployment", status: "in-progress", date: "Nov 15" },
-      { title: "Frontend Integration", status: "pending", date: "Nov 25" }
-    ]
+    status: "Recruiting",
+    category: "Startup Projects",
+    mentor: { name: "Sneha Iyer", role: "AI Engineer", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" },
+    organization: "NeuraDesk Startup",
+    teamSize: { current: 1, max: 4 },
+    openRoles: ["Frontend Dev", "DevOps"],
+    progress: 30,
+    estimatedCompletion: "Dec 2026",
+    metrics: { stars: 156, views: 800, bookmarks: 45 },
+    overview: "Small businesses struggle to manage customer support tickets. NeuraDesk uses fine-tuned LLMs to automatically categorize tickets and draft responses, saving up to 60% of agent time.",
+    problemStatement: "High volume of repetitive support queries overwhelms small teams.",
+    github: "github.com/neuradesk/core",
+    tasks: [],
+    members: []
+  },
+  {
+    id: "p5",
+    title: "CryptoWallet UI Kit",
+    shortDescription: "A comprehensive open-source UI kit for Web3 applications built with React and Tailwind.",
+    bannerUrl: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80",
+    techStack: ["React", "TailwindCSS", "Figma", "Storybook"],
+    domain: "Design",
+    difficulty: "Beginner",
+    status: "In Progress",
+    category: "Open Source",
+    mentor: { name: "Rahul Sharma", role: "Frontend Lead", avatar: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=150" },
+    organization: "Web3 Designers",
+    teamSize: { current: 3, max: 5 },
+    openRoles: ["UI Designer", "Technical Writer"],
+    progress: 60,
+    estimatedCompletion: "Aug 2026",
+    metrics: { stars: 890, views: 2500, bookmarks: 120 },
+    overview: "Building Web3 apps is hard enough. Developers shouldn't have to rebuild wallet connection modals and token swap interfaces from scratch. This library provides highly customizable, accessible components.",
+    problemStatement: "Lack of standardized, accessible UI components in Web3.",
+    github: "github.com/web3designers/ui-kit",
+    tasks: [],
+    members: []
+  },
+  {
+    id: "p6",
+    title: "Campus Marketplace",
+    shortDescription: "A platform for college students to buy and sell used books, electronics, and furniture securely.",
+    bannerUrl: "https://images.unsplash.com/photo-1555529771-835f59fc5efe?auto=format&fit=crop&w=800&q=80",
+    techStack: ["Next.js", "Supabase", "Prisma", "Stripe"],
+    domain: "Web Development",
+    difficulty: "Intermediate",
+    status: "Completed",
+    category: "Featured Projects",
+    mentor: { name: "Arjun Reddy", role: "Founder", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" },
+    organization: "CampusConnect",
+    teamSize: { current: 4, max: 4 },
+    openRoles: [],
+    progress: 100,
+    estimatedCompletion: "Completed",
+    metrics: { stars: 320, views: 4100, bookmarks: 210 },
+    overview: "An escrow-based marketplace designed exclusively for students with verified university email addresses, ensuring a safe and scam-free environment.",
+    problemStatement: "Students get scammed on Facebook Marketplace and OLX. We need a trusted local ecosystem.",
+    github: "github.com/campusconnect/marketplace",
+    tasks: [],
+    members: []
   }
 ];
 
-export const mockTasks = [
-  { id: "task-1", title: "Setup Project Repository", status: "completed", priority: "High", assignee: "Shray Dobhal" },
-  { id: "task-2", title: "Design Database Schema", status: "completed", priority: "High", assignee: "Rahul Sharma" },
-  { id: "task-3", title: "Implement Auth Flow", status: "in-progress", priority: "High", assignee: "Priya Singh" },
-  { id: "task-4", title: "Create Dashboard UI", status: "todo", priority: "Medium", assignee: "Priya Singh" },
-  { id: "task-5", title: "Write API Documentation", status: "backlog", priority: "Low", assignee: "Unassigned" },
-  { id: "task-6", title: "Train ResNet50 Model", status: "in-progress", priority: "High", assignee: "Shray Dobhal" },
-  { id: "task-7", title: "Code Review: Auth PR", status: "review", priority: "High", assignee: "Rahul Sharma" }
-];
+export const projectFilters = {
+  domains: ["AI", "Machine Learning", "Web Development", "App Development", "Cyber Security", "Blockchain", "Cloud", "IoT", "Robotics", "Design"],
+  difficulties: ["Beginner", "Intermediate", "Advanced"],
+  statuses: ["Recruiting", "In Progress", "Completed"],
+  categories: ["Featured Projects", "Recruiting Now", "Startup Projects", "Hackathon Projects", "Open Source", "Research Projects", "Industry Projects", "Trending This Week"]
+};

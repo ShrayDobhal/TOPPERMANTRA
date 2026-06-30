@@ -1,178 +1,127 @@
 import { motion } from 'framer-motion';
-import { Check, Lock, Play, Circle, BookOpen, Code, Briefcase, FileText, Send, UserCheck, Star, Sparkles } from 'lucide-react';
+import { CheckCircle2, Circle, Lock, Play, Trophy, Users, Briefcase } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
+const roadmapSteps = [
+  { id: 1, title: 'Profile Complete', type: 'setup', status: 'completed', desc: 'Added details and goals.', xp: 50 },
+  { id: 2, title: 'Career Selected', type: 'setup', status: 'completed', desc: 'AI Engineer track chosen.', xp: 50 },
+  { id: 3, title: 'Python Basics', type: 'learning', status: 'completed', desc: 'Mastered core syntax and data structures.', xp: 200 },
+  { id: 4, title: 'Git & GitHub', type: 'learning', status: 'completed', desc: 'Version control fundamentals.', xp: 150 },
+  { id: 5, title: 'Build Portfolio Website', type: 'project', status: 'in-progress', desc: 'Showcase your skills online.', xp: 300 },
+  { id: 6, title: 'Complete AI Project', type: 'project', status: 'locked', desc: 'Resume Analyzer with NLP.', xp: 500 },
+  { id: 7, title: 'Participate in Hackathon', type: 'community', status: 'locked', desc: 'Test your skills under pressure.', xp: 400 },
+  { id: 8, title: 'Get Mentor Review', type: 'mentorship', status: 'locked', desc: 'Feedback from a senior engineer.', xp: 150 },
+  { id: 9, title: 'Apply Internship', type: 'career', status: 'locked', desc: 'Land your first tech role.', xp: 500 },
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
+
 export default function JourneyTimeline() {
-  const modules = [
-    {
-      id: "foundation",
-      title: "Foundation",
-      status: "completed", // completed, in-progress, locked
-      icon: <BookOpen size={20} />,
-      estimatedTime: "2 Weeks",
-      xpReward: 500,
-      milestones: [
-        { label: "Profile Complete", status: "completed" },
-        { label: "Choose Career Goal", status: "completed" },
-        { label: "Tech Industry 101", status: "completed" },
-      ]
-    },
-    {
-      id: "programming",
-      title: "Programming",
-      status: "in-progress",
-      icon: <Code size={20} />,
-      estimatedTime: "8 Weeks",
-      xpReward: 1200,
-      milestones: [
-        { label: "JavaScript Fundamentals", status: "in-progress" },
-        { label: "Data Structures & Algorithms", status: "locked" },
-        { label: "React JS Basics", status: "locked" },
-      ]
-    },
-    {
-      id: "projects",
-      title: "Projects",
-      status: "locked",
-      icon: <Briefcase size={20} />,
-      estimatedTime: "6 Weeks",
-      xpReward: 2000,
-      milestones: [
-        { label: "Build Portfolio Website", status: "locked" },
-        { label: "API Integration Project", status: "locked" },
-        { label: "Full Stack App", status: "locked" },
-      ]
-    },
-    {
-      id: "resume",
-      title: "Resume & Portfolio",
-      status: "locked",
-      icon: <FileText size={20} />,
-      estimatedTime: "2 Weeks",
-      xpReward: 800,
-      milestones: [
-        { label: "Draft V1 Resume", status: "locked" },
-        { label: "ATS Optimization", status: "locked" },
-        { label: "Update GitHub Profile", status: "locked" },
-      ]
-    },
-    {
-      id: "networking",
-      title: "Networking",
-      status: "locked",
-      icon: <UserCheck size={20} />,
-      estimatedTime: "Ongoing",
-      xpReward: 1500,
-      milestones: [
-        { label: "Optimize LinkedIn", status: "locked" },
-        { label: "Connect with 50 Peers", status: "locked" },
-        { label: "Receive Mentor Feedback", status: "locked" },
-      ]
-    },
-    {
-      id: "placement",
-      title: "Placement",
-      status: "locked",
-      icon: <Sparkles size={20} />,
-      estimatedTime: "4 Weeks",
-      xpReward: 5000,
-      milestones: [
-        { label: "Apply to 50 Jobs", status: "locked" },
-        { label: "Mock Interviews", status: "locked" },
-        { label: "Get Offer", status: "locked" },
-      ]
-    }
-  ];
-
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E9ECEF] shadow-sm">
-      <h2 className="text-xl font-bold font-heading text-[#0F172A] mb-8">Your Journey</h2>
-      
-      <div className="relative">
-        {/* Main Vertical Line */}
-        <div className="absolute left-[27px] sm:left-[35px] top-6 bottom-6 w-0.5 bg-[#F1F5F9] rounded-full" />
-        
-        <div className="space-y-8">
-          {modules.map((mod, index) => {
-            const isCompleted = mod.status === 'completed';
-            const isInProgress = mod.status === 'in-progress';
-            const isLocked = mod.status === 'locked';
-
-            return (
-              <motion.div 
-                key={mod.id}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={cn("relative z-10 flex gap-4 sm:gap-6", isLocked && "opacity-60 grayscale")}
-              >
-                {/* Module Icon Indicator */}
-                <div className={cn(
-                  "w-[54px] h-[54px] sm:w-[70px] sm:h-[70px] shrink-0 rounded-2xl flex items-center justify-center border-4 border-white shadow-sm transition-all duration-300 relative",
-                  isCompleted ? "bg-[#10B981] text-white" : 
-                  isInProgress ? "bg-[#FF5722] text-white shadow-lg shadow-[#FF5722]/30 scale-110" : 
-                  "bg-[#F1F5F9] text-[#94A3B8]"
-                )}>
-                  {isInProgress && (
-                    <span className="absolute inset-0 rounded-2xl bg-[#FF5722] animate-ping opacity-20"></span>
-                  )}
-                  {mod.icon}
-                </div>
-
-                {/* Module Content */}
-                <div className="flex-1 pt-1 sm:pt-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-[#0F172A]">{mod.title}</h3>
-                      <div className="flex items-center gap-3 mt-1 text-xs font-bold text-[#64748B] uppercase tracking-wider">
-                        <span>{mod.estimatedTime}</span>
-                        <span className="w-1 h-1 rounded-full bg-[#CBD5E1]"></span>
-                        <span className="text-[#FF5722]">{mod.xpReward} XP</span>
-                      </div>
-                    </div>
-                    {isInProgress && (
-                      <button className="self-start sm:self-center px-4 py-2 bg-[#FF5722]/10 text-[#FF5722] text-xs font-bold rounded-lg hover:bg-[#FF5722] hover:text-white transition-colors">
-                        Continue
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Milestones */}
-                  <div className="space-y-3 bg-[#F8FAFC] rounded-xl p-4 sm:p-5 border border-[#E9ECEF]">
-                    {mod.milestones.map((milestone, mIndex) => (
-                      <div key={mIndex} className="flex items-start gap-3">
-                        <div className="mt-0.5 shrink-0">
-                          {milestone.status === 'completed' ? (
-                            <div className="w-5 h-5 rounded-full bg-[#10B981] flex items-center justify-center text-white">
-                              <Check size={12} strokeWidth={3} />
-                            </div>
-                          ) : milestone.status === 'in-progress' ? (
-                            <div className="w-5 h-5 rounded-full border-2 border-[#FF5722] flex items-center justify-center">
-                              <div className="w-2 h-2 rounded-full bg-[#FF5722] animate-pulse"></div>
-                            </div>
-                          ) : (
-                            <div className="w-5 h-5 rounded-full bg-[#E2E8F0] flex items-center justify-center text-[#94A3B8]">
-                              <Lock size={10} />
-                            </div>
-                          )}
-                        </div>
-                        <span className={cn(
-                          "text-sm font-semibold",
-                          milestone.status === 'completed' ? "text-[#64748B] line-through decoration-[#94A3B8]/50" :
-                          milestone.status === 'in-progress' ? "text-[#0F172A]" : "text-[#94A3B8]"
-                        )}>
-                          {milestone.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+    <div className="bg-white rounded-[32px] p-6 sm:p-10 border border-[#E9ECEF] shadow-sm relative">
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <h2 className="text-2xl font-bold font-heading text-[#0F172A] mb-1">Roadmap</h2>
+          <p className="text-sm font-semibold text-[#64748B]">Your personalized path to success.</p>
         </div>
       </div>
+
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="relative"
+      >
+        {/* Vertical Track */}
+        <div className="absolute left-[27px] top-4 bottom-8 w-1.5 bg-[#F1F5F9] rounded-full z-0"></div>
+        {/* Animated Fill for completed steps */}
+        <motion.div 
+          initial={{ height: 0 }}
+          whileInView={{ height: '45%' }} // Approximation based on 4 completed steps out of 9
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          viewport={{ once: true }}
+          className="absolute left-[27px] top-4 w-1.5 bg-gradient-to-b from-[#22C55E] via-[#22C55E] to-[#FF5722] rounded-full z-0"
+        ></motion.div>
+
+        <div className="space-y-8 relative z-10">
+          {roadmapSteps.map((step, i) => (
+            <motion.div key={step.id} variants={itemVariants} className="flex gap-6 group">
+              
+              {/* Icon / Status */}
+              <div className="shrink-0 relative">
+                <div className={cn(
+                  "w-14 h-14 rounded-2xl flex items-center justify-center border-4 border-white shadow-sm transition-all duration-300",
+                  step.status === 'completed' ? "bg-[#22C55E] text-white" :
+                  step.status === 'in-progress' ? "bg-[#FF5722] text-white shadow-[0_0_20px_rgba(255,87,34,0.3)] scale-110" :
+                  "bg-[#F1F5F9] text-[#94A3B8]"
+                )}>
+                  {step.status === 'completed' ? <CheckCircle2 size={24} /> :
+                   step.status === 'in-progress' ? <Play size={24} className="fill-current ml-1" /> :
+                   <Lock size={20} />}
+                </div>
+                
+                {/* Pulse ring for in-progress */}
+                {step.status === 'in-progress' && (
+                  <div className="absolute inset-0 rounded-2xl border-2 border-[#FF5722] animate-ping opacity-20 scale-110"></div>
+                )}
+              </div>
+
+              {/* Content Card */}
+              <div className={cn(
+                "flex-1 p-5 rounded-2xl border transition-all duration-300",
+                step.status === 'completed' ? "bg-white border-[#E9ECEF] group-hover:border-[#22C55E]/30" :
+                step.status === 'in-progress' ? "bg-[#FF5722]/5 border-[#FF5722]/30" :
+                "bg-[#F8FAFC] border-transparent"
+              )}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
+                      step.status === 'completed' ? "bg-[#22C55E]/10 text-[#22C55E]" :
+                      step.status === 'in-progress' ? "bg-[#FF5722]/10 text-[#FF5722]" :
+                      "bg-[#E2E8F0] text-[#64748B]"
+                    )}>
+                      {step.type}
+                    </span>
+                    {step.status === 'in-progress' && (
+                      <span className="text-[10px] font-bold text-[#FF5722] animate-pulse flex items-center gap-1">
+                        <Circle size={8} className="fill-current" /> CURRENT STAGE
+                      </span>
+                    )}
+                  </div>
+                  <span className={cn(
+                    "text-xs font-bold",
+                    step.status === 'locked' ? "text-[#94A3B8]" : "text-[#F59E0B]"
+                  )}>+{step.xp} XP</span>
+                </div>
+                
+                <h3 className={cn(
+                  "text-lg font-bold mb-1",
+                  step.status === 'locked' ? "text-[#94A3B8]" : "text-[#0F172A]"
+                )}>
+                  {step.title}
+                </h3>
+                <p className="text-sm text-[#64748B]">{step.desc}</p>
+                
+                {step.status === 'in-progress' && (
+                  <button className="mt-4 text-sm font-bold text-white bg-[#FF5722] px-4 py-2 rounded-lg hover:bg-[#E64A19] transition-colors shadow-sm">
+                    Continue Task
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }

@@ -98,9 +98,9 @@ export default function FinalCta() {
             variants={fadeUp} 
             className="text-[48px] sm:text-[64px] md:text-[80px] lg:text-[96px] font-heading font-extrabold text-white tracking-tighter leading-[1.05] mb-8"
           >
-            Don't Wait For Opportunities. <br className="hidden md:block" />
+            READY TO BUILD <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 relative">
-              Build Them.
+              YOUR FUTURE?
               {/* Glowing underline effect */}
               <motion.span 
                 initial={{ width: "0%" }}
@@ -115,15 +115,9 @@ export default function FinalCta() {
           {/* Supporting Text */}
           <motion.p 
             variants={fadeUp} 
-            className="text-[20px] md:text-[24px] text-white/70 font-sans leading-relaxed mb-4 max-w-3xl text-balance"
+            className="text-[20px] md:text-[24px] text-white/70 font-sans leading-relaxed mb-12 max-w-3xl text-balance"
           >
-            Thousands of ambitious students are already building projects, connecting with mentors, discovering opportunities and creating careers beyond the classroom.
-          </motion.p>
-          <motion.p 
-            variants={fadeUp} 
-            className="text-[20px] md:text-[24px] text-white font-bold font-sans mb-12"
-          >
-            Now it's your turn.
+            Join India's fastest-growing ecosystem for ambitious students.
           </motion.p>
 
           {/* Action Buttons */}
