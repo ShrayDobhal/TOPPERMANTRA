@@ -11,6 +11,7 @@ import { GlobalSearch } from '../components/shared/GlobalSearch';
 import { NotificationCenter } from '../components/shared/NotificationCenter';
 import useStudentStore from '../store/useStudentStore';
 import useProjectForgeStore from '../store/useProjectForgeStore';
+import { useAuth } from '../contexts/AuthContext';
 
 const sidebarLinks = [
   { icon: <Home size={20} />, label: "Mission Control", path: "/dashboard" },
@@ -35,6 +36,7 @@ export default function DashboardLayout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const location = useLocation();
+  const { signOut } = useAuth();
 
   const fetchProfile = useStudentStore((s) => s.fetchProfile);
   const fetchProjects = useProjectForgeStore((s) => s.fetchProjects);
@@ -123,7 +125,10 @@ export default function DashboardLayout() {
               <p className="text-xs text-[#64748B] truncate">AI Engineer</p>
             </div>
           </div>
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#64748B] hover:bg-[#FEE2E2] hover:text-[#EF4444] transition-colors">
+          <button 
+            onClick={() => signOut()}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#64748B] hover:bg-[#FEE2E2] hover:text-[#EF4444] transition-colors"
+          >
             <LogOut size={20} />
             Logout
           </button>
