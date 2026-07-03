@@ -9,6 +9,10 @@ dotenv.config();
 
 const app = express();
 
+// Initialize Cron Jobs
+const initCustodianBot = require('./src/cron/custodianBot');
+initCustodianBot();
+
 // Middlewares
 app.use(helmet());
 app.use(cors({
@@ -32,6 +36,9 @@ app.use('/api/auth', require('./src/routes/auth.routes'));
 app.use('/api/user', require('./src/routes/user.routes'));
 app.use('/api/onboarding', require('./src/routes/onboarding.routes'));
 app.use('/api/dashboard', require('./src/routes/dashboard.routes'));
+app.use('/api/cohort', require('./src/routes/cohort.routes'));
+app.use('/api/projects', require('./src/routes/projects.routes'));
+app.use('/api/community', require('./src/routes/community.routes'));
 
 // Health Check Route
 app.get('/health', (req, res) => {

@@ -41,6 +41,9 @@ import MentorProfile from './modules/mentors/pages/MentorProfile'
 import PortfolioDashboard from './modules/portfolio/pages/PortfolioDashboard'
 import ResumeBuilder from './modules/portfolio/pages/ResumeBuilder'
 import PublicProfile from './modules/portfolio/pages/PublicProfile'
+import CohortLayout from './modules/cohort/layouts/CohortLayout'
+import CohortDashboard from './modules/cohort/pages/CohortDashboard'
+import ProjectForgePage from './modules/projects/pages/ProjectForgePage'
 import ComingSoon from './components/shared/ComingSoon'
 
 export default function App() {
@@ -84,8 +87,12 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="journey" element={<Journey />} />
+          <Route path="cohort" element={<CohortLayout />}>
+            <Route index element={<CohortDashboard />} />
+          </Route>
           <Route path="projects" element={<ProjectLayout />}>
             <Route index element={<ProjectHub />} />
+            <Route path=":id" element={<ProjectForgePage />} />
           </Route>
           <Route path="community" element={<CommunityLayout />}>
             <Route index element={<CommunityHub />} />

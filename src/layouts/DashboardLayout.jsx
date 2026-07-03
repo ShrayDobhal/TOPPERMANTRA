@@ -4,19 +4,20 @@ import { motion } from 'framer-motion';
 import { 
   Home, Compass, Map, Briefcase, Users, Target, Users2, Trophy, 
   Folder, FileText, Award, Calendar, MessageSquare, Bell, Settings,
-  LogOut, Search, Plus, Menu, X, ChevronRight
+  LogOut, Search, Plus, Menu, X, ChevronRight, Hammer, Shield, AlertTriangle, Flame
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { GlobalSearch } from '../components/shared/GlobalSearch';
 import { NotificationCenter } from '../components/shared/NotificationCenter';
 
 const sidebarLinks = [
+  { icon: <Home size={20} />, label: "Mission Control", path: "/dashboard" },
+  { icon: <Shield size={20} />, label: "My Cohort", path: "/dashboard/cohort" },
+  { icon: <Hammer size={20} />, label: "Project Forge", path: "/dashboard/projects" },
+  { icon: <Users2 size={20} />, label: "Community Hub", path: "/dashboard/community" },
   { icon: <Compass size={20} />, label: "My Journey", path: "/dashboard/journey" },
-  { icon: <Home size={20} />, label: "Dashboard", path: "/dashboard" },
-  { icon: <Briefcase size={20} />, label: "Projects", path: "/dashboard/projects" },
   { icon: <Users size={20} />, label: "Mentors", path: "/dashboard/mentors" },
   { icon: <Target size={20} />, label: "Opportunities", path: "/dashboard/opportunities" },
-  { icon: <Users2 size={20} />, label: "Community", path: "/dashboard/community" },
   { icon: <Trophy size={20} />, label: "Hackathons", path: "/dashboard/hackathons" },
   { icon: <Folder size={20} />, label: "Portfolio", path: "/dashboard/portfolio" },
   { icon: <FileText size={20} />, label: "Resume Builder", path: "/dashboard/resume" },
@@ -196,91 +197,105 @@ export default function DashboardLayout() {
       {/* Right Utility Panel (Desktop) */}
       <aside className="hidden xl:flex flex-col w-[300px] bg-white border-l border-[#E9ECEF] h-screen sticky top-0 z-40 p-5 overflow-y-auto custom-scrollbar">
         
-        {/* 1. Today's Events */}
+        {/* 1. Cohort Activity */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Today's Events</h3>
-            <button className="text-[#64748B] hover:text-[#FF5722] transition-colors"><Plus size={16} /></button>
+            <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Cohort Pulse</h3>
           </div>
-          <div className="bg-[#F8FAFC] rounded-xl p-3 border border-[#E9ECEF] flex gap-3 hover:border-[#FF5722]/30 transition-colors cursor-pointer group">
-            <div className="w-10 h-10 rounded-lg bg-white border border-[#E9ECEF] flex flex-col items-center justify-center shrink-0 shadow-sm">
-              <span className="text-[10px] font-bold text-[#EF4444] uppercase">Oct</span>
-              <span className="text-sm font-extrabold text-[#0F172A] leading-none mt-0.5">24</span>
+          <div className="bg-[#F8FAFC] rounded-xl p-4 border border-[#E9ECEF] shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-[#0F172A]">47/50 Active</span>
+              <span className="text-xs font-bold text-[#22C55E]">Healthy</span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#0F172A] truncate group-hover:text-[#FF5722] transition-colors">1:1 with Sarah Chen</p>
-              <p className="text-xs font-semibold text-[#64748B]">4:00 PM - 5:00 PM</p>
+            <div className="w-full bg-[#E2E8F0] rounded-full h-1.5 mb-3 overflow-hidden">
+              <div className="bg-[#22C55E] h-1.5 rounded-full" style={{ width: '94%' }}></div>
             </div>
+            <p className="text-xs font-semibold text-[#64748B]">Your rank: <span className="text-[#3B82F6] font-bold">#14</span></p>
           </div>
         </div>
 
-        {/* 2. Mentor Availability */}
+        {/* 2. Claimed Tasks */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Mentors Online</h3>
+            <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Active Claims</h3>
           </div>
-          <div className="flex -space-x-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="relative w-10 h-10 rounded-full border-2 border-white bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center text-white text-xs font-bold shadow-sm hover:z-10 hover:-translate-y-1 transition-all cursor-pointer">
-                M{i}
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#22C55E] rounded-full border-2 border-white"></div>
+          <div className="space-y-3">
+            <div className="bg-white rounded-xl p-3 border border-[#E9ECEF] border-l-4 border-l-[#F59E0B] shadow-sm group cursor-pointer hover:border-[#F59E0B] transition-colors">
+              <p className="text-xs font-bold text-[#3B82F6] mb-1">Food Delivery App</p>
+              <p className="text-sm font-bold text-[#0F172A] mb-2">Payment Gateway Integration</p>
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span className="text-[#F59E0B] flex items-center gap-1">⚠ 3 days left</span>
+                <span className="text-[#64748B]">In Progress</span>
               </div>
-            ))}
-            <div className="w-10 h-10 rounded-full border-2 border-white bg-[#F1F5F9] flex items-center justify-center text-[#64748B] text-xs font-bold shadow-sm hover:z-10 hover:bg-[#E2E8F0] transition-colors cursor-pointer">
-              +5
+            </div>
+            <div className="bg-white rounded-xl p-3 border border-[#E9ECEF] border-l-4 border-l-[#22C55E] shadow-sm group cursor-pointer hover:border-[#22C55E] transition-colors">
+              <p className="text-xs font-bold text-[#3B82F6] mb-1">Spaces Engine</p>
+              <p className="text-sm font-bold text-[#0F172A] mb-2">WebSockets Sync</p>
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span className="text-[#22C55E]">5 days left</span>
+                <span className="text-[#64748B]">In Progress</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 3. Community Trending */}
+        {/* 3. Custodian Alerts */}
+        <div className="mb-6">
+          <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
+            Custodian Bot
+          </h3>
+          <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 shadow-sm">
+            <div className="flex items-start gap-2">
+              <div className="mt-0.5 text-[#E11D48]"><AlertTriangle size={16} /></div>
+              <div>
+                <p className="text-sm font-bold text-[#9F1239]">Yellow Flag Warning</p>
+                <p className="text-xs font-semibold text-[#BE123C] mt-1 leading-snug">
+                  You haven't participated in the cohort challenge this week. 2 days remaining.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Community Trending */}
         <div className="mb-6">
           <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-3">Trending Discussions</h3>
           <div className="space-y-3">
             {[
               { tag: 'React', title: 'Best state management in 2026?', replies: 42 },
-              { tag: 'AI', title: 'Using Gemini API for side projects', replies: 18 },
+              { tag: 'System Design', title: 'How to scale WebSockets to 1M concurrent users?', replies: 18 },
             ].map((topic, i) => (
               <div key={i} className="group cursor-pointer">
                 <p className="text-xs font-bold text-[#3B82F6] mb-0.5">#{topic.tag}</p>
                 <p className="text-sm font-semibold text-[#0F172A] leading-snug group-hover:text-[#FF5722] transition-colors line-clamp-2">{topic.title}</p>
-                <p className="text-[10px] text-[#64748B] mt-1">{topic.replies} replies</p>
+                <p className="text-[10px] text-[#64748B] mt-1">{topic.replies} upvotes</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 4. Upcoming Deadlines */}
-        <div className="mb-6">
-          <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-3">Deadlines</h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer border border-transparent hover:border-[#E9ECEF]">
-              <div className="w-2 h-2 rounded-full bg-[#EF4444]"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#0F172A] truncate">Stripe Application</p>
-                <p className="text-xs text-[#64748B]">Tomorrow</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer border border-transparent hover:border-[#E9ECEF]">
-              <div className="w-2 h-2 rounded-full bg-[#F59E0B]"></div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#0F172A] truncate">Project Milestone 2</p>
-                <p className="text-xs text-[#64748B]">In 3 days</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 5. Quick Notes */}
+        {/* 5. Streak Calendar */}
         <div className="flex-1 flex flex-col min-h-[150px]">
           <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-3 flex items-center justify-between">
-            Quick Notes
-            <FileText size={14} className="text-[#64748B]" />
+            Activity Streak
+            <Flame size={16} className="text-[#F97316]" />
           </h3>
-          <textarea 
-            placeholder="Jot down ideas, to-dos, or links..."
-            className="flex-1 w-full bg-[#FFFBEB] border border-[#FDE68A] rounded-xl p-3 text-sm text-[#0F172A] placeholder:text-[#D97706]/50 focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 resize-none custom-scrollbar"
-            defaultValue="1. Ask mentor about System Design&#10;2. Update LinkedIn profile&#10;3. Practice Leetcode arrays"
-          />
+          <div className="bg-white border border-[#E9ECEF] rounded-xl p-4 shadow-sm">
+            <div className="grid grid-cols-7 gap-1">
+              {/* Fake calendar grid for last 14 days */}
+              {Array.from({ length: 14 }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className={cn(
+                    "w-6 h-6 rounded-md m-auto",
+                    i === 4 || i === 9 ? "bg-[#F1F5F9]" : "bg-[#F97316]"
+                  )}
+                  title={i === 4 || i === 9 ? "Missed day" : "Active day"}
+                />
+              ))}
+            </div>
+            <p className="text-center text-xs font-bold text-[#64748B] mt-3">21 Day Streak 🔥</p>
+          </div>
         </div>
       </aside>
 
@@ -288,8 +303,8 @@ export default function DashboardLayout() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E9ECEF] z-40 flex items-center justify-around py-2 px-4 pb-safe">
         {[
           { icon: <Home size={24} />, path: "/dashboard", id: "home" },
-          { icon: <Compass size={24} />, path: "/dashboard/journey", id: "journey" },
-          { icon: <Briefcase size={24} />, path: "/dashboard/projects", id: "projects" },
+          { icon: <Shield size={24} />, path: "/dashboard/cohort", id: "cohort" },
+          { icon: <Hammer size={24} />, path: "/dashboard/projects", id: "projects" },
           { icon: <Users2 size={24} />, path: "/dashboard/community", id: "community" },
         ].map((item) => (
           <Link

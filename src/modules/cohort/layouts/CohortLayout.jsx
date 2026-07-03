@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
 
-export default function CommunityLayout() {
+export default function CohortLayout() {
   return <Outlet />;
 }
