@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, MoreHorizontal, CheckCircle2, Circle, Clock, AlertCircle } from "lucide-react";
 import { fadeUp } from "../../../lib/animations";
+import TaskDetailModal from "./TaskDetailModal";
 
 export default function KanbanBoard({ tasks }) {
+  const [selectedTask, setSelectedTask] = useState(null);
+
   // Group tasks by status
   const [boardData, setBoardData] = useState({
     "Backlog": tasks.filter(t => t.status === "Backlog"),
@@ -60,6 +63,7 @@ export default function KanbanBoard({ tasks }) {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
+                  onClick={() => setSelectedTask(task)}
                   className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-[#FF5722]/40 hover:shadow-md transition-all group"
                 >
                   <div className="flex justify-between items-start mb-2">
@@ -95,6 +99,14 @@ export default function KanbanBoard({ tasks }) {
           </div>
         </div>
       ))}
+
+      {/* Task Detail Modal */}
+      {selectedTask && (
+        <TaskDetailModal 
+          task={selectedTask} 
+          onClose={() => setSelectedTask(null)} 
+        />
+      )}
     </div>
   );
 }

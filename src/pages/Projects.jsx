@@ -100,7 +100,7 @@ export default function Projects() {
 
             <h1 className="text-[5vw] sm:text-[6vw] lg:text-[7vw] font-extrabold tracking-tighter leading-[0.9] text-center max-w-7xl text-[#0F172A]">
               The real world doesn't care <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B0B0B0] to-[#0F172A]">about your GPA.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B0B0B0] to-[#0F172A]">about your GPA</span>
             </h1>
 
             <motion.div 
@@ -108,7 +108,6 @@ export default function Projects() {
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               className="absolute bottom-12 flex flex-col items-center text-[#B0B0B0]"
             >
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold mb-4 text-[#0F172A]">Scroll to uncover</span>
               <ChevronDown className="w-6 h-6 text-[#FF5722]" />
             </motion.div>
           </motion.div>
@@ -126,10 +125,10 @@ export default function Projects() {
           >
             <div className="max-w-4xl text-center">
               <p className="text-3xl md:text-5xl lg:text-7xl font-bold tracking-tight text-[#0F172A] leading-tight">
-                You build clones that no one uses.
+                You build clones that no one uses
               </p>
               <p className="text-xl md:text-3xl text-[#FE6D4D] mt-6 font-bold">
-                The top 1% build products that solve real problems.
+                The top 1% build products that solve real problems
               </p>
             </div>
           </motion.div>
@@ -147,8 +146,8 @@ export default function Projects() {
           >
             <div className="max-w-4xl text-center">
               <p className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#0F172A] leading-tight">
-                Stop playing in the sandbox. <br/>
-                It's time to <span className="text-[#FF5722]">deploy to production.</span>
+                Stop playing in the sandbox <br/>
+                It's time to <span className="text-[#FF5722]">deploy to production</span>
               </p>
             </div>
           </motion.div>
@@ -164,7 +163,7 @@ export default function Projects() {
           <div className="pt-20 px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16 max-w-4xl mx-auto">
               <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter mb-6 text-[#0F172A]">
-                The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Battlefield.</span>
+                The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Battlefield</span>
               </h2>
               <p className="text-xl text-[#64748B] font-semibold leading-relaxed">
                 Join live open-source repositories, collaborate with top engineers, and build a portfolio that guarantees interviews.

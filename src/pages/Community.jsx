@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, useScroll, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, MessageSquare, Zap, Users, Globe, ChevronDown } from "lucide-react";
+import TiltCard from "../components/ui/TiltCard";
 
 export default function Community() {
   const { scrollY } = useScroll();
@@ -64,8 +65,8 @@ export default function Community() {
             </div>
 
             <h1 className="text-[5vw] sm:text-[6vw] lg:text-[7vw] font-extrabold tracking-tighter leading-[0.9] text-center max-w-7xl text-[#0F172A]">
-              Lone wolves don't build unicorns.<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B0B0B0] to-[#0F172A]">Welcome to the collective.</span>
+              Lone wolves don't build unicorns<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B0B0B0] to-[#0F172A]">Welcome to the collective</span>
             </h1>
 
             <motion.div 
@@ -73,7 +74,6 @@ export default function Community() {
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               className="absolute bottom-12 flex flex-col items-center text-[#B0B0B0]"
             >
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold mb-4 text-[#0F172A]">Enter the fray</span>
               <ChevronDown className="w-6 h-6 text-[#FF5722]" />
             </motion.div>
           </motion.div>
@@ -91,10 +91,10 @@ export default function Community() {
           >
             <div className="max-w-4xl text-center">
               <p className="text-3xl md:text-5xl lg:text-7xl font-bold tracking-tight text-[#0F172A] leading-tight">
-                Most students grind LeetCode in total isolation.
+                Most students grind LeetCode in total isolation
               </p>
               <p className="text-xl md:text-3xl text-[#FE6D4D] mt-6 font-bold">
-                The top 1% build alongside founders, hackers, and prodigies.
+                The top 1% build alongside founders, hackers, and prodigies
               </p>
             </div>
           </motion.div>
@@ -113,7 +113,7 @@ export default function Community() {
             <div className="max-w-4xl text-center">
               <p className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#0F172A] leading-tight">
                 A high-frequency network where your next <br/>
-                <span className="text-[#FF5722]">co-founder</span> is already waiting.
+                <span className="text-[#FF5722]">co-founder</span> is already waiting
               </p>
             </div>
           </motion.div>
@@ -130,7 +130,7 @@ export default function Community() {
             
             <div className="text-center mb-24">
               <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter mb-8 text-[#0F172A]">
-                Connect. Build. <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Scale.</span>
+                Connect. Build. <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Scale</span>
               </h2>
               <p className="text-xl text-[#0F172A] max-w-2xl mx-auto font-semibold leading-relaxed">
                 Find teammates, get code reviews from seniors, and participate in exclusive hackathons.
@@ -139,63 +139,48 @@ export default function Community() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Feature 1 */}
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
-                  <Users size={24} />
+              <TiltCard className="h-full">
+                <div className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300 h-full">
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
+                    <Users size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">Find Teammates</h3>
+                  <p className="text-[#64748B] font-medium leading-relaxed">Filter by skill, stack, and ambition level to find your perfect match.</p>
                 </div>
-                <h3 className="text-xl font-bold text-[#0F172A] mb-3">Find Teammates</h3>
-                <p className="text-[#64748B] font-medium leading-relaxed">Filter by skill, stack, and ambition level to find your perfect match.</p>
-              </motion.div>
+              </TiltCard>
 
               {/* Feature 2 */}
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
-                  <MessageSquare size={24} />
+              <TiltCard className="h-full">
+                <div className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300 h-full">
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
+                    <MessageSquare size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">Live AMAs</h3>
+                  <p className="text-[#64748B] font-medium leading-relaxed">Weekly unrecorded voice sessions with industry leaders.</p>
                 </div>
-                <h3 className="text-xl font-bold text-[#0F172A] mb-3">Live AMAs</h3>
-                <p className="text-[#64748B] font-medium leading-relaxed">Weekly unrecorded voice sessions with industry leaders.</p>
-              </motion.div>
+              </TiltCard>
 
               {/* Feature 3 */}
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
-                  <Zap size={24} />
+              <TiltCard className="h-full">
+                <div className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300 h-full">
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
+                    <Zap size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">Hackathons</h3>
+                  <p className="text-[#64748B] font-medium leading-relaxed">Compete in high-stakes builds with cash prizes and investor eyes.</p>
                 </div>
-                <h3 className="text-xl font-bold text-[#0F172A] mb-3">Hackathons</h3>
-                <p className="text-[#64748B] font-medium leading-relaxed">Compete in high-stakes builds with cash prizes and investor eyes.</p>
-              </motion.div>
+              </TiltCard>
 
               {/* Feature 4 */}
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
-                  <Globe size={24} />
+              <TiltCard className="h-full">
+                <div className="bg-[#FFFFFF] p-8 rounded-3xl border border-[#E9ECEF] shadow-sm hover:border-[#FF5722]/30 transition-all duration-300 h-full">
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
+                    <Globe size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">Global Reach</h3>
+                  <p className="text-[#64748B] font-medium leading-relaxed">Connect with ambitious builders from top universities worldwide.</p>
                 </div>
-                <h3 className="text-xl font-bold text-[#0F172A] mb-3">Global Reach</h3>
-                <p className="text-[#64748B] font-medium leading-relaxed">Connect with ambitious builders from top universities worldwide.</p>
-              </motion.div>
+              </TiltCard>
             </div>
 
             <motion.div 

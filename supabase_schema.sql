@@ -1,91 +1,223 @@
--- Enable UUID extension
-create extension if not exists "uuid-ossp";
+-- TOPPER MANTRA SUPABASE SCHEMA
 
--- 1. PROFILES TABLE (Linked to Supabase Auth)
-create table profiles (
-  id uuid references auth.users on delete cascade primary key,
-  first_name text,
-  last_name text,
-  email text unique,
-  college text,
-  branch text,
-  year text,
-  career_goal text,
-  
-  -- Gamification
-  level integer default 1,
-  xp integer default 0,
-  streak integer default 0,
-  active_claims integer default 0,
-  max_claims integer default 2,
-  
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- 0. Clean up existing tables and types to prevent "already exists" errors
+DROP TABLE IF EXISTS public.applications CASCADE;
+DROP TABLE IF EXISTS public.opportunities CASCADE;
+DROP TABLE IF EXISTS public.project_tasks CASCADE;
+DROP TABLE IF EXISTS public.projects CASCADE;
+DROP TABLE IF EXISTS public.cohort_members CASCADE;
+DROP TABLE IF EXISTS public.cohorts CASCADE;
+DROP TABLE IF EXISTS public.user_badges CASCADE;
+DROP TABLE IF EXISTS public.badges CASCADE;
+DROP TABLE IF EXISTS public.hub_comments CASCADE;
+DROP TABLE IF EXISTS public.hub_posts CASCADE;
+DROP TABLE IF EXISTS public.channels CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;
+
+DROP TYPE IF EXISTS project_status CASCADE;
+DROP TYPE IF EXISTS task_status CASCADE;
+DROP TYPE IF EXISTS application_status CASCADE;
+DROP TYPE IF EXISTS user_role CASCADE;
+-- 1. Create custom types
+CREATE TYPE project_status AS ENUM ('Planning', 'Active', 'Completed', 'Paused');
+CREATE TYPE task_status AS ENUM ('Backlog', 'In Progress', 'In Review', 'Completed');
+CREATE TYPE application_status AS ENUM ('Saved', 'Applied', 'Interview', 'Shortlisted', 'Rejected', 'Offer');
+CREATE TYPE user_role AS ENUM ('Student', 'Mentor', 'Admin');
+
+-- 2. Create Profiles Table (extends Supabase Auth)
+CREATE TABLE public.profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  full_name TEXT,
+  username TEXT UNIQUE,
+  avatar_url TEXT,
+  role user_role DEFAULT 'Student',
+  bio TEXT,
+  college TEXT,
+  github_url TEXT,
+  linkedin_url TEXT,
+  contribution_score INT DEFAULT 0,
+  streak INT DEFAULT 0,
+  longest_streak INT DEFAULT 0,
+  last_active_at TIMESTAMPTZ DEFAULT NOW(),
+  status TEXT DEFAULT 'active', -- active, yellow, red, removed
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. PROJECTS TABLE (The Project Forge Hub)
-create table projects (
-  id uuid default uuid_generate_v4() primary key,
-  title text not null,
-  description text not null,
-  mentor_name text,
-  mentor_institution text,
-  branch text,
-  difficulty text, -- Beginner, Intermediate, Advanced
-  tech_stack text[], -- Array of strings
-  cover_gradient text,
-  status text default 'active',
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Enable RLS
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Policies for Profiles
+CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own profile." ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Users can update own profile." ON public.profiles FOR UPDATE USING (auth.uid() = id);
+
+-- 3. Create Projects Table
+CREATE TABLE public.projects (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  domain TEXT NOT NULL,
+  difficulty TEXT NOT NULL,
+  status project_status DEFAULT 'Planning',
+  creator_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  github_url TEXT,
+  live_url TEXT,
+  last_activity_at TIMESTAMPTZ DEFAULT NOW(), -- Used by Custodian Bot to archive dead projects
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. TASKS TABLE (Subparts of Projects)
-create table tasks (
-  id uuid default uuid_generate_v4() primary key,
-  project_id uuid references projects(id) on delete cascade,
-  title text not null,
-  description text not null,
-  difficulty text,
-  estimated_hours integer,
-  xp_reward integer,
-  status text default 'available', -- available, claimed, submitted, completed
-  
-  claimed_by uuid references profiles(id) on delete set null,
-  claimed_at timestamp with time zone,
-  
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- 3.5 Create Project Tasks Table (Subparts)
+CREATE TABLE public.project_tasks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  status task_status DEFAULT 'Backlog',
+  assignee_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  claimed_at TIMESTAMPTZ,
+  last_submission_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ROW LEVEL SECURITY (RLS) POLICIES
-alter table profiles enable row level security;
-alter table projects enable row level security;
-alter table tasks enable row level security;
+ALTER TABLE public.project_tasks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Tasks viewable by everyone." ON public.project_tasks FOR SELECT USING (true);
+CREATE POLICY "Users can claim up to 2 tasks." ON public.project_tasks FOR UPDATE USING (auth.uid() = assignee_id);
 
--- Profiles: Anyone can read profiles, but users can only update their own
-create policy "Public profiles are viewable by everyone." on profiles for select using (true);
-create policy "Users can insert their own profile." on profiles for insert with check (auth.uid() = id);
-create policy "Users can update own profile." on profiles for update using (auth.uid() = id);
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Projects are viewable by everyone." ON public.projects FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can create projects." ON public.projects FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Creators can update their projects." ON public.projects FOR UPDATE USING (auth.uid() = creator_id);
 
--- Projects: Anyone can view active projects
-create policy "Projects are viewable by everyone." on projects for select using (true);
+-- 4. Create Opportunities Table (For Discover Hub)
+CREATE TABLE public.opportunities (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  company TEXT NOT NULL,
+  logo_url TEXT,
+  location TEXT,
+  type TEXT NOT NULL, -- Internship, Hackathon, etc.
+  workplace_type TEXT, -- Remote, Hybrid
+  paid_status TEXT, -- Paid, Unpaid
+  stipend TEXT,
+  duration TEXT,
+  deadline TIMESTAMPTZ,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
--- Tasks: Anyone can view tasks, users can update tasks they have claimed
-create policy "Tasks are viewable by everyone." on tasks for select using (true);
-create policy "Users can update their claimed tasks." on tasks for update using (auth.uid() = claimed_by or claimed_by is null);
+ALTER TABLE public.opportunities ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Opportunities are viewable by everyone." ON public.opportunities FOR SELECT USING (true);
 
--- TRIGGERS: Automatically create a profile when a new user signs up
-create or replace function public.handle_new_user() 
-returns trigger as $$
-begin
-  insert into public.profiles (id, email, first_name, last_name)
-  values (
-    new.id, 
-    new.email, 
-    new.raw_user_meta_data->>'first_name',
-    new.raw_user_meta_data->>'last_name'
-  );
-  return new;
-end;
-$$ language plpgsql security definer;
+-- 5. Create Applications Table (For Application Tracker)
+CREATE TABLE public.applications (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  opportunity_id UUID REFERENCES public.opportunities(id) ON DELETE CASCADE,
+  status application_status DEFAULT 'Saved',
+  applied_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, opportunity_id)
+);
 
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view their own applications." ON public.applications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own applications." ON public.applications FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own applications." ON public.applications FOR UPDATE USING (auth.uid() = user_id);
+
+-- 6. Create Cohorts Table
+CREATE TABLE public.cohorts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  branch TEXT NOT NULL,
+  mentor_id UUID REFERENCES public.profiles(id),
+  max_size INT DEFAULT 50,
+  current_week INT DEFAULT 1,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Create Cohort Members Table
+CREATE TABLE public.cohort_members (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  cohort_id UUID REFERENCES public.cohorts(id) ON DELETE CASCADE,
+  student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  status TEXT DEFAULT 'active', -- active, yellow, red, removed
+  last_participation_at TIMESTAMPTZ DEFAULT NOW(),
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(cohort_id, student_id)
+);
+
+ALTER TABLE public.cohorts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cohort_members ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Cohorts viewable by everyone." ON public.cohorts FOR SELECT USING (true);
+CREATE POLICY "Members viewable by everyone." ON public.cohort_members FOR SELECT USING (true);
+
+-- 8. Create Community Hub Tables
+CREATE TABLE public.channels (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT DEFAULT 'branch', -- branch, global
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE public.hub_posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  channel_id UUID REFERENCES public.channels(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  tag TEXT NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  upvotes INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE public.hub_comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  post_id UUID REFERENCES public.hub_posts(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  upvotes INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 9. Create Gamification Tables
+CREATE TABLE public.badges (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  description TEXT NOT NULL,
+  icon TEXT NOT NULL,
+  criteria_type TEXT NOT NULL,
+  threshold INT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE public.user_badges (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  badge_id UUID REFERENCES public.badges(id) ON DELETE CASCADE,
+  earned_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, badge_id)
+);
+
+ALTER TABLE public.channels ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hub_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hub_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.badges ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_badges ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Hub viewable by everyone" ON public.channels FOR SELECT USING (true);
+CREATE POLICY "Posts viewable by everyone" ON public.hub_posts FOR SELECT USING (true);
+CREATE POLICY "Users can create posts" ON public.hub_posts FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Users can update own posts" ON public.hub_posts FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Comments viewable by everyone" ON public.hub_comments FOR SELECT USING (true);
+CREATE POLICY "Users can create comments" ON public.hub_comments FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Badges viewable by everyone" ON public.badges FOR SELECT USING (true);
+CREATE POLICY "User Badges viewable by everyone" ON public.user_badges FOR SELECT USING (true);
+
+-- Set up Realtime
+alter publication supabase_realtime add table public.projects;
+alter publication supabase_realtime add table public.applications;
+alter publication supabase_realtime add table public.hub_posts;
+

@@ -33,7 +33,7 @@ export const mockProjects = [
     id: "p2",
     title: "OpenCampus Decentralized Voting",
     shortDescription: "A blockchain-based secure voting system for university student council elections.",
-    bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f4fc083?auto=format&fit=crop&w=800&q=80",
+    bannerUrl: "https://images.unsplash.com/photo-1622630998477-20aa696ecb05?auto=format&fit=crop&w=800&q=80",
     techStack: ["Solidity", "Next.js", "Ethers.js", "Tailwind"],
     domain: "Blockchain",
     difficulty: "Intermediate",

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { motion, useScroll, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, Target, Shield, ChevronDown } from "lucide-react";
+import TiltCard from "../components/ui/TiltCard";
+import MentorCard from "../components/mentors/MentorCard";
+import { mockMentors } from "../lib/mockMentors";
 
 export default function Mentors() {
   const { scrollY } = useScroll();
@@ -64,8 +67,8 @@ export default function Mentors() {
             </div>
 
             <h1 className="text-[5vw] sm:text-[6vw] lg:text-[7vw] font-extrabold tracking-tighter leading-[0.9] text-center max-w-7xl text-[#0F172A]">
-              You don't need another roadmap.<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B0B0B0] to-[#0F172A]">You need a guide.</span>
+              You don't need another roadmap<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B0B0B0] to-[#0F172A]">You need a guide</span>
             </h1>
 
             <motion.div 
@@ -73,7 +76,6 @@ export default function Mentors() {
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               className="absolute bottom-12 flex flex-col items-center text-[#B0B0B0]"
             >
-              <span className="text-[10px] uppercase tracking-[0.3em] font-bold mb-4 text-[#0F172A]">Scroll to uncover</span>
               <ChevronDown className="w-6 h-6 text-[#FF5722]" />
             </motion.div>
           </motion.div>
@@ -91,10 +93,10 @@ export default function Mentors() {
           >
             <div className="max-w-4xl text-center">
               <p className="text-3xl md:text-5xl lg:text-7xl font-bold tracking-tight text-[#0F172A] leading-tight">
-                95% of students ask AI for career advice.
+                95% of students ask AI for career advice
               </p>
               <p className="text-xl md:text-3xl text-[#FE6D4D] mt-6 font-bold">
-                The top 1% ask the engineers who built it.
+                The top 1% ask the engineers who built it
               </p>
             </div>
           </motion.div>
@@ -112,8 +114,8 @@ export default function Mentors() {
           >
             <div className="max-w-4xl text-center">
               <p className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#0F172A] leading-tight">
-                No sugarcoating. <br/>
-                Just brutal, <span className="text-[#FF5722]">actionable truths</span> to get you hired.
+                No sugarcoating <br/>
+                Just brutal, <span className="text-[#FF5722]">actionable truths</span> to get you hired
               </p>
             </div>
           </motion.div>
@@ -130,7 +132,7 @@ export default function Mentors() {
             
             <div className="text-center mb-24">
               <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter mb-8 text-[#0F172A]">
-                The Inner <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Circle.</span>
+                The Inner <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Circle</span>
               </h2>
               <p className="text-xl text-[#0F172A] max-w-2xl mx-auto font-semibold leading-relaxed">
                 Direct access to senior engineers from Google, Amazon, Microsoft, and elite YC startups.
@@ -139,60 +141,62 @@ export default function Mentors() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
               {/* Box 1 */}
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                className="md:col-span-1 row-span-1 bg-[#FFFFFF] rounded-3xl p-8 border border-[#E9ECEF] shadow-sm flex flex-col justify-between group hover:border-[#FF5722]/30 transition-all duration-300"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
-                    <Star size={24} />
+              <TiltCard className="md:col-span-1 row-span-1 h-full">
+                <div className="bg-[#FFFFFF] rounded-3xl p-8 border border-[#E9ECEF] shadow-sm flex flex-col justify-between h-full group hover:border-[#FF5722]/30 transition-all duration-300">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
+                      <Star size={24} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#0F172A] mb-3 tracking-tight">1-on-1 Guidance</h3>
+                    <p className="text-[#64748B] font-medium leading-relaxed">
+                      Personalized career roadmaps designed specifically for your strengths.
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-bold text-[#0F172A] mb-3 tracking-tight">1-on-1 Guidance</h3>
-                  <p className="text-[#64748B] font-medium leading-relaxed">
-                    Personalized career roadmaps designed specifically for your strengths.
-                  </p>
                 </div>
-              </motion.div>
+              </TiltCard>
 
               {/* Box 2 */}
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: 0.1 }}
-                className="md:col-span-1 row-span-1 bg-[#FFFFFF] rounded-3xl p-8 border border-[#E9ECEF] shadow-sm flex flex-col justify-between group hover:border-[#FF5722]/30 transition-all duration-300"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
-                    <Target size={24} />
+              <TiltCard className="md:col-span-1 row-span-1 h-full">
+                <div className="bg-[#FFFFFF] rounded-3xl p-8 border border-[#E9ECEF] shadow-sm flex flex-col justify-between h-full group hover:border-[#FF5722]/30 transition-all duration-300">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
+                      <Target size={24} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#0F172A] mb-3 tracking-tight">Interview Prep</h3>
+                    <p className="text-[#64748B] font-medium leading-relaxed">
+                      Mock interviews with engineers who actually conduct them at top companies.
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-bold text-[#0F172A] mb-3 tracking-tight">Mock Interviews</h3>
-                  <p className="text-[#64748B] font-medium leading-relaxed">
-                    Practice with the exact people who conduct hiring rounds at FAANG.
-                  </p>
                 </div>
-              </motion.div>
+              </TiltCard>
 
               {/* Box 3 */}
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: 0.2 }}
-                className="md:col-span-1 row-span-1 bg-[#FFFFFF] rounded-3xl p-8 border border-[#E9ECEF] shadow-sm flex flex-col justify-between group hover:border-[#FF5722]/30 transition-all duration-300"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
-                    <Shield size={24} />
+              <TiltCard className="md:col-span-1 row-span-1 h-full">
+                <div className="bg-[#FFFFFF] rounded-3xl p-8 border border-[#E9ECEF] shadow-sm flex flex-col justify-between h-full group hover:border-[#FF5722]/30 transition-all duration-300">
+                  <div>
+                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-6 text-[#FF5722]">
+                      <Shield size={24} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#0F172A] mb-3 tracking-tight">Resume Reviews</h3>
+                    <p className="text-[#64748B] font-medium leading-relaxed">
+                      Tear-downs and rebuilds of your resume to bypass ATS filters effortlessly.
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-bold text-[#0F172A] mb-3 tracking-tight">Resume Reviews</h3>
-                  <p className="text-[#64748B] font-medium leading-relaxed">
-                    Tear-downs and rebuilds of your resume to bypass ATS filters effortlessly.
-                  </p>
                 </div>
-              </motion.div>
+              </TiltCard>
+            </div>
+
+            <div className="mt-24 mb-8 text-center">
+              <h3 className="text-3xl font-bold text-[#0F172A] mb-4">Meet Your Mentors</h3>
+              <p className="text-lg text-[#64748B] max-w-2xl mx-auto">
+                Select from our curated list of elite engineers ready to guide your journey.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mockMentors.map((mentor) => (
+                <MentorCard key={mentor.id} mentor={mentor} onViewProfile={() => {}} />
+              ))}
             </div>
 
             <motion.div 

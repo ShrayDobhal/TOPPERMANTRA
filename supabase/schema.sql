@@ -17,6 +17,11 @@ CREATE TABLE public.profiles (
   college TEXT,
   github_url TEXT,
   linkedin_url TEXT,
+  contribution_score INT DEFAULT 0,
+  streak INT DEFAULT 0,
+  longest_streak INT DEFAULT 0,
+  last_active_at TIMESTAMPTZ DEFAULT NOW(),
+  status TEXT DEFAULT 'active', -- active, yellow, red, removed
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -40,9 +45,28 @@ CREATE TABLE public.projects (
   creator_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   github_url TEXT,
   live_url TEXT,
+  last_activity_at TIMESTAMPTZ DEFAULT NOW(), -- Used by Custodian Bot to archive dead projects
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 3.5 Create Project Tasks Table (Subparts)
+CREATE TABLE public.project_tasks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  status task_status DEFAULT 'Backlog',
+  assignee_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  claimed_at TIMESTAMPTZ,
+  last_submission_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.project_tasks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Tasks viewable by everyone." ON public.project_tasks FOR SELECT USING (true);
+CREATE POLICY "Users can claim up to 2 tasks." ON public.project_tasks FOR UPDATE USING (auth.uid() = assignee_id);
 
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Projects are viewable by everyone." ON public.projects FOR SELECT USING (true);
@@ -83,6 +107,33 @@ ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own applications." ON public.applications FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own applications." ON public.applications FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update their own applications." ON public.applications FOR UPDATE USING (auth.uid() = user_id);
+
+-- 6. Create Cohorts Table
+CREATE TABLE public.cohorts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  branch TEXT NOT NULL,
+  mentor_id UUID REFERENCES public.profiles(id),
+  max_size INT DEFAULT 50,
+  current_week INT DEFAULT 1,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Create Cohort Members Table
+CREATE TABLE public.cohort_members (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  cohort_id UUID REFERENCES public.cohorts(id) ON DELETE CASCADE,
+  student_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  status TEXT DEFAULT 'active', -- active, yellow, red, removed
+  last_participation_at TIMESTAMPTZ DEFAULT NOW(),
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(cohort_id, student_id)
+);
+
+ALTER TABLE public.cohorts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cohort_members ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Cohorts viewable by everyone." ON public.cohorts FOR SELECT USING (true);
+CREATE POLICY "Members viewable by everyone." ON public.cohort_members FOR SELECT USING (true);
 
 -- Set up Realtime
 alter publication supabase_realtime add table public.projects;

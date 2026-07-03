@@ -38,6 +38,7 @@ import MentorLayout from './modules/mentors/layouts/MentorLayout'
 import MentorHub from './modules/mentors/pages/MentorHub'
 import SessionDashboard from './modules/mentors/pages/SessionDashboard'
 import MentorProfile from './modules/mentors/pages/MentorProfile'
+import MentorReviewDashboard from './modules/mentors/pages/MentorReviewDashboard'
 import PortfolioDashboard from './modules/portfolio/pages/PortfolioDashboard'
 import ResumeBuilder from './modules/portfolio/pages/ResumeBuilder'
 import PublicProfile from './modules/portfolio/pages/PublicProfile'
@@ -45,7 +46,8 @@ import CohortLayout from './modules/cohort/layouts/CohortLayout'
 import CohortDashboard from './modules/cohort/pages/CohortDashboard'
 import ProjectForgePage from './modules/projects/pages/ProjectForgePage'
 import ComingSoon from './components/shared/ComingSoon'
-
+import ScrollToTop from './components/shared/ScrollToTop'
+import CustomCursor from './components/shared/CustomCursor'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 
 export default function App() {
@@ -58,6 +60,8 @@ export default function App() {
 
   return (
     <Router>
+      <ScrollToTop />
+      <CustomCursor />
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
@@ -115,6 +119,7 @@ export default function App() {
             <Route path="mentors" element={<MentorLayout />}>
               <Route index element={<MentorHub />} />
               <Route path="sessions" element={<SessionDashboard />} />
+              <Route path="reviews" element={<MentorReviewDashboard />} />
               <Route path=":id" element={<MentorProfile />} />
             </Route>
             <Route path="opportunities" element={<DiscoverLayout />}>

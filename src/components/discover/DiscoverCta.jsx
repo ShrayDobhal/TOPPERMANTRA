@@ -17,7 +17,7 @@ export default function DiscoverCta() {
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black font-heading text-[#0F172A] tracking-tight mb-6 leading-[1.1]">
             Your Next Opportunity <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Is Waiting.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">Is Waiting</span>
           </h2>
           
           <p className="text-lg md:text-xl text-[#64748B] mb-12 max-w-2xl mx-auto leading-relaxed">

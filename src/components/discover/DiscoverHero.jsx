@@ -35,7 +35,7 @@ export default function DiscoverHero() {
           >
             Opportunities That<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5722] to-[#FE6D4D]">
-              Change Careers.
+              Change Careers
             </span>
           </motion.h1>
           
@@ -43,7 +43,7 @@ export default function DiscoverHero() {
             variants={fadeUp} 
             className="text-lg md:text-xl text-[#64748B] mb-10 max-w-2xl mx-auto leading-relaxed"
           >
-            Discover internships, hackathons, research programs, fellowships, scholarships, startup roles and competitions—all curated for ambitious students.
+            Discover internships, hackathons, research programs, fellowships, scholarships, startup roles and competitions - all curated for ambitious students.
           </motion.p>
           
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">

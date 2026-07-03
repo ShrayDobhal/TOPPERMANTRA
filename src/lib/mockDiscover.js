@@ -81,7 +81,7 @@ export const mockOpportunities = [
     id: "opp-4",
     title: "Frontend Developer (Founding Team)",
     company: "Linear",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Linear_logo.svg",
+    logo: "https://logo.clearbit.com/linear.app",
     location: "Remote",
     type: "Startup Role",
     workplaceType: "Remote",
@@ -206,7 +206,7 @@ export const mockOpportunities = [
 
 export const mockCompanies = [
   { id: "c1", name: "Stripe", logo: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg", openRoles: 12 },
-  { id: "c2", name: "Linear", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Linear_logo.svg", openRoles: 4 },
+  { id: "c2", name: "Linear", logo: "https://logo.clearbit.com/linear.app", openRoles: 4 },
   { id: "c3", name: "Vercel", logo: "https://assets.vercel.com/image/upload/v1588805858/repositories/vercel/logo.png", openRoles: 8 },
   { id: "c4", name: "Google", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg", openRoles: 45 }
 ];
