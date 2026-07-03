@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
+import { badgeDefinitions, earnedBadges, leaderboard, projectPortfolio, contributionHistory } from '../lib/mockGamification';
 
 const useGamificationStore = create((set, get) => ({
   // ---- Badges ----
@@ -77,6 +78,18 @@ const useGamificationStore = create((set, get) => ({
         badges: 0, 
         isCurrentUser: p.id === userId
       }));
+
+      // Fallback to mock data if leaderboard is empty
+      if (!leaderboardData || leaderboardData.length === 0) {
+        set({
+          allBadges: badgeDefinitions,
+          earnedBadges: earnedBadges,
+          portfolio: projectPortfolio,
+          leaderboard: leaderboard,
+          contributionHistory: contributionHistory
+        });
+        return;
+      }
 
       // Mocking contribution history for heatmap (until we log daily xp events in DB)
       const mockHistory = Array.from({ length: 30 }).map((_, i) => ({

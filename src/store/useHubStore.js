@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
+import { channels as mockChannels, hubPosts as mockHubPosts } from '../lib/mockHub';
 
 const useHubStore = create((set, get) => ({
   // ---- Channels ----
@@ -38,6 +39,12 @@ const useHubStore = create((set, get) => ({
         .order('created_at', { ascending: false });
 
       if (postsError) throw postsError;
+      
+      // Fallback to mock data if empty
+      if (!postsData || postsData.length === 0) {
+        set({ channels: mockChannels, posts: mockHubPosts, activeChannelId: 'ch-cs' });
+        return;
+      }
 
       // Calculate today's posts by current user
       const { data: { session } } = await supabase.auth.getSession();

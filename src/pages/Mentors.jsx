@@ -195,7 +195,7 @@ export default function Mentors() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {mockMentors.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} onViewProfile={() => {}} />
+                <MentorCard key={mentor.id} mentor={mentor} onViewProfile={() => window.location.href = '/signup'} />
               ))}
             </div>
 
@@ -207,7 +207,7 @@ export default function Mentors() {
               className="mt-12 flex justify-center"
             >
               <Link 
-                to="/login"
+                to="/signup"
                 className="px-8 py-4 bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold rounded-xl transition-all duration-300 flex items-center gap-3 group"
               >
                 Find Your Mentor

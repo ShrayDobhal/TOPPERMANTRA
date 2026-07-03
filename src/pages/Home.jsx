@@ -64,7 +64,7 @@ export default function Home() {
           >
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFFFFF] border border-[#E9ECEF] text-[#FF5722] shadow-sm text-xs font-bold uppercase tracking-[0.2em] mb-12">
               <span className="w-2 h-2 rounded-full bg-[#FF5722] animate-pulse" />
-              Access strictly by invitation
+              Talent Is Everywhere. Opportunity Isn't
             </div>
 
             <h1 className="text-[5vw] sm:text-[6vw] lg:text-[7vw] font-extrabold tracking-tighter leading-[0.9] text-center max-w-7xl text-[#0F172A]">
@@ -222,7 +222,7 @@ export default function Home() {
                   
                   <MagneticButton>
                     <Link 
-                      to="/login"
+                      to="/signup"
                       className="px-8 py-4 bg-[#FF5722] hover:bg-[#FE6D4D] text-white font-bold rounded-xl transition-all duration-300 flex items-center gap-3 shrink-0 shadow-[0_0_20px_rgba(255,87,34,0.3)] hover:shadow-[0_0_30px_rgba(255,87,34,0.6)]"
                     >
                       Join the Ecosystem

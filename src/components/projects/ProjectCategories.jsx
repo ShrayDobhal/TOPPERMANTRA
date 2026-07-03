@@ -21,7 +21,7 @@ export default function ProjectCategories({ projects, filters, searchQuery }) {
           {projects.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {projects.map(p => (
-                <ProjectCard key={p.id} project={p} onClick={(id) => window.location.href = `/dashboard/projects/${id}`} />
+                <ProjectCard key={p.id} project={p} onClick={(id) => window.location.href = '/signup'} />
               ))}
             </div>
           ) : (
@@ -95,7 +95,7 @@ export default function ProjectCategories({ projects, filters, searchQuery }) {
                   transition={{ delay: i * 0.1 }}
                   className="min-w-[300px] w-[300px] sm:min-w-[340px] sm:w-[340px] shrink-0 snap-start"
                 >
-                  <ProjectCard project={project} onClick={(id) => window.location.href = `/dashboard/projects/${id}`} />
+                  <ProjectCard project={project} onClick={(id) => window.location.href = '/signup'} />
                 </motion.div>
               ))}
             </div>

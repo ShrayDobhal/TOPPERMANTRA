@@ -30,7 +30,7 @@ export default function ProjectsCta() {
               variant="primary" 
               size="lg" 
               className="w-full sm:w-auto h-14 px-10 text-lg font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] hover:shadow-[0_6px_20px_rgba(255,87,34,0.23)] hover:scale-105 transition-all"
-              onClick={() => window.location.href = '/dashboard/projects/create'}
+              onClick={() => window.location.href = '/signup'}
             >
               Start a Project
             </Button>

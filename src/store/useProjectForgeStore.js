@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
+import { mockProjects } from '../lib/mockProjects';
 
 const useProjectForgeStore = create((set, get) => ({
   projects: [],
@@ -30,6 +31,12 @@ const useProjectForgeStore = create((set, get) => ({
       ...task,
       claimedBy: task.claimed_by ? { id: task.claimed_by, name: `${task.claimed_by.first_name} ${task.claimed_by.last_name}` } : null
     }));
+
+    // Fallback to mock data if empty
+    if (!projectsData || projectsData.length === 0) {
+      set({ projects: mockProjects, subparts: mockProjects.flatMap(p => p.tasks || []), loading: false });
+      return;
+    }
 
     // Attach task summary stats to projects
     const formattedProjects = (projectsData || []).map(proj => {
