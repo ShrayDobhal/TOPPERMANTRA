@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -12,8 +12,15 @@ export default function Signup() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isMockMode } = useAuth();
+  const { isMockMode, user } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/welcome');
+    }
+  }, [user, navigate]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -49,7 +56,8 @@ export default function Signup() {
       if (error) {
         setError(error.message);
       } else {
-        navigate('/verify-email');
+        // Since Email Confirmations are off, we can bypass the verify-email page
+        navigate('/welcome');
       }
     } catch (err) {
       console.error(err);

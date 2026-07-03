@@ -62,7 +62,7 @@ export default function CohortDashboard() {
                   <Shield size={24} />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold font-heading">{cohort.name}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#FF5722]">{cohort.name}</h1>
                   <p className="text-[#94A3B8] text-sm font-medium">Mentored by {cohort.mentor.name} · {cohort.mentor.institution}</p>
                 </div>
               </div>

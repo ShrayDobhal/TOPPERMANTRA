@@ -12,6 +12,7 @@ import { cn } from '../../lib/utils';
 import { useMutation } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { useUser } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 const TOTAL_STEPS = 5;
 
@@ -34,8 +35,20 @@ export default function Onboarding() {
   // Mutation to save onboarding data
   const { mutate: saveOnboarding, isPending: isSaving } = useMutation({
     mutationFn: async (onboardingData) => {
-      const response = await api.post('/onboarding', onboardingData);
-      return response.data;
+      if (!user) throw new Error("No user found");
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          college: onboardingData.college || '',
+          branch: onboardingData.branch || '',
+          year: onboardingData.year || '',
+          career_goal: onboardingData.careerGoal || ''
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      return true;
     },
     onSuccess: () => {
       setIsCompleted(true);

@@ -35,7 +35,7 @@ export default function ProjectWorkspace() {
         className="bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 relative z-20"
       >
         <div className="h-16 flex items-center px-4 border-b border-slate-800">
-          <button onClick={() => navigate('/projects')} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 text-white hover:bg-[#FF5722] transition-colors shrink-0">
+          <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 text-white hover:bg-[#FF5722] transition-colors shrink-0">
             <ChevronLeft className="w-4 h-4" />
           </button>
           <AnimatePresence>

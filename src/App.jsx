@@ -46,6 +46,8 @@ import CohortDashboard from './modules/cohort/pages/CohortDashboard'
 import ProjectForgePage from './modules/projects/pages/ProjectForgePage'
 import ComingSoon from './components/shared/ComingSoon'
 
+import ProtectedRoute from './components/auth/ProtectedRoute'
+
 export default function App() {
   const { getToken } = useAuth();
 
@@ -76,51 +78,59 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* Onboarding Routes */}
-        <Route path="/welcome" element={<Welcome />} />
-        <Route path="/onboarding" element={<Onboarding />} />
+        {/* Protected Routes (Require Authentication) */}
+        <Route element={<ProtectedRoute />}>
+          {/* Onboarding Routes */}
+          <Route path="/welcome" element={<Welcome />} />
+          <Route path="/onboarding" element={<Onboarding />} />
 
-        {/* Standalone Dashboard/Project Routes */}
-        <Route path="/dashboard/projects/create" element={<ProjectCreationWizard />} />
-        <Route path="/dashboard/projects/:id" element={<ProjectWorkspace />} />
+          {/* Standalone Dashboard/Project Routes */}
+          <Route path="/dashboard/projects/create" element={<ProjectCreationWizard />} />
+          <Route path="/dashboard/projects/my-projects" element={<ProjectWorkspace />} />
+          <Route path="/dashboard/projects/:id/workspace" element={<ProjectWorkspace />} />
 
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="journey" element={<Journey />} />
-          <Route path="cohort" element={<CohortLayout />}>
-            <Route index element={<CohortDashboard />} />
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="journey" element={<Journey />} />
+            <Route path="cohort" element={<CohortLayout />}>
+              <Route index element={<CohortDashboard />} />
+            </Route>
+            <Route path="projects" element={<ProjectLayout />}>
+              <Route index element={<ProjectHub />} />
+              <Route path="open" element={<ProjectHub />} />
+              <Route path="hackathon" element={<ProjectHub />} />
+              <Route path="research" element={<ProjectHub />} />
+              <Route path="opensource" element={<ProjectHub />} />
+              <Route path=":id" element={<ProjectForgePage />} />
+            </Route>
+            <Route path="community" element={<CommunityLayout />}>
+              <Route index element={<CommunityHub />} />
+              <Route path="c/:id" element={<CommunitySpace />} />
+            </Route>
+            <Route path="spaces" element={<SpaceLayout />}>
+              <Route path=":id" element={<SpaceWorkspace />} />
+            </Route>
+            
+            {/* Coming Soon / Placeholder Routes */}
+            <Route path="mentors" element={<MentorLayout />}>
+              <Route index element={<MentorHub />} />
+              <Route path="sessions" element={<SessionDashboard />} />
+              <Route path=":id" element={<MentorProfile />} />
+            </Route>
+            <Route path="opportunities" element={<DiscoverLayout />}>
+              <Route index element={<DiscoverHub />} />
+              <Route path="tracker" element={<ApplicationTracker />} />
+              <Route path=":id" element={<OpportunityDetail />} />
+            </Route>
+            <Route path="hackathons" element={<ComingSoon />} />
+            <Route path="portfolio" element={<PortfolioDashboard />} />
+            <Route path="resume" element={<ResumeBuilder />} />
+            <Route path="certificates" element={<ComingSoon />} />
+            <Route path="events" element={<ComingSoon />} />
+            <Route path="messages" element={<ComingSoon />} />
+            <Route path="notifications" element={<ComingSoon />} />
+            <Route path="settings" element={<ComingSoon />} />
           </Route>
-          <Route path="projects" element={<ProjectLayout />}>
-            <Route index element={<ProjectHub />} />
-            <Route path=":id" element={<ProjectForgePage />} />
-          </Route>
-          <Route path="community" element={<CommunityLayout />}>
-            <Route index element={<CommunityHub />} />
-            <Route path="c/:id" element={<CommunitySpace />} />
-          </Route>
-          <Route path="spaces" element={<SpaceLayout />}>
-            <Route path=":id" element={<SpaceWorkspace />} />
-          </Route>
-          
-          {/* Coming Soon / Placeholder Routes */}
-          <Route path="mentors" element={<MentorLayout />}>
-            <Route index element={<MentorHub />} />
-            <Route path="sessions" element={<SessionDashboard />} />
-            <Route path=":id" element={<MentorProfile />} />
-          </Route>
-          <Route path="opportunities" element={<DiscoverLayout />}>
-            <Route index element={<DiscoverHub />} />
-            <Route path="tracker" element={<ApplicationTracker />} />
-            <Route path=":id" element={<OpportunityDetail />} />
-          </Route>
-          <Route path="hackathons" element={<ComingSoon />} />
-          <Route path="portfolio" element={<PortfolioDashboard />} />
-          <Route path="resume" element={<ResumeBuilder />} />
-          <Route path="certificates" element={<ComingSoon />} />
-          <Route path="events" element={<ComingSoon />} />
-          <Route path="messages" element={<ComingSoon />} />
-          <Route path="notifications" element={<ComingSoon />} />
-          <Route path="settings" element={<ComingSoon />} />
         </Route>
 
         {/* Public Portfolio Route */}

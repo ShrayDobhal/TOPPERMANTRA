@@ -1,14 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ChevronLeft, Download, FileText, CheckCircle2, LayoutTemplate, 
   Settings2, Sparkles, Wand2
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+import useStudentStore from '../../../store/useStudentStore';
 
 export default function ResumeBuilder() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportComplete, setExportComplete] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(true);
+  
+  const profile = useStudentStore(s => s.profile);
+
+  // Section visibility state
+  const [sections, setSections] = useState({
+    'Contact Info': true,
+    'Professional Summary': false,
+    'Experience': true,
+    'Projects': true,
+    'Education': true,
+    'Skills': true
+  });
+
+  const [activeTemplate, setActiveTemplate] = useState('Harvard Minimal');
+
+  useEffect(() => {
+    // Simulate auto-sync completion
+    const timer = setTimeout(() => setIsSyncing(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleExport = () => {
     setIsExporting(true);
@@ -18,6 +40,10 @@ export default function ResumeBuilder() {
       setExportComplete(true);
       setTimeout(() => setExportComplete(false), 3000);
     }, 2000);
+  };
+
+  const toggleSection = (section) => {
+    setSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
   return (
@@ -38,12 +64,12 @@ export default function ResumeBuilder() {
         
         <button 
           onClick={handleExport}
-          disabled={isExporting || exportComplete}
+          disabled={isExporting || exportComplete || isSyncing}
           className={cn(
             "px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-sm",
             exportComplete 
               ? "bg-[#22C55E] text-white" 
-              : isExporting
+              : (isExporting || isSyncing)
               ? "bg-[#E2E8F0] text-[#64748B] cursor-not-allowed"
               : "bg-[#0F172A] text-white hover:bg-[#1E293B]"
           )}
@@ -59,10 +85,10 @@ export default function ResumeBuilder() {
       </div>
 
       {/* Main Content - Dual Pane */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         
         {/* Left Sidebar - Controls */}
-        <div className="w-80 shrink-0 bg-white border-r border-[#E9ECEF] flex flex-col overflow-y-auto custom-scrollbar">
+        <div className="w-80 shrink-0 bg-white border-r border-[#E9ECEF] flex flex-col overflow-y-auto custom-scrollbar z-10 relative">
           
           <div className="p-6 border-b border-[#E9ECEF]">
             <h3 className="text-sm font-extrabold text-[#0F172A] mb-4 flex items-center gap-2">
@@ -88,27 +114,31 @@ export default function ResumeBuilder() {
               <LayoutTemplate className="text-[#64748B]" size={16} /> Templates
             </h3>
             <div className="space-y-3">
-              {['Harvard Minimal', 'Modern Tech', 'Creative Grid'].map((template, i) => (
-                <button key={template} className={cn(
-                  "w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all border",
-                  i === 0 ? "bg-[#3B82F6]/10 border-[#3B82F6]/30 text-[#3B82F6]" : "bg-white border-[#E9ECEF] text-[#64748B] hover:border-[#94A3B8]"
-                )}>
+              {['Harvard Minimal', 'Modern Tech', 'Creative Grid'].map((template) => (
+                <button 
+                  key={template} 
+                  onClick={() => setActiveTemplate(template)}
+                  className={cn(
+                    "w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all border",
+                    activeTemplate === template ? "bg-[#3B82F6]/10 border-[#3B82F6]/30 text-[#3B82F6]" : "bg-white border-[#E9ECEF] text-[#64748B] hover:border-[#94A3B8]"
+                  )}
+                >
                   {template}
                 </button>
               ))}
             </div>
           </div>
           
-          <div className="p-6">
+          <div className="p-6 pb-24">
             <h3 className="text-sm font-extrabold text-[#0F172A] mb-4 flex items-center gap-2">
               <Settings2 className="text-[#64748B]" size={16} /> Included Sections
             </h3>
             <div className="space-y-3">
-              {['Contact Info', 'Professional Summary', 'Experience', 'Projects', 'Education', 'Skills'].map(section => (
-                <label key={section} className="flex items-center justify-between group cursor-pointer">
+              {Object.keys(sections).map(section => (
+                <label key={section} className="flex items-center justify-between group cursor-pointer" onClick={() => toggleSection(section)}>
                   <span className="text-sm font-semibold text-[#0F172A]">{section}</span>
-                  <div className="w-10 h-6 bg-[#3B82F6] rounded-full relative transition-colors">
-                    <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-transform"></div>
+                  <div className={cn("w-10 h-6 rounded-full relative transition-colors", sections[section] ? "bg-[#3B82F6]" : "bg-[#CBD5E1]")}>
+                    <div className={cn("absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-200", sections[section] ? "right-1" : "left-1")}></div>
                   </div>
                 </label>
               ))}
@@ -118,74 +148,99 @@ export default function ResumeBuilder() {
         </div>
 
         {/* Right Pane - Live Preview */}
-        <div className="flex-1 bg-[#F1F5F9] p-8 overflow-y-auto custom-scrollbar flex justify-center">
+        <div className="flex-1 bg-[#F1F5F9] p-8 overflow-y-auto custom-scrollbar flex justify-center items-start">
           
           {/* A4 Paper Preview */}
-          <div className="w-[800px] h-[1131px] bg-white shadow-xl flex flex-col p-12 shrink-0">
-            {/* Header */}
-            <div className="border-b-2 border-[#0F172A] pb-6 mb-6 text-center">
-              <h1 className="text-4xl font-serif text-[#0F172A] uppercase tracking-wider mb-2">Shray Dobhal</h1>
-              <p className="text-sm text-[#475569] font-sans">
-                shraydobhal@gmail.com • +91 9876543210 • linkedin.com/in/shray • github.com/shray
-              </p>
-            </div>
-            
-            {/* Education */}
-            <div className="mb-6">
-              <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Education</h2>
-              <div className="flex justify-between items-baseline mb-1">
-                <h3 className="text-base font-bold text-[#0F172A]">Topper Mantra University</h3>
-                <span className="text-sm text-[#475569]">Expected 2027</span>
-              </div>
-              <p className="text-sm text-[#475569] italic">Bachelor of Technology in Computer Science</p>
-            </div>
-            
-            {/* Experience */}
-            <div className="mb-6">
-              <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Experience</h2>
-              
-              <div className="mb-4">
-                <div className="flex justify-between items-baseline mb-1">
-                  <h3 className="text-base font-bold text-[#0F172A]">Google</h3>
-                  <span className="text-sm text-[#475569]">Summer 2026</span>
-                </div>
-                <p className="text-sm text-[#475569] italic mb-2">Software Engineering Intern</p>
-                <ul className="list-disc list-outside ml-4 text-sm text-[#475569] space-y-1">
-                  <li>Designed and implemented a distributed caching system using Redis, reducing API latency by 40%.</li>
-                  <li>Collaborated with a team of 5 engineers to migrate legacy monolith architecture to Go microservices.</li>
-                </ul>
-              </div>
-            </div>
-            
-            {/* Projects */}
-            <div className="mb-6">
-              <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Projects</h2>
-              
-              <div className="mb-4">
-                <div className="flex justify-between items-baseline mb-1">
-                  <h3 className="text-base font-bold text-[#0F172A]">Spaces Collaboration Engine</h3>
-                  <span className="text-sm text-[#475569]">React, Node.js, WebSockets</span>
-                </div>
-                <ul className="list-disc list-outside ml-4 text-sm text-[#475569] space-y-1">
-                  <li>Built a real-time collaborative workspace supporting 10,000+ concurrent users with zero latency tab switching.</li>
-                  <li>Implemented drag-and-drop Kanban boards and integrated video conferencing APIs for live office hours.</li>
-                </ul>
-              </div>
-            </div>
-            
-            {/* Skills */}
-            <div>
-              <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Technical Skills</h2>
-              <p className="text-sm text-[#475569] mb-1"><span className="font-bold text-[#0F172A]">Languages:</span> JavaScript, TypeScript, Python, Java, Go, C++</p>
-              <p className="text-sm text-[#475569] mb-1"><span className="font-bold text-[#0F172A]">Frameworks:</span> React, Next.js, Express, Spring Boot, Tailwind CSS</p>
-              <p className="text-sm text-[#475569]"><span className="font-bold text-[#0F172A]">Tools & Cloud:</span> AWS, Docker, Kubernetes, Git, GitHub Actions, Figma</p>
-            </div>
+          <div className="relative w-[800px] min-h-[1131px] bg-white shadow-xl flex flex-col p-12 shrink-0 transition-all">
             
             {/* Auto Generate Overlay */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-4 rounded-2xl border border-[#E9ECEF] shadow-xl flex items-center gap-3 animate-pulse">
-              <Wand2 className="text-[#A855F7]" size={20} />
-              <span className="text-sm font-bold text-[#0F172A]">Auto-syncing from Showcase...</span>
+            {isSyncing && (
+              <div className="absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center">
+                <div className="bg-white p-4 rounded-2xl border border-[#E9ECEF] shadow-2xl flex items-center gap-3 animate-pulse">
+                  <Wand2 className="text-[#A855F7]" size={20} />
+                  <span className="text-sm font-bold text-[#0F172A]">Auto-syncing from Showcase...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Header */}
+            <div className="border-b-2 border-[#0F172A] pb-6 mb-6 text-center">
+              <h1 className="text-4xl font-serif text-[#0F172A] uppercase tracking-wider mb-2">{profile?.name || 'Student Name'}</h1>
+              {sections['Contact Info'] && (
+                <p className="text-sm text-[#475569] font-sans">
+                  {profile?.email || 'email@example.com'} • +91 9876543210 • linkedin.com/in/{profile?.name?.split(' ')[0].toLowerCase()} • github.com/{profile?.name?.split(' ')[0].toLowerCase()}
+                </p>
+              )}
             </div>
+            
+            {/* Professional Summary */}
+            {sections['Professional Summary'] && (
+              <div className="mb-6">
+                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Professional Summary</h2>
+                <p className="text-sm text-[#475569] leading-relaxed">
+                  Results-driven software engineering student with a strong foundation in modern web technologies and a passion for building scalable, high-performance applications. Proven ability to quickly learn new tools and collaborate effectively in fast-paced environments.
+                </p>
+              </div>
+            )}
+
+            {/* Education */}
+            {sections['Education'] && (
+              <div className="mb-6">
+                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Education</h2>
+                <div className="flex justify-between items-baseline mb-1">
+                  <h3 className="text-base font-bold text-[#0F172A]">{profile?.college || 'University Name'}</h3>
+                  <span className="text-sm text-[#475569]">Expected 2027</span>
+                </div>
+                <p className="text-sm text-[#475569] italic">Bachelor of Technology in {profile?.major || 'Computer Science'}</p>
+              </div>
+            )}
+            
+            {/* Experience */}
+            {sections['Experience'] && (
+              <div className="mb-6">
+                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Experience</h2>
+                
+                <div className="mb-4">
+                  <div className="flex justify-between items-baseline mb-1">
+                    <h3 className="text-base font-bold text-[#0F172A]">Google</h3>
+                    <span className="text-sm text-[#475569]">Summer 2026</span>
+                  </div>
+                  <p className="text-sm text-[#475569] italic mb-2">Software Engineering Intern</p>
+                  <ul className="list-disc list-outside ml-4 text-sm text-[#475569] space-y-1">
+                    <li>Designed and implemented a distributed caching system using Redis, reducing API latency by 40%.</li>
+                    <li>Collaborated with a team of 5 engineers to migrate legacy monolith architecture to Go microservices.</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+            
+            {/* Projects */}
+            {sections['Projects'] && (
+              <div className="mb-6">
+                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Projects</h2>
+                
+                <div className="mb-4">
+                  <div className="flex justify-between items-baseline mb-1">
+                    <h3 className="text-base font-bold text-[#0F172A]">Spaces Collaboration Engine</h3>
+                    <span className="text-sm text-[#475569]">React, Node.js, WebSockets</span>
+                  </div>
+                  <ul className="list-disc list-outside ml-4 text-sm text-[#475569] space-y-1">
+                    <li>Built a real-time collaborative workspace supporting 10,000+ concurrent users with zero latency tab switching.</li>
+                    <li>Implemented drag-and-drop Kanban boards and integrated video conferencing APIs for live office hours.</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+            
+            {/* Skills */}
+            {sections['Skills'] && (
+              <div>
+                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Technical Skills</h2>
+                <p className="text-sm text-[#475569] mb-1"><span className="font-bold text-[#0F172A]">Languages:</span> JavaScript, TypeScript, Python, Java, Go, C++</p>
+                <p className="text-sm text-[#475569] mb-1"><span className="font-bold text-[#0F172A]">Frameworks:</span> React, Next.js, Express, Spring Boot, Tailwind CSS</p>
+                <p className="text-sm text-[#475569]"><span className="font-bold text-[#0F172A]">Tools & Cloud:</span> AWS, Docker, Kubernetes, Git, GitHub Actions, Figma</p>
+              </div>
+            )}
             
           </div>
         </div>

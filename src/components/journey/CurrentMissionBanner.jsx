@@ -17,7 +17,7 @@ export default function CurrentMissionBanner() {
               <Target size={12} /> Current Mission
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold font-heading mb-2">Build your AI Resume Analyzer Project</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#FF5722] mb-2">Build your AI Resume Analyzer Project</h2>
           <p className="text-[#94A3B8] text-sm md:text-base font-medium max-w-xl">
             You have completed the required backend modules. It is time to apply your skills and build a full-stack project for your portfolio.
           </p>

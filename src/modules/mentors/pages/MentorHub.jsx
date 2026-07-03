@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Search, Filter, Star, MapPin, GraduationCap, Clock, Award, Check
+  Search, Filter, Star, MapPin, GraduationCap, Clock, Award, Check, ChevronDown
 } from 'lucide-react';
 import { Avatar } from '../../../components/ui/Avatar';
 import { cn } from '../../../lib/utils';
@@ -43,6 +44,7 @@ const mentors = [
 
 export default function MentorHub() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar h-full bg-[#FFFFFF]">
@@ -59,66 +61,143 @@ export default function MentorHub() {
             </p>
           </div>
 
-          <div className="relative w-full md:w-[400px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0F172A]/50" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search by name, company..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#FFFFFF] border border-[#E9ECEF] rounded-full py-2.5 pl-11 pr-4 text-sm font-medium text-[#000000] placeholder:text-[#0F172A]/50 focus:outline-none focus:border-[#FE6D4D] shadow-sm transition-all"
-            />
+          <div className="relative w-full md:w-[480px]">
+            <div className="flex items-center bg-[#FFFFFF] border border-[#E9ECEF] rounded-full shadow-sm focus-within:border-[#FE6D4D] transition-all overflow-hidden relative z-20">
+              <div className="pl-4 pr-2 flex items-center shrink-0">
+                <Search className="text-[#0F172A]/50" size={18} />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search by name, company..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 py-2.5 px-2 text-sm font-medium text-[#000000] placeholder:text-[#0F172A]/50 focus:outline-none bg-transparent"
+              />
+              <div className="h-6 w-px bg-[#E9ECEF] shrink-0 mx-1"></div>
+              <button 
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
+              >
+                <Filter size={16} className={showFilters ? "text-[#FE6D4D]" : ""} />
+                Filters
+                <ChevronDown size={14} className={cn("transition-transform duration-200", showFilters ? "rotate-180 text-[#FE6D4D]" : "")} />
+              </button>
+            </div>
+
+            {/* Filter Dropdown */}
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-[calc(100%+12px)] w-[320px] bg-[#FFFFFF] border border-[#E9ECEF] rounded-2xl shadow-xl z-50 p-5 overflow-hidden"
+                >
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="text-xs font-bold text-[#0F172A]/60 uppercase tracking-wider mb-3">Expertise</h4>
+                      <div className="space-y-2.5 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                        {filters.expertise.map((item, i) => (
+                          <label key={i} className="flex items-center gap-3 cursor-pointer group">
+                            <div className="w-4 h-4 rounded border border-[#B0B0B0] flex items-center justify-center group-hover:border-[#FE6D4D] transition-colors"></div>
+                            <span className="text-sm font-semibold text-[#0F172A]/70 group-hover:text-[#000000]">{item}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="pt-4 border-t border-[#E9ECEF]">
+                      <h4 className="text-xs font-bold text-[#0F172A]/60 uppercase tracking-wider mb-3">Experience Level</h4>
+                      <div className="space-y-2.5">
+                        {filters.experienceLevel.map((item, i) => (
+                          <label key={i} className="flex items-center gap-3 cursor-pointer group">
+                            <div className="w-4 h-4 rounded border border-[#B0B0B0] flex items-center justify-center group-hover:border-[#FE6D4D] transition-colors"></div>
+                            <span className="text-sm font-semibold text-[#0F172A]/70 group-hover:text-[#000000]">{item}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Click away overlay */}
+            {showFilters && (
+              <div 
+                className="fixed inset-0 z-10" 
+                onClick={() => setShowFilters(false)}
+              />
+            )}
           </div>
         </div>
       </div>
 
-      <div className="p-6 lg:p-10 max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-8 pb-24">
+      <div className="p-6 lg:p-10 max-w-[1400px] mx-auto pb-24">
         
-        {/* Left Sidebar Filters */}
-        <div className="w-full lg:w-[280px] shrink-0 bg-[#FFFFFF] border border-[#E9ECEF] rounded-2xl p-6 shadow-sm self-start">
-          <div className="flex items-center gap-2 mb-6">
-            <Filter size={20} className="text-[#000000]" />
-            <h3 className="text-lg font-bold text-[#000000]">Filters</h3>
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-xs font-bold text-[#0F172A]/60 uppercase tracking-wider mb-4">Expertise</h4>
-              <div className="space-y-3 h-48 overflow-y-auto custom-scrollbar pr-2">
-                {filters.expertise.map((item, i) => (
-                  <label key={i} className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-4 h-4 rounded border border-[#B0B0B0] flex items-center justify-center group-hover:border-[#FE6D4D] transition-colors">
-                      {/* Check icon would go here if selected */}
-                    </div>
-                    <span className="text-sm font-semibold text-[#0F172A]/70 group-hover:text-[#000000]">{item}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-[#E9ECEF]">
-              <h4 className="text-xs font-bold text-[#0F172A]/60 uppercase tracking-wider mb-4">Experience Level</h4>
-              <div className="space-y-3">
-                {filters.experienceLevel.map((item, i) => (
-                  <label key={i} className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-4 h-4 rounded border border-[#B0B0B0] flex items-center justify-center group-hover:border-[#FE6D4D] transition-colors">
-                    </div>
-                    <span className="text-sm font-semibold text-[#0F172A]/70 group-hover:text-[#000000]">{item}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Content - Mentor Grid */}
-        <div className="flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Main Content - Mentor List */}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col gap-4">
             {mentors.map(mentor => (
-              <div key={mentor.id} className="bg-[#FFFFFF] rounded-3xl border border-[#E9ECEF] p-6 shadow-sm hover:shadow-md hover:border-[#FE6D4D] transition-all flex flex-col relative">
+              <div key={mentor.id} className="bg-[#FFFFFF] rounded-2xl border border-[#E9ECEF] p-5 shadow-sm hover:shadow-md hover:border-[#FE6D4D] transition-all flex flex-col lg:flex-row items-start lg:items-center gap-5">
                 
-                {/* Status Badge */}
-                <div className="absolute top-6 right-6">
+                {/* Avatar */}
+                <div className="shrink-0 flex justify-between w-full lg:w-auto items-start">
+                  <Avatar size="xl" src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${mentor.avatar}`} className="border border-[#E9ECEF] shadow-sm bg-[#FFFFFF]" />
+                  
+                  {/* Mobile Badge */}
+                  <div className="lg:hidden flex flex-col items-end gap-2">
+                    {mentor.status === 'Available' ? (
+                      <span className="bg-[#FFFFFF] text-[#FF5722] text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-[#FE6D4D]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"></div> Available
+                      </span>
+                    ) : (
+                      <span className="bg-[#FFFFFF] text-[#0F172A]/60 text-[10px] font-bold px-2.5 py-1 rounded-full border border-[#E9ECEF]">
+                        Booked
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Info Container */}
+                <div className="flex-1 min-w-0 flex flex-row flex-wrap items-center gap-x-6 gap-y-4 w-full">
+                  
+                  {/* Name & Role */}
+                  <div className="w-[200px] shrink-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-bold text-[#000000] truncate">{mentor.name}</h3>
+                      <div className="flex items-center gap-1 text-xs font-bold text-[#000000]">
+                        <Star size={14} className="text-[#FF5722] fill-current" /> {mentor.rating}
+                      </div>
+                    </div>
+                    <p className="text-[#FF5722] text-sm font-bold truncate">{mentor.role} @ {mentor.company}</p>
+                  </div>
+
+                  {/* Details */}
+                  <div className="hidden sm:flex flex-col gap-1.5 w-[200px] shrink-0">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#0F172A]/80">
+                      <MapPin size={14} className="shrink-0 text-[#FE6D4D]" />
+                      <span className="truncate">{mentor.education}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#0F172A]/80">
+                      <Award size={14} className="shrink-0 text-[#FE6D4D]" />
+                      <span className="truncate">{mentor.achievement}</span>
+                    </div>
+                  </div>
+
+                  {/* Skills Tags */}
+                  <div className="flex flex-wrap gap-1.5 flex-1 min-w-[180px]">
+                    {mentor.skills.map(skill => (
+                      <span key={skill} className="text-[10px] font-bold text-[#64748B] bg-[#F1F5F9] px-2 py-1 rounded whitespace-nowrap">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+
+                </div>
+
+                {/* Desktop Action & Badge */}
+                <div className="hidden lg:flex flex-col items-end gap-3 shrink-0 ml-auto pl-4 border-l border-[#E9ECEF]">
                   {mentor.status === 'Available' ? (
                     <span className="bg-[#FFFFFF] text-[#FF5722] text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-[#FE6D4D]">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]"></div> Available
@@ -128,49 +207,10 @@ export default function MentorHub() {
                       Booked
                     </span>
                   )}
+                  <button className="px-4 py-2 bg-[#FF5722] text-white text-sm font-bold rounded-xl hover:bg-[#FE6D4D] transition-colors whitespace-nowrap">
+                    View Profile
+                  </button>
                 </div>
-
-                {/* Avatar */}
-                <div className="mb-4 mt-2 self-start flex justify-center w-full">
-                  <Avatar size="2xl" src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${mentor.avatar}`} className="border border-[#E9ECEF] shadow-sm bg-[#FFFFFF]" />
-                </div>
-
-                {/* Info Header */}
-                <div className="mb-4 text-center sm:text-left">
-                  <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 mb-1">
-                    <h3 className="text-xl font-bold text-[#000000]">{mentor.name}</h3>
-                    <div className="flex items-center gap-1 text-sm font-bold text-[#000000] sm:ml-auto">
-                      <Star size={16} className="text-[#FF5722] fill-current" /> {mentor.rating}
-                    </div>
-                  </div>
-                  <p className="text-[#FF5722] text-sm font-bold">{mentor.role} @ {mentor.company}</p>
-                </div>
-
-                {/* Details List */}
-                <div className="space-y-2.5 mb-6">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#0F172A]/80">
-                    <MapPin size={14} className="shrink-0 text-[#FE6D4D]" />
-                    <span>{mentor.education}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#0F172A]/80">
-                    <Clock size={14} className="shrink-0 text-[#FE6D4D]" />
-                    <span>{mentor.experience} • {mentor.type}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#0F172A]/80">
-                    <Award size={14} className="shrink-0 text-[#FE6D4D]" />
-                    <span>{mentor.achievement}</span>
-                  </div>
-                </div>
-
-                {/* Skills Tags */}
-                <div className="mt-auto flex flex-wrap gap-2 pt-4">
-                  {mentor.skills.map(skill => (
-                    <span key={skill} className="text-[11px] font-bold text-[#64748B] bg-[#F1F5F9] px-2 py-1 rounded">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-
               </div>
             ))}
           </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -9,6 +9,8 @@ import {
 import { cn } from '../lib/utils';
 import { GlobalSearch } from '../components/shared/GlobalSearch';
 import { NotificationCenter } from '../components/shared/NotificationCenter';
+import useStudentStore from '../store/useStudentStore';
+import useProjectForgeStore from '../store/useProjectForgeStore';
 
 const sidebarLinks = [
   { icon: <Home size={20} />, label: "Mission Control", path: "/dashboard" },
@@ -33,6 +35,14 @@ export default function DashboardLayout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const location = useLocation();
+
+  const fetchProfile = useStudentStore((s) => s.fetchProfile);
+  const fetchProjects = useProjectForgeStore((s) => s.fetchProjects);
+
+  useEffect(() => {
+    fetchProfile();
+    fetchProjects();
+  }, [fetchProfile, fetchProjects]);
 
   const currentPathLabel = sidebarLinks.find(link => link.path === location.pathname)?.label || "Dashboard";
 
@@ -197,22 +207,24 @@ export default function DashboardLayout() {
       {/* Right Utility Panel (Desktop) */}
       <aside className="hidden xl:flex flex-col w-[300px] bg-white border-l border-[#E9ECEF] h-screen sticky top-0 z-40 p-5 overflow-y-auto custom-scrollbar">
         
-        {/* 1. Cohort Activity */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Cohort Pulse</h3>
-          </div>
-          <div className="bg-[#F8FAFC] rounded-xl p-4 border border-[#E9ECEF] shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-bold text-[#0F172A]">47/50 Active</span>
-              <span className="text-xs font-bold text-[#22C55E]">Healthy</span>
+        {/* 1. Cohort Activity (Only visible on Cohort page) */}
+        {location.pathname === '/dashboard/cohort' && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Cohort Pulse</h3>
             </div>
-            <div className="w-full bg-[#E2E8F0] rounded-full h-1.5 mb-3 overflow-hidden">
-              <div className="bg-[#22C55E] h-1.5 rounded-full" style={{ width: '94%' }}></div>
+            <div className="bg-[#F8FAFC] rounded-xl p-4 border border-[#E9ECEF] shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-[#0F172A]">47/50 Active</span>
+                <span className="text-xs font-bold text-[#22C55E]">Healthy</span>
+              </div>
+              <div className="w-full bg-[#E2E8F0] rounded-full h-1.5 mb-3 overflow-hidden">
+                <div className="bg-[#22C55E] h-1.5 rounded-full" style={{ width: '94%' }}></div>
+              </div>
+              <p className="text-xs font-semibold text-[#64748B]">Your rank: <span className="text-[#3B82F6] font-bold">#14</span></p>
             </div>
-            <p className="text-xs font-semibold text-[#64748B]">Your rank: <span className="text-[#3B82F6] font-bold">#14</span></p>
           </div>
-        </div>
+        )}
 
         {/* 2. Claimed Tasks */}
         <div className="mb-6">

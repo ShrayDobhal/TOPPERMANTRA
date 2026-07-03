@@ -66,7 +66,7 @@ export default function ProjectForgePage() {
                     <Hammer size={24} />
                   </div>
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold font-heading">{project.title}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#FF5722]">{project.title}</h1>
                     <p className="text-white/70 text-sm font-medium">
                       Mentored by {project.mentor.name} · {project.mentor.institution}
                     </p>

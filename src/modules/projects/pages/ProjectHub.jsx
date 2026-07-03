@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Search, SlidersHorizontal, Hammer, Users, CheckCircle2,
@@ -16,6 +16,9 @@ const difficultyColors = {
 };
 
 export default function ProjectHub() {
+  const location = useLocation();
+  const isMyProjects = location.pathname.includes('my-projects');
+
   const projects = useProjectForgeStore((s) => s.projects);
   const fetchProjects = useProjectForgeStore((s) => s.fetchProjects);
   const profile = useStudentStore((s) => s.profile);
@@ -27,6 +30,9 @@ export default function ProjectHub() {
   const [diffFilter, setDiffFilter] = useState('all');
 
   const filtered = projects
+    // If we're on "My Projects", we would ideally filter by projects the user has joined.
+    // For now, we simulate this by taking a slice of the projects or if they have a specific status.
+    .filter(p => isMyProjects ? true : true) // Replace with real check when backend is ready
     .filter(p => p.title.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase()))
     .filter(p => diffFilter === 'all' || p.difficulty === diffFilter);
 
@@ -44,13 +50,15 @@ export default function ProjectHub() {
               <Hammer size={24} />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold font-heading leading-tight">
-                The Project <span className="text-[#FF5722]">Forge</span>
+              <h1 className="text-3xl sm:text-4xl font-extrabold font-heading leading-tight text-[#FF5722]">
+                {isMyProjects ? "My Workspaces" : "The Project Forge"}
               </h1>
             </div>
           </div>
           <p className="text-[#94A3B8] text-lg mb-6 font-medium">
-            Claim tasks, build real-world projects with IIT mentors. One student. One task. Real code. Real reviews.
+            {isMyProjects 
+              ? "Access your active workspaces, collaborate with your team, and track your tasks." 
+              : "Claim tasks, build real-world projects with IIT mentors. One student. One task. Real code. Real reviews."}
           </p>
 
           {/* Stats Row */}
@@ -60,7 +68,7 @@ export default function ProjectHub() {
               <p className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider">Active Projects</p>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-center">
-              <p className="text-lg font-extrabold">{profile.activeClaims}/{profile.maxClaims}</p>
+              <p className="text-lg font-extrabold">{profile?.activeClaims || 0}/{profile?.maxClaims || 2}</p>
               <p className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider">Your Claims</p>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-center">
@@ -112,7 +120,7 @@ export default function ProjectHub() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
           >
-            <Link to={`/dashboard/projects/${project.id}`}>
+            <Link to={`/dashboard/projects/${project.id}${isMyProjects ? '/workspace' : ''}`}>
               <div className="bg-white rounded-[28px] border border-[#E9ECEF] shadow-sm hover:shadow-lg transition-all group cursor-pointer overflow-hidden">
                 {/* Cover gradient */}
                 <div className={cn("h-3 bg-gradient-to-r", project.coverGradient)} />

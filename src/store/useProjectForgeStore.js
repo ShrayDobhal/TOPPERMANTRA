@@ -1,120 +1,116 @@
 import { create } from 'zustand';
-import { forgeProjects, projectSubparts, aidRequests, submissions, waitlists } from '../lib/mockProjectForge';
-import api from '../lib/api';
+import { supabase } from '../lib/supabase';
+import useStudentStore from './useStudentStore';
 
 const useProjectForgeStore = create((set, get) => ({
-  // ---- Projects ----
-  projects: forgeProjects,
-  subparts: projectSubparts,
-  aidRequests: aidRequests,
-  submissions: submissions,
-  waitlists: waitlists,
+  projects: [],
+  subparts: [],
+  aidRequests: [],
+  submissions: [],
+  waitlists: {},
+  loading: false,
 
-  // ---- Fetch from API ----
   fetchProjects: async () => {
-    try {
-      const res = await api.get('/projects');
-      if (res.data.success) {
-        // Transform Prisma data to match our UI state shape
-        const apiProjects = res.data.data;
-        const subpartsDict = {};
-        
-        apiProjects.forEach(p => {
-          // Keep mock data for UI components that need richer data (like tech stack, mentors) if DB lacks it
-          // Or just use the DB subparts
-          if (p.subparts) {
-            subpartsDict[p.id] = p.subparts.map(sp => ({
-              ...sp,
-              // Map prisma fields to UI expected fields
-              claimedBy: sp.claimedById ? { id: sp.claimedById, name: 'Student', avatar: '' } : null,
-              daysLeft: sp.dueDate ? Math.max(0, Math.ceil((new Date(sp.dueDate) - new Date()) / (1000 * 60 * 60 * 24))) : 0
-            }));
-          }
-        });
-        
-        set({ 
-          // We merge mock projects with DB projects so UI doesn't break if DB is missing coverImages
-          subparts: { ...get().subparts, ...subpartsDict }
-        });
-      }
-    } catch(err) {
-      console.error("Failed to fetch projects from API", err);
-    }
+    set({ loading: true });
+    
+    // Fetch projects
+    const { data: projectsData, error: projError } = await supabase
+      .from('projects')
+      .select('*');
+      
+    // Fetch tasks
+    const { data: tasksData, error: taskError } = await supabase
+      .from('tasks')
+      .select('*, claimed_by(first_name, last_name)');
+
+    if (projError) console.error("Error fetching projects:", projError);
+    if (taskError) console.error("Error fetching tasks:", taskError);
+
+    const formattedTasks = (tasksData || []).map(task => ({
+      ...task,
+      claimedBy: task.claimed_by ? { id: task.claimed_by, name: `${task.claimed_by.first_name} ${task.claimed_by.last_name}` } : null
+    }));
+
+    // Attach task summary stats to projects
+    const formattedProjects = (projectsData || []).map(proj => {
+      const projTasks = formattedTasks.filter(t => t.project_id === proj.id);
+      return {
+        ...proj,
+        techStack: proj.tech_stack,
+        mentor: { name: proj.mentor_name, institution: proj.mentor_institution },
+        coverGradient: proj.cover_gradient,
+        totalSubparts: projTasks.length,
+        completedSubparts: projTasks.filter(t => t.status === 'completed').length,
+        claimedSubparts: projTasks.filter(t => t.status === 'claimed').length,
+        availableSubparts: projTasks.filter(t => t.status === 'available').length,
+      };
+    });
+
+    set({ projects: formattedProjects, subparts: formattedTasks, loading: false });
   },
 
-  // ---- Get subparts for a project ----
-  getSubparts: (projectId) => get().subparts[projectId] || [],
-  getAvailable: (projectId) => (get().subparts[projectId] || []).filter(s => s.status === 'available'),
-  getClaimed: (projectId) => (get().subparts[projectId] || []).filter(s => s.status === 'claimed'),
-  getCompleted: (projectId) => (get().subparts[projectId] || []).filter(s => s.status === 'completed'),
+  getSubparts: (projectId) => {
+    return get().subparts.filter(s => s.project_id === projectId);
+  },
 
-  // ---- Claim Task (max 2 rule) ----
+  getAvailable: (projectId) => get().getSubparts(projectId).filter(s => s.status === 'available'),
+  getClaimed: (projectId) => get().getSubparts(projectId).filter(s => s.status === 'claimed'),
+  getCompleted: (projectId) => get().getSubparts(projectId).filter(s => s.status === 'completed'),
+
   claimTask: async (subpartId, projectId, user) => {
-    try {
-      // 1. Hit the backend API
-      const res = await api.post('/projects/claim', { subpartId });
-      
-      if (res.data.success) {
-        // 2. Update local state on success
-        set((s) => ({
-          subparts: {
-            ...s.subparts,
-            [projectId]: s.subparts[projectId].map(sp =>
-              sp.id === subpartId ? { ...sp, status: 'claimed', claimedBy: user, claimedAt: new Date().toISOString(), daysLeft: 3 } : sp
-            ),
-          },
-        }));
-        return true;
-      }
-    } catch(err) {
-      console.error("Failed to claim task", err);
-      // The backend will reject if user has >= 2 claims
-      alert(err.response?.data?.message || "Failed to claim task. You may have reached your limit.");
+    const canClaim = useStudentStore.getState().canClaimTask();
+    if (!canClaim) {
+      alert("You have reached the maximum number of active claims.");
       return false;
     }
-    return false;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      alert("You must be logged in to claim tasks.");
+      return false;
+    }
+    const userId = session.user.id;
+
+    // Supabase claim
+    const { error } = await supabase
+      .from('tasks')
+      .update({ 
+        status: 'claimed', 
+        claimed_by: userId, 
+        claimed_at: new Date().toISOString() 
+      })
+      .eq('id', subpartId)
+      .eq('status', 'available'); 
+
+    if (error) {
+      console.error("Error claiming task:", error);
+      alert("Could not claim this task. Someone else may have claimed it.");
+      return false;
+    }
+
+    // Refresh UI
+    await get().fetchProjects();
+    
+    // Update student claims count in UI
+    useStudentStore.getState().setProfile({
+      ...useStudentStore.getState().profile,
+      activeClaims: useStudentStore.getState().profile.activeClaims + 1
+    });
+
+    return true;
   },
 
-  // ---- Request Aid ----
-  requestAid: async (subpartId, aidData) => {
-    try {
-      const res = await api.post('/projects/aid', { subpartId, ...aidData });
-      if (res.data.success) {
-        set((s) => ({ aidRequests: [...s.aidRequests, res.data.data] }));
-      }
-    } catch (err) {
-      console.error('Failed to request aid', err);
-    }
+  requestAid: (subpartId, type, description, student) => {
+    console.log("Mock request aid sent", { subpartId, type, description, student });
   },
 
-  // ---- Submit for Review ----
-  submitForReview: async (subpartId, submissionData) => {
-    try {
-      const res = await api.post('/projects/submit', { subpartId, ...submissionData });
-      if (res.data.success) {
-        set((s) => ({ submissions: [...s.submissions, res.data.data] }));
-      }
-    } catch (err) {
-      console.error('Failed to submit review', err);
-    }
+  submitForReview: (subpartId, codeUrl, student) => {
+    console.log("Mock submit for review", { subpartId, codeUrl, student });
   },
 
-  // ---- Join Waitlist ----
-  joinWaitlist: async (subpartId, user) => {
-    try {
-      const res = await api.post('/projects/waitlist', { subpartId });
-      if (res.data.success) {
-        set((s) => {
-          const current = s.waitlists[subpartId] || [];
-          return {
-            waitlists: { ...s.waitlists, [subpartId]: [...current, res.data.data] },
-          };
-        });
-      }
-    } catch (err) {
-      console.error('Failed to join waitlist', err);
-    }
-  },
+  getProjectsByStatus: (status) => {
+    return get().projects.filter(p => p.status === status);
+  }
 }));
 
 export default useProjectForgeStore;
