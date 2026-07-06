@@ -70,20 +70,11 @@ const useStudentStore = create((set, get) => ({
         activeClaims: data.active_claims || 0,
         maxClaims: data.max_claims || 2,
         
-        // As a product manager, a day 1 user shouldn't see random old activity.
-        activity: data.xp === 0 ? [{
-          id: 1,
-          type: 'achievement',
-          title: 'Joined Topper Mantra',
-          timestamp: 'Just now',
-          points: 0
-        }] : state.activity,
-        
         // No deadlines on Day 1 until they claim tasks
         deadlines: data.xp === 0 ? [] : state.deadlines,
 
         // Day 1 Welcome Alert
-        alerts: data.xp === 0 ? [{
+        alerts: data.xp === 0 && data.contribution_score === 0 ? [{
           id: 1,
           type: 'warning',
           title: 'Welcome to Mission Control!',
@@ -93,6 +84,26 @@ const useStudentStore = create((set, get) => ({
           isRead: false
         }] : state.alerts
       }));
+      
+      // Fetch dynamic activity logs
+      const { data: activityData, error: activityError } = await supabase
+        .from('activity_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(10);
+        
+      if (!activityError && activityData) {
+        set((state) => ({
+          activity: activityData.map(log => ({
+            id: log.id,
+            type: log.action_type === 'badge_earned' ? 'achievement' : 'project',
+            title: log.action_type === 'badge_earned' ? `Earned Badge: ${log.entity_name}` : `Completed Task: ${log.entity_name}`,
+            timestamp: new Date(log.created_at).toLocaleDateString(),
+            points: log.xp_earned
+          }))
+        }));
+      }
     }
   },
 

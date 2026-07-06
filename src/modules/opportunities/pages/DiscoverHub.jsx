@@ -1,40 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { 
   Search, Sparkles, MapPin, Briefcase, IndianRupee, Clock, 
-  Bookmark, ExternalLink, ChevronRight, Filter
+  Bookmark, ExternalLink, ChevronRight, Filter, Loader2
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
-
-const featured = [
-  { id: '1', company: 'Google', role: 'Software Engineering Intern (Summer 2027)', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg', type: 'Internship', deadline: 'Oct 30', bg: 'bg-gradient-to-br from-[#3B82F6]/10 to-[#A855F7]/10' },
-  { id: '2', company: 'Microsoft', role: 'Explore Microsoft Intern', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', type: 'Internship', deadline: 'Nov 15', bg: 'bg-gradient-to-br from-[#10B981]/10 to-[#3B82F6]/10' },
-];
-
-const opportunities = [
-  { 
-    id: '101', company: 'Amazon', role: 'SDE Intern (6 Months)', location: 'Bangalore, Hybrid', 
-    stipend: '1.1L / mo', duration: '6 Months', type: 'Internship', match: 94, isMatch: true, 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg',
-    skills: ['DSA', 'Java', 'AWS']
-  },
-  { 
-    id: '102', company: 'Smart India Hackathon', role: 'Software Edition', location: 'Remote', 
-    stipend: '1 Lakh Prize', duration: '36 Hours', type: 'Hackathon', match: 88, isMatch: true,
-    logo: 'https://upload.wikimedia.org/wikipedia/en/b/b3/Smart_India_Hackathon_logo.png',
-    skills: ['React', 'Node.js', 'Teamwork']
-  },
-  { 
-    id: '103', company: 'Atlassian', role: 'SDE 1 (New Grad)', location: 'Remote', 
-    stipend: '32 LPA', duration: 'Full Time', type: 'Job', match: 72, isMatch: false,
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Atlassian_logo.svg',
-    skills: ['React', 'Spring Boot', 'System Design']
-  },
-];
+import useDiscoverStore from '../../../store/useDiscoverStore';
 
 export default function DiscoverHub() {
   const [searchParams] = useSearchParams();
   const categoryFilter = searchParams.get('category');
+  
+  const { opportunities, featured, loading, fetchOpportunities } = useDiscoverStore();
+
+  useEffect(() => {
+    fetchOpportunities();
+  }, [fetchOpportunities]);
   
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -64,6 +45,11 @@ export default function DiscoverHub() {
         </div>
       </div>
 
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center p-20">
+          <Loader2 className="w-8 h-8 animate-spin text-[#3B82F6]" />
+        </div>
+      ) : (
       <div className="p-6 lg:p-10 max-w-6xl mx-auto space-y-12 pb-24">
         
         {/* Featured Opportunities (Only show if no category filter) */}
@@ -82,7 +68,7 @@ export default function DiscoverHub() {
                     <span className="text-[10px] font-bold text-[#0F172A] uppercase tracking-wider bg-white/60 backdrop-blur-sm px-2 py-1 rounded-md border border-[#0F172A]/10 mb-3 inline-block">
                       {item.type}
                     </span>
-                    <h3 className="text-xl md:text-2xl font-extrabold text-[#0F172A] leading-tight mb-2 group-hover:text-[#3B82F6] transition-colors">{item.role}</h3>
+                    <h3 className="text-xl md:text-2xl font-extrabold text-[#0F172A] leading-tight mb-2 group-hover:text-[#3B82F6] transition-colors">{item.title}</h3>
                     <p className="text-sm font-bold text-[#64748B] flex items-center gap-1.5"><Clock size={16}/> Deadline: {item.deadline}</p>
                   </div>
                 </Link>
@@ -111,7 +97,7 @@ export default function DiscoverHub() {
                       <img src={opp.logo} alt={opp.company} className="max-w-full max-h-full object-contain" />
                     </div>
                     <div>
-                      <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-[#3B82F6] transition-colors line-clamp-1">{opp.role}</h3>
+                      <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-[#3B82F6] transition-colors line-clamp-1">{opp.title}</h3>
                       <p className="text-sm font-semibold text-[#64748B]">{opp.company}</p>
                     </div>
                   </div>
@@ -151,6 +137,7 @@ export default function DiscoverHub() {
         </section>
 
       </div>
+      )}
     </div>
   );
 }

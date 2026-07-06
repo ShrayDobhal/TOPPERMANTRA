@@ -1,48 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Search, Filter, Star, MapPin, GraduationCap, Clock, Award, Check, ChevronDown
+  Search, Filter, Star, MapPin, GraduationCap, Clock, Award, Check, ChevronDown, Loader2
 } from 'lucide-react';
 import { Avatar } from '../../../components/ui/Avatar';
 import { cn } from '../../../lib/utils';
+import useMentorStore from '../../../store/useMentorStore';
 
 const filters = {
   expertise: ['AI', 'ML', 'Web Development', 'Competitive Programming', 'DSA', 'System Design', 'Research'],
   experienceLevel: ['Student', 'Alumni', 'Professional']
 };
 
-const mentors = [
-  {
-    id: 'm1', name: 'Rahul Sharma', role: 'Software Engineer', company: 'Google', 
-    experience: '3 YOE', type: 'Alumni', rating: 4.9, 
-    education: 'IIT Delhi • B.Tech Computer Science',
-    achievement: 'SIH National Winner',
-    status: 'Available',
-    avatar: 'Rahul',
-    skills: ['React', 'Node.js', 'System Design', '+1']
-  },
-  {
-    id: 'm2', name: 'Neha Kapoor', role: 'Research Intern', company: 'OpenAI', 
-    experience: '2 YOE', type: 'Student', rating: 5.0, 
-    education: 'BITS Pilani • M.Sc Data Science',
-    achievement: 'Published at NeurIPS',
-    status: 'Available',
-    avatar: 'Neha',
-    skills: ['PyTorch', 'NLP', 'Machine Learning', '+1']
-  },
-  {
-    id: 'm3', name: 'Arjun Reddy', role: 'Founder', company: 'BuildSpace', 
-    experience: '4 YOE', type: 'Founder', rating: 4.8, 
-    education: 'IIT Bombay • B.Tech Electrical',
-    achievement: 'Raised $2M Seed',
-    status: 'Booked',
-    avatar: 'Arjun',
-    skills: ['Product Management', 'Growth', 'Next.js', '+1']
-  },
-];
-
 export default function MentorHub() {
+  const { mentors, loading, fetchMentors } = useMentorStore();
+
+  useEffect(() => {
+    fetchMentors();
+  }, [fetchMentors]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -135,10 +112,18 @@ export default function MentorHub() {
 
       <div className="p-6 lg:p-10 max-w-[1400px] mx-auto pb-24">
         
-        {/* Main Content - Mentor List */}
+        {loading ? (
+          <div className="flex items-center justify-center p-20">
+            <Loader2 className="w-8 h-8 animate-spin text-[#FE6D4D]" />
+          </div>
+        ) : (
         <div className="flex-1 min-w-0">
           <div className="flex flex-col gap-4">
-            {mentors.map(mentor => (
+            {mentors.length === 0 ? (
+              <div className="text-center p-10 bg-[#F8FAFC] rounded-2xl border border-[#E9ECEF]">
+                <p className="text-[#64748B] font-bold">No mentors found. The Admin hasn't assigned mentor roles yet.</p>
+              </div>
+            ) : mentors.map(mentor => (
               <div key={mentor.id} className="bg-[#FFFFFF] rounded-2xl border border-[#E9ECEF] p-5 shadow-sm hover:shadow-md hover:border-[#FE6D4D] transition-all flex flex-col lg:flex-row items-start lg:items-center gap-5">
                 
                 {/* Avatar */}
@@ -215,6 +200,7 @@ export default function MentorHub() {
             ))}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
