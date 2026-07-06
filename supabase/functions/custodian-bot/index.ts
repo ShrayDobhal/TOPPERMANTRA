@@ -98,6 +98,15 @@ serve(async (req) => {
             .from('project_tasks')
             .update({ assignee_id: null, status: 'Backlog', claimed_at: null })
             .eq('id', task.id);
+            
+          // Log unassignment
+          await supabase.from('activity_logs').insert({
+            user_id: task.assignee_id,
+            action_type: 'task_unassigned',
+            entity_id: task.id,
+            entity_name: 'Task Unassigned due to inactivity',
+            xp_earned: 0
+          });
         }
       }
     }
@@ -143,24 +152,44 @@ serve(async (req) => {
     if (resetStreakError) console.error("Error resetting streaks:", resetStreakError);
 
     // ============================================================
-    // 4. BADGE ELIGIBILITY
+    // 4. BADGE ELIGIBILITY (Streak Based Only)
     // ============================================================
-    console.log("➡️ Checking Badge Eligibility...");
+    console.log("➡️ Checking Streak Badge Eligibility...");
     
-    // Auto-grant badges based on threshold (e.g., Code Ninja)
-    const { data: allUsers } = await supabase.from('profiles').select('id, contribution_score, streak');
-    const { data: allBadges } = await supabase.from('badges').select('*');
+    // Note: contribution_score badges are handled by PostgreSQL triggers instantly.
+    // Here we only check for streak-based badges because streaks increment daily.
+    const { data: streakBadges } = await supabase.from('badges').select('*').eq('criteria_type', 'streak');
     
-    if (allUsers && allBadges) {
-      for (const user of allUsers) {
-        for (const badge of allBadges) {
-          let isEligible = false;
-          if (badge.criteria_type === 'streak' && user.streak >= badge.threshold) isEligible = true;
-          if (badge.criteria_type === 'contributionScore' && user.contribution_score >= badge.threshold) isEligible = true;
+    if (streakBadges && streakBadges.length > 0) {
+      for (const badge of streakBadges) {
+        // Find users who just hit the threshold and don't already have the badge
+        // In a true production system of 100k+ users, this would be a Postgres RPC (Stored Procedure).
+        const { data: eligibleUsers } = await supabase
+          .from('profiles')
+          .select('id')
+          .gte('streak', badge.threshold);
           
-          if (isEligible) {
-            // Attempt to insert (will fail gracefully if UNIQUE constraint exists)
-            await supabase.from('user_badges').insert({ user_id: user.id, badge_id: badge.id }).select().single();
+        if (eligibleUsers && eligibleUsers.length > 0) {
+          const insertPromises = eligibleUsers.map(user => 
+            supabase.from('user_badges').insert({ user_id: user.id, badge_id: badge.id }).select().single()
+          );
+          
+          const results = await Promise.allSettled(insertPromises);
+          
+          // Log to activity_logs for newly earned badges
+          const newEarners = results
+            .filter(r => r.status === 'fulfilled' && !r.value.error)
+            .map(r => r.value.data.user_id);
+            
+          if (newEarners.length > 0) {
+            const activityLogs = newEarners.map(userId => ({
+              user_id: userId,
+              action_type: 'badge_earned',
+              entity_id: badge.id,
+              entity_name: badge.name,
+              xp_earned: 0
+            }));
+            await supabase.from('activity_logs').insert(activityLogs);
           }
         }
       }
