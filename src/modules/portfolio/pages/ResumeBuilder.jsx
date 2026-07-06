@@ -6,13 +6,18 @@ import {
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import useStudentStore from '../../../store/useStudentStore';
+import usePortfolioStore from '../../../store/usePortfolioStore';
 
 export default function ResumeBuilder() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportComplete, setExportComplete] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(true);
   
   const profile = useStudentStore(s => s.profile);
+  const { projects, badges, loading, fetchPortfolioData } = usePortfolioStore();
+
+  useEffect(() => {
+    fetchPortfolioData();
+  }, [fetchPortfolioData]);
 
   // Section visibility state
   const [sections, setSections] = useState({
@@ -25,12 +30,6 @@ export default function ResumeBuilder() {
   });
 
   const [activeTemplate, setActiveTemplate] = useState('Harvard Minimal');
-
-  useEffect(() => {
-    // Simulate auto-sync completion
-    const timer = setTimeout(() => setIsSyncing(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleExport = () => {
     setIsExporting(true);
@@ -69,7 +68,7 @@ export default function ResumeBuilder() {
             "px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-sm",
             exportComplete 
               ? "bg-[#22C55E] text-white" 
-              : (isExporting || isSyncing)
+              : (isExporting || loading)
               ? "bg-[#E2E8F0] text-[#64748B] cursor-not-allowed"
               : "bg-[#0F172A] text-white hover:bg-[#1E293B]"
           )}
@@ -154,7 +153,7 @@ export default function ResumeBuilder() {
           <div className="relative w-[800px] min-h-[1131px] bg-white shadow-xl flex flex-col p-12 shrink-0 transition-all">
             
             {/* Auto Generate Overlay */}
-            {isSyncing && (
+            {loading && (
               <div className="absolute inset-0 z-20 bg-white/50 backdrop-blur-[2px] flex items-center justify-center">
                 <div className="bg-white p-4 rounded-2xl border border-[#E9ECEF] shadow-2xl flex items-center gap-3 animate-pulse">
                   <Wand2 className="text-[#A855F7]" size={20} />
@@ -168,7 +167,9 @@ export default function ResumeBuilder() {
               <h1 className="text-4xl font-serif text-[#0F172A] uppercase tracking-wider mb-2">{profile?.name || 'Student Name'}</h1>
               {sections['Contact Info'] && (
                 <p className="text-sm text-[#475569] font-sans">
-                  {profile?.email || 'email@example.com'} • +91 9876543210 • linkedin.com/in/{profile?.name?.split(' ')[0].toLowerCase()} • github.com/{profile?.name?.split(' ')[0].toLowerCase()}
+                  {profile?.email || 'email@example.com'} 
+                  {profile?.githubUrl && ` • github.com/${profile.githubUrl.replace('https://github.com/', '')}`}
+                  {profile?.linkedinUrl && ` • linkedin.com/in/${profile.linkedinUrl.replace('https://www.linkedin.com/in/', '')}`}
                 </p>
               )}
             </div>
@@ -191,7 +192,7 @@ export default function ResumeBuilder() {
                   <h3 className="text-base font-bold text-[#0F172A]">{profile?.college || 'University Name'}</h3>
                   <span className="text-sm text-[#475569]">Expected 2027</span>
                 </div>
-                <p className="text-sm text-[#475569] italic">Bachelor of Technology in {profile?.major || 'Computer Science'}</p>
+                <p className="text-sm text-[#475569] italic">Bachelor of Technology in {profile?.branch || 'Computer Science'}</p>
               </div>
             )}
             
@@ -214,31 +215,48 @@ export default function ResumeBuilder() {
               </div>
             )}
             
-            {/* Projects */}
+            {/* Projects & Experience from Tasks */}
             {sections['Projects'] && (
               <div className="mb-6">
-                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Projects</h2>
+                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Completed Projects</h2>
                 
-                <div className="mb-4">
-                  <div className="flex justify-between items-baseline mb-1">
-                    <h3 className="text-base font-bold text-[#0F172A]">Spaces Collaboration Engine</h3>
-                    <span className="text-sm text-[#475569]">React, Node.js, WebSockets</span>
-                  </div>
-                  <ul className="list-disc list-outside ml-4 text-sm text-[#475569] space-y-1">
-                    <li>Built a real-time collaborative workspace supporting 10,000+ concurrent users with zero latency tab switching.</li>
-                    <li>Implemented drag-and-drop Kanban boards and integrated video conferencing APIs for live office hours.</li>
-                  </ul>
-                </div>
+                {projects.length === 0 ? (
+                  <p className="text-sm text-[#475569] italic">No completed projects yet. Claim and finish tasks to build your portfolio!</p>
+                ) : (
+                  projects.map(project => (
+                    <div key={project.id} className="mb-4">
+                      <div className="flex justify-between items-baseline mb-1">
+                        <h3 className="text-base font-bold text-[#0F172A]">{project.projectTitle}</h3>
+                        <span className="text-sm text-[#475569]">{project.completedAt}</span>
+                      </div>
+                      <p className="text-sm text-[#475569] italic mb-2">{project.title}</p>
+                      <ul className="list-disc list-outside ml-4 text-sm text-[#475569] space-y-1">
+                        <li>{project.description}</li>
+                      </ul>
+                    </div>
+                  ))
+                )}
               </div>
             )}
             
-            {/* Skills */}
+            {/* Skills & Badges */}
             {sections['Skills'] && (
               <div>
-                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Technical Skills</h2>
-                <p className="text-sm text-[#475569] mb-1"><span className="font-bold text-[#0F172A]">Languages:</span> JavaScript, TypeScript, Python, Java, Go, C++</p>
-                <p className="text-sm text-[#475569] mb-1"><span className="font-bold text-[#0F172A]">Frameworks:</span> React, Next.js, Express, Spring Boot, Tailwind CSS</p>
-                <p className="text-sm text-[#475569]"><span className="font-bold text-[#0F172A]">Tools & Cloud:</span> AWS, Docker, Kubernetes, Git, GitHub Actions, Figma</p>
+                <h2 className="text-lg font-serif text-[#0F172A] uppercase tracking-widest border-b border-[#E2E8F0] pb-1 mb-3">Achievements & Skills</h2>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {badges.length === 0 ? (
+                    <span className="text-sm text-[#475569]">Earn badges to display them here.</span>
+                  ) : (
+                    badges.map(badge => (
+                      <span key={badge.id} className="text-xs font-bold text-[#0F172A] bg-[#F1F5F9] px-2.5 py-1 rounded-lg border border-[#E2E8F0] flex items-center gap-1.5">
+                        {badge.icon} {badge.name}
+                      </span>
+                    ))
+                  )}
+                </div>
+                {profile?.skills && (
+                   <p className="text-sm text-[#475569] mb-1 mt-3"><span className="font-bold text-[#0F172A]">Technical Skills:</span> {profile.skills.join(', ')}</p>
+                )}
               </div>
             )}
             
