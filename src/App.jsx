@@ -45,6 +45,7 @@ import PublicProfile from './modules/portfolio/pages/PublicProfile'
 import CohortLayout from './modules/cohort/layouts/CohortLayout'
 import CohortDashboard from './modules/cohort/pages/CohortDashboard'
 import ProjectForgePage from './modules/projects/pages/ProjectForgePage'
+import Settings from './modules/dashboard/pages/Settings'
 import ComingSoon from './components/shared/ComingSoon'
 import ScrollToTop from './components/shared/ScrollToTop'
 import CustomCursor from './components/shared/CustomCursor'
@@ -134,7 +135,7 @@ export default function App() {
             <Route path="events" element={<ComingSoon />} />
             <Route path="messages" element={<ComingSoon />} />
             <Route path="notifications" element={<ComingSoon />} />
-            <Route path="settings" element={<ComingSoon />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Route>
 

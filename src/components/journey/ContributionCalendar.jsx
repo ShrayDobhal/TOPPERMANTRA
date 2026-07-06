@@ -1,18 +1,26 @@
 import { motion } from 'framer-motion';
 import { Flame, Trophy } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import useStudentStore from '../../store/useStudentStore';
 
 export default function ContributionCalendar() {
-  // Generate random data for last 90 days (13 weeks)
+  const profile = useStudentStore(s => s.profile);
+  const streak = profile?.streak || 0;
+
+  // Generate data for last 90 days (13 weeks)
   const weeks = 13;
   const daysPerWeek = 7;
+  const totalDays = weeks * daysPerWeek;
+  
   const calendar = Array.from({ length: weeks }, (_, w) => 
     Array.from({ length: daysPerWeek }, (_, d) => {
-      // Create some realistic looking gaps and active periods
-      const isActive = Math.random() > 0.4; 
-      const intensity = isActive ? Math.floor(Math.random() * 4) + 1 : 0;
-      // Force the last few days to be active for streak
-      if (w === weeks - 1 && d > 3) return { intensity: 3 };
+      // Calculate how many days ago this block represents (0 = today, from right to left, bottom to top)
+      const dayIndex = (weeks - 1 - w) * daysPerWeek + (daysPerWeek - 1 - d);
+      
+      // If the day index is less than the current streak, it should be lit up!
+      const isActive = dayIndex < streak;
+      const intensity = isActive ? Math.floor(Math.random() * 2) + 2 : (Math.random() > 0.8 ? 1 : 0);
+      
       return { intensity };
     })
   );
@@ -33,8 +41,8 @@ export default function ContributionCalendar() {
         <h3 className="text-lg font-bold font-heading text-[#0F172A]">Activity</h3>
         <div className="flex gap-4">
           <div className="flex items-center gap-1.5">
-            <Flame size={16} className="text-[#EF4444] fill-[#EF4444]" />
-            <span className="text-sm font-bold text-[#0F172A]">21 Day Streak</span>
+            <Flame size={16} className={streak > 0 ? "text-[#EF4444] fill-[#EF4444]" : "text-gray-300"} />
+            <span className="text-sm font-bold text-[#0F172A]">{streak} Day Streak</span>
           </div>
         </div>
       </div>

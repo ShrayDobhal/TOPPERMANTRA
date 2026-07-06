@@ -1,275 +1,196 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import {
-  Shield, Users, Crown, Flame, AlertTriangle, UserMinus,
-  MessageSquare, ChevronRight, Clock, CheckCircle2, Circle,
-  TrendingUp, Award, Search, ArrowRight
-} from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Send, Users, Shield, Clock, Paperclip, MoreVertical, CheckCircle2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import useCohortStore from '../../../store/useCohortStore';
 import useStudentStore from '../../../store/useStudentStore';
+import useRoomStore from '../../../store/useRoomStore';
 
 export default function CohortDashboard() {
   const fetchCohort = useCohortStore((s) => s.fetchCohort);
+  const cohort = useCohortStore((s) => s.cohort);
+  const members = useCohortStore((s) => s.members);
+  const profile = useStudentStore((s) => s.profile);
+  
+  const { messages, fetchMessages, sendMessage, subscribeToMessages } = useRoomStore();
+  const [newMessage, setNewMessage] = useState('');
+  const messagesEndRef = useRef(null);
+
   useEffect(() => {
     fetchCohort();
   }, [fetchCohort]);
 
-  const cohort = useCohortStore((s) => s.cohort);
-  const members = useCohortStore((s) => s.members);
-  const currentChallenge = useCohortStore((s) => s.currentChallenge);
-  const previousChallenges = useCohortStore((s) => s.previousChallenges);
-  const challengeResponses = useCohortStore((s) => s.challengeResponses);
-  const profile = useStudentStore((s) => s.profile);
-
-  const [memberFilter, setMemberFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const activeMembers = members.filter(m => m.status === 'active');
-  const yellowFlagged = members.filter(m => m.status === 'yellow');
-  const redFlagged = members.filter(m => m.status === 'red');
-  const removedMembers = members.filter(m => m.status === 'removed');
-
-  const filteredMembers = members
-    .filter(m => memberFilter === 'all' || m.status === memberFilter)
-    .filter(m => m.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => b.contributionScore - a.contributionScore);
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'active': return { label: 'Active', color: 'bg-[#22C55E]/10 text-[#22C55E]', dot: 'bg-[#22C55E]' };
-      case 'yellow': return { label: 'Yellow Flag', color: 'bg-[#F59E0B]/10 text-[#D97706]', dot: 'bg-[#F59E0B]' };
-      case 'red': return { label: 'Red Flag', color: 'bg-[#EF4444]/10 text-[#EF4444]', dot: 'bg-[#EF4444]' };
-      case 'removed': return { label: 'Removed', color: 'bg-[#94A3B8]/10 text-[#64748B]', dot: 'bg-[#94A3B8]' };
-      default: return { label: status, color: 'bg-[#F1F5F9] text-[#64748B]', dot: 'bg-[#94A3B8]' };
+  useEffect(() => {
+    if (cohort?.id) {
+      fetchMessages(cohort.id);
+      const channel = subscribeToMessages(cohort.id);
+      return () => {
+        if (channel) channel.unsubscribe();
+      };
     }
+  }, [cohort?.id, fetchMessages, subscribeToMessages]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !cohort?.id) return;
+    sendMessage(cohort.id, newMessage);
+    setNewMessage('');
   };
 
-  return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+  if (!cohort) {
+    return <div className="flex h-full items-center justify-center p-8 text-gray-500">Loading your batch...</div>;
+  }
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-[32px] p-8 sm:p-12 border border-[#334155] text-white relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#3B82F6]/20 blur-[100px] rounded-full translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#A855F7]/10 blur-[80px] rounded-full -translate-x-1/3 translate-y-1/3" />
-        
-        <div className="relative z-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+  const mentor = members.find(m => m.user?.role === 'Mentor' || m.status === 'mentor') || { name: cohort.mentor?.name || 'Mentor', role: 'Mentor' };
+  const activeMembers = members.filter(m => m.status === 'active' || m.status === 'yellow');
+
+  return (
+    <div className="flex h-[calc(100vh-140px)] gap-6 animate-in fade-in duration-500 pb-4">
+      
+      {/* LEFT: Chat Area */}
+      <div className="flex-1 bg-white rounded-3xl border border-[#E9ECEF] shadow-sm flex flex-col overflow-hidden relative">
+        {/* Chat Header */}
+        <div className="h-16 px-6 border-b border-[#E9ECEF] flex items-center justify-between bg-white z-10">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#6366F1] flex items-center justify-center shadow-sm">
+              <Shield size={20} className="text-white" />
+            </div>
             <div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#6366F1] flex items-center justify-center">
-                  <Shield size={24} />
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-[#FF5722]">{cohort.name}</h1>
-                  <p className="text-[#94A3B8] text-sm font-medium">Mentored by {cohort.mentor.name} · {cohort.mentor.institution}</p>
-                </div>
-              </div>
-              <p className="text-[#94A3B8] text-sm max-w-xl mt-2">
-                All learning happens in the group. No DMs to mentor. Discuss, debate, and solve real-world problems together.
+              <h2 className="text-base font-bold text-[#0F172A]">{cohort.name}</h2>
+              <p className="text-xs font-semibold text-[#22C55E] flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span> Mentor Online
               </p>
             </div>
-
-            {/* Cohort Stats */}
-            <div className="flex items-center gap-4 shrink-0">
-              {[
-                { label: 'Active', value: activeMembers.length, max: cohort.maxSize, color: 'text-[#22C55E]' },
-                { label: 'Week', value: cohort.currentWeek, color: 'text-[#3B82F6]' },
-                { label: 'Challenges', value: previousChallenges.length + 1, color: 'text-[#F59E0B]' },
-              ].map((stat, i) => (
-                <div key={i} className="text-center bg-white/5 border border-white/10 rounded-2xl px-5 py-3">
-                  <p className={cn("text-2xl font-extrabold font-heading", stat.color)}>
-                    {stat.value}{stat.max ? `/${stat.max}` : ''}
-                  </p>
-                  <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">{stat.label}</p>
-                </div>
-              ))}
-            </div>
           </div>
+          <button className="text-[#64748B] hover:bg-[#F1F5F9] p-2 rounded-full transition-colors">
+            <MoreVertical size={20} />
+          </button>
+        </div>
 
-          {/* No-DM Rule Banner */}
-          <div className="mt-6 bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#EF4444]/20 flex items-center justify-center shrink-0">
-              <MessageSquare size={16} className="text-[#EF4444]" />
-            </div>
-            <p className="text-xs font-semibold text-[#CBD5E1]">
-              <span className="text-[#EF4444] font-bold">No-DM Rule:</span> Private messages to the mentor are disabled. All questions must be posted in the group for everyone to learn.
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#F8FAFC]">
+          {/* Welcome Banner */}
+          <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-4 text-center max-w-lg mx-auto">
+            <p className="text-sm font-bold text-[#9F1239] mb-1">Welcome to your Mentor Room</p>
+            <p className="text-xs font-medium text-[#BE123C]">
+              All technical discussions and doubts should be posted here. Do not DM the mentor directly. Your participation is tracked.
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Current Weekly Challenge */}
-      <div>
-        <h2 className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest mb-4 px-1 flex items-center gap-2">
-          <Flame size={14} className="text-[#FF5722]" />
-          This Week's Challenge · Week {currentChallenge.week}
-        </h2>
-        <div className="bg-white rounded-[28px] p-6 sm:p-8 border border-[#E9ECEF] shadow-sm">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div>
-              <h3 className="text-xl font-bold font-heading text-[#0F172A] mb-2">{currentChallenge.title}</h3>
-              <div className="flex items-center gap-3 text-xs text-[#64748B] font-semibold">
-                <span className="flex items-center gap-1"><Users size={12} /> {currentChallenge.responsesCount} responses</span>
-                <span className="w-1 h-1 rounded-full bg-[#CBD5E1]" />
-                <span className="flex items-center gap-1"><Clock size={12} /> Deadline: Sunday</span>
-              </div>
-            </div>
-            <span className="bg-[#22C55E]/10 text-[#22C55E] text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shrink-0">
-              Active
-            </span>
-          </div>
-          <div className="bg-[#F8FAFC] rounded-2xl p-5 border border-[#E9ECEF] text-sm text-[#334155] leading-relaxed whitespace-pre-line mb-6">
-            {currentChallenge.description}
-          </div>
-
-          {/* Top Responses */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold text-[#0F172A]">Top Responses</h4>
-            {challengeResponses
-              .sort((a, b) => b.upvotes - a.upvotes)
-              .slice(0, 3)
-              .map((resp, i) => (
-                <div
-                  key={resp.id}
-                  className={cn(
-                    "p-4 rounded-2xl border transition-all",
-                    resp.isCurrentUser
-                      ? "bg-[#FF5722]/5 border-[#FF5722]/20"
-                      : "bg-white border-[#E9ECEF] hover:border-[#3B82F6]/30"
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        "w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold",
-                        i === 0 ? "bg-gradient-to-br from-[#F59E0B] to-[#D97706]" :
-                        "bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6]"
-                      )}>
-                        {resp.userName.charAt(0)}
-                      </div>
-                      <span className="text-sm font-bold text-[#0F172A]">{resp.userName}</span>
-                      {resp.isCurrentUser && <span className="text-[9px] font-bold text-[#FF5722] bg-[#FF5722]/10 px-1.5 py-0.5 rounded">You</span>}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#64748B]">
-                      <TrendingUp size={12} className="text-[#22C55E]" />
-                      {resp.upvotes} upvotes
+          {messages.map((msg, idx) => {
+            const isMe = msg.user.id === profile.id;
+            const isMentor = msg.user.role === 'Mentor';
+            
+            return (
+              <div key={msg.id || idx} className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
+                {!isMe && (
+                  <span className="text-[11px] font-bold text-[#64748B] mb-1 ml-12 flex items-center gap-1">
+                    {msg.user.name} 
+                    {isMentor && <span className="bg-[#3B82F6] text-white text-[9px] px-1.5 py-0.5 rounded ml-1 uppercase tracking-wider">Mentor</span>}
+                  </span>
+                )}
+                <div className={cn("flex items-end gap-2 max-w-[80%]", isMe ? "flex-row-reverse" : "flex-row")}>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CBD5E1] to-[#94A3B8] shrink-0 overflow-hidden flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                    {msg.user.avatar ? <img src={msg.user.avatar} alt="avatar" /> : msg.user.name.charAt(0)}
+                  </div>
+                  <div className={cn(
+                    "px-4 py-3 rounded-2xl text-sm shadow-sm",
+                    isMe 
+                      ? "bg-[#FF5722] text-white rounded-br-sm" 
+                      : isMentor
+                        ? "bg-[#3B82F6] text-white rounded-bl-sm"
+                        : "bg-white border border-[#E9ECEF] text-[#334155] rounded-bl-sm"
+                  )}>
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <div className={cn("text-[10px] mt-1 text-right font-medium", isMe || isMentor ? "text-white/70" : "text-[#94A3B8]")}>
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
-                  <p className="text-sm text-[#334155] leading-relaxed line-clamp-4 whitespace-pre-line">
-                    {resp.content.substring(0, 200)}...
-                  </p>
                 </div>
-              ))}
-          </div>
+              </div>
+            );
+          })}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 bg-white border-t border-[#E9ECEF]">
+          <form onSubmit={handleSend} className="flex items-center gap-3 bg-[#F1F5F9] border border-[#E2E8F0] p-2 rounded-2xl focus-within:ring-2 focus-within:ring-[#FF5722]/20 focus-within:border-[#FF5722]/50 transition-all">
+            <button type="button" className="p-2 text-[#94A3B8] hover:text-[#64748B] transition-colors rounded-full hover:bg-white shrink-0">
+              <Paperclip size={20} />
+            </button>
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Ask a doubt or share an update..."
+              className="flex-1 bg-transparent text-sm text-[#0F172A] focus:outline-none placeholder:text-[#94A3B8]"
+            />
+            <button 
+              type="submit" 
+              disabled={!newMessage.trim()}
+              className="w-10 h-10 rounded-xl bg-[#FF5722] flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#E64A19] transition-colors shadow-sm shrink-0"
+            >
+              <Send size={18} className="ml-1" />
+            </button>
+          </form>
         </div>
       </div>
 
-      {/* Member Grid */}
-      <div>
-        <div className="flex items-center justify-between mb-4 px-1">
-          <h2 className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest flex items-center gap-2">
-            <Users size={14} /> Cohort Members
-          </h2>
-          <div className="flex items-center gap-2">
-            {[
-              { key: 'all', label: `All (${members.length})` },
-              { key: 'active', label: `Active (${activeMembers.length})` },
-              { key: 'yellow', label: `Warned (${yellowFlagged.length})` },
-            ].map(f => (
-              <button
-                key={f.key}
-                onClick={() => setMemberFilter(f.key)}
-                className={cn(
-                  "text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors",
-                  memberFilter === f.key
-                    ? "bg-[#0F172A] text-white"
-                    : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
-                )}
-              >
-                {f.label}
-              </button>
+      {/* RIGHT: Batch Details (Hidden on small screens) */}
+      <div className="hidden lg:flex flex-col w-[320px] gap-4">
+        {/* Mentor Info */}
+        <div className="bg-white rounded-3xl p-6 border border-[#E9ECEF] shadow-sm flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] mb-4 shadow-md flex items-center justify-center text-white text-2xl font-bold border-4 border-white">
+            {mentor.name.charAt(0)}
+          </div>
+          <h3 className="font-bold text-[#0F172A] text-lg">{mentor.name}</h3>
+          <p className="text-sm font-semibold text-[#3B82F6] mb-4">Batch Mentor</p>
+          <div className="w-full bg-[#F8FAFC] border border-[#E9ECEF] rounded-xl p-3 flex items-center justify-center gap-2 text-xs font-bold text-[#64748B]">
+            <Clock size={14} /> Available: 6 PM - 8 PM
+          </div>
+        </div>
+
+        {/* Batch Members */}
+        <div className="bg-white rounded-3xl p-6 border border-[#E9ECEF] shadow-sm flex-1 overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider flex items-center gap-2">
+              <Users size={16} /> Batch Members
+            </h3>
+            <span className="bg-[#F1F5F9] text-[#64748B] text-xs font-bold px-2 py-0.5 rounded-md">
+              {activeMembers.length}
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
+            {members.filter(m => m.status !== 'mentor').map(member => (
+              <div key={member.id} className="flex items-center justify-between group">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CBD5E1] to-[#94A3B8] flex items-center justify-center text-white text-xs font-bold">
+                      {member.name.charAt(0)}
+                    </div>
+                    <div className={cn(
+                      "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white",
+                      member.status === 'active' ? "bg-[#22C55E]" : "bg-[#F59E0B]"
+                    )}></div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#0F172A] group-hover:text-[#FF5722] transition-colors line-clamp-1">
+                      {member.name} {member.isCurrentUser && '(You)'}
+                    </p>
+                    <p className="text-[10px] font-semibold text-[#94A3B8]">{member.contributionScore} pts</p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
-
-        {/* Search */}
-        <div className="relative mb-4">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
-          <input
-            type="text"
-            placeholder="Search members..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-[#E9ECEF] rounded-xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {filteredMembers.slice(0, 20).map((member) => {
-            const badge = getStatusBadge(member.status);
-            return (
-              <motion.div
-                key={member.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={cn(
-                  "bg-white rounded-2xl p-4 border shadow-sm transition-all hover:shadow-md cursor-pointer",
-                  member.isCurrentUser ? "border-[#FF5722]/30 ring-1 ring-[#FF5722]/10" : "border-[#E9ECEF]"
-                )}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold",
-                    member.isCurrentUser ? "bg-gradient-to-br from-[#FF5722] to-[#FF9800]" : "bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6]"
-                  )}>
-                    {member.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-[#0F172A] truncate">
-                      {member.name} {member.isCurrentUser && '(You)'}
-                    </p>
-                    <p className="text-[10px] text-[#94A3B8] font-medium truncate">{member.college}</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1", badge.color)}>
-                    <span className={cn("w-1.5 h-1.5 rounded-full", badge.dot)} />
-                    {badge.label}
-                  </span>
-                  <span className="text-xs font-bold text-[#64748B]">{member.contributionScore.toLocaleString()} pts</span>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-        {filteredMembers.length > 20 && (
-          <p className="text-center text-xs text-[#94A3B8] font-semibold mt-4">
-            Showing 20 of {filteredMembers.length} members
-          </p>
-        )}
       </div>
-
-      {/* Previous Challenges */}
-      <div>
-        <h2 className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest mb-4 px-1">Previous Challenges</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {previousChallenges.map((ch) => (
-            <div key={ch.id} className="bg-white rounded-2xl p-5 border border-[#E9ECEF] shadow-sm hover:shadow-md transition-all cursor-pointer group">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold text-[#3B82F6] bg-[#3B82F6]/10 px-2 py-0.5 rounded-full">Week {ch.week}</span>
-                <span className="text-[10px] font-bold text-[#22C55E] bg-[#22C55E]/10 px-2 py-0.5 rounded-full">Closed</span>
-              </div>
-              <h3 className="text-sm font-bold text-[#0F172A] mb-2 group-hover:text-[#3B82F6] transition-colors">{ch.title}</h3>
-              <div className="flex items-center justify-between text-xs text-[#64748B] font-semibold">
-                <span>{ch.responsesCount} responses</span>
-                <span className="flex items-center gap-1"><Crown size={12} className="text-[#F59E0B]" /> {ch.topResponder}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      
     </div>
   );
 }

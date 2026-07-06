@@ -4,11 +4,17 @@ import { ProgressRing } from '../ui/ProgressRing';
 import { cn } from '../../lib/utils';
 
 export default function JourneyHero({ profile }) {
+  // Use profile data or default to generic values if missing
+  const firstName = profile?.fullName ? profile.fullName.split(' ')[0] : 'Student';
+  
+  // Calculate dynamic stats based on XP or defaults for demonstration
+  const baseProgress = Math.min(100, Math.max(0, (profile?.xp || 0) / 100));
+  
   const stats = [
-    { label: 'Journey Completion', value: 41, color: '#FF5722', secondary: '#FE6D4D', text: '41%' },
-    { label: 'Weekly Progress', value: 85, color: '#3B82F6', secondary: '#60A5FA', text: '85%' },
-    { label: 'Monthly Progress', value: 65, color: '#A855F7', secondary: '#C084FC', text: '65%' },
-    { label: 'Yearly Growth', value: 72, color: '#22C55E', secondary: '#4ADE80', text: '72%' }
+    { label: 'Journey Completion', value: Math.min(100, 10 + baseProgress), color: '#FF5722', secondary: '#FE6D4D', text: `${Math.min(100, Math.floor(10 + baseProgress))}%` },
+    { label: 'Weekly Progress', value: Math.min(100, 40 + (baseProgress * 0.5)), color: '#3B82F6', secondary: '#60A5FA', text: `${Math.min(100, Math.floor(40 + (baseProgress * 0.5)))}%` },
+    { label: 'Monthly Progress', value: Math.min(100, 25 + (baseProgress * 0.8)), color: '#A855F7', secondary: '#C084FC', text: `${Math.min(100, Math.floor(25 + (baseProgress * 0.8)))}%` },
+    { label: 'Yearly Growth', value: Math.min(100, 30 + baseProgress), color: '#22C55E', secondary: '#4ADE80', text: `${Math.min(100, Math.floor(30 + baseProgress))}%` }
   ];
 
   return (
@@ -21,13 +27,13 @@ export default function JourneyHero({ profile }) {
         {/* Left: Info */}
         <div className="flex-1">
           <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-[#0F172A] mb-8 tracking-tight">
-            Good Morning, Shray 👋
+            Good Morning, {firstName} 👋
           </h1>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
             <div className="flex flex-col">
               <span className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-2 flex items-center gap-1.5"><Target size={14} className="text-[#FF5722]" /> Current Goal</span>
-              <span className="text-base font-bold text-[#0F172A] leading-tight">Become an AI Engineer</span>
+              <span className="text-base font-bold text-[#0F172A] leading-tight">{profile?.careerGoal || 'Become an AI Engineer'}</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Current Stage</span>
@@ -41,7 +47,7 @@ export default function JourneyHero({ profile }) {
               <span className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Current Level</span>
               <div className="flex items-center gap-1.5">
                 <Star size={16} className="text-[#F59E0B] fill-[#F59E0B]" />
-                <span className="text-base font-bold text-[#0F172A] leading-tight">Builder Level 9</span>
+                <span className="text-base font-bold text-[#0F172A] leading-tight">{profile?.rank || 'Builder Level 1'}</span>
               </div>
             </div>
           </div>
@@ -55,15 +61,15 @@ export default function JourneyHero({ profile }) {
                 <Flame size={18} className="text-[#EF4444] fill-[#EF4444]" />
                 <div>
                   <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">Career Health</p>
-                  <p className="text-sm font-bold text-[#0F172A]">84%</p>
+                  <p className="text-sm font-bold text-[#0F172A]">{Math.min(100, 70 + (baseProgress * 0.5)).toFixed(0)}%</p>
                 </div>
               </div>
               <div className="w-px h-8 bg-[#E9ECEF]"></div>
               <div className="flex items-center gap-2">
                 <Zap size={18} className="text-[#A855F7] fill-[#A855F7]" />
                 <div>
-                  <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">Weekly XP</p>
-                  <p className="text-sm font-bold text-[#0F172A]">+320 XP</p>
+                  <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">Total XP</p>
+                  <p className="text-sm font-bold text-[#0F172A]">{profile?.xp || 0} XP</p>
                 </div>
               </div>
             </div>

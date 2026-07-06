@@ -34,7 +34,7 @@ const useHubStore = create((set, get) => ({
         .from('hub_posts')
         .select(`
           *,
-          author:profiles(id, full_name, role, contribution_score)
+          author:profiles(id, full_name, role, xp)
         `)
         .order('created_at', { ascending: false });
 
@@ -72,8 +72,8 @@ const useHubStore = create((set, get) => ({
           author: {
             id: post.author.id,
             name: post.author.full_name,
-            level: Math.floor((post.author.contribution_score || 0) / 100) + 1,
-            contributionScore: post.author.contribution_score || 0
+            level: Math.floor((post.author.xp || 0) / 100) + 1,
+            contributionScore: post.author.xp || 0
           }
         };
       });
@@ -111,7 +111,7 @@ const useHubStore = create((set, get) => ({
           title: postData.title,
           content: postData.content
         }])
-        .select(`*, author:profiles(id, full_name, role, contribution_score)`)
+        .select(`*, author:profiles(id, full_name, role, xp)`)
         .single();
 
       if (error) throw error;
@@ -130,8 +130,8 @@ const useHubStore = create((set, get) => ({
           author: {
             id: data.author.id,
             name: data.author.full_name,
-            level: Math.floor((data.author.contribution_score || 0) / 100) + 1,
-            contributionScore: data.author.contribution_score || 0
+            level: Math.floor((data.author.xp || 0) / 100) + 1,
+            contributionScore: data.author.xp || 0
           }
         };
 

@@ -96,6 +96,43 @@ const useStudentStore = create((set, get) => ({
     }
   },
 
+  updateProfile: async (updates) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    const userId = session.user.id;
+    
+    // Convert camelCase to snake_case if needed
+    const dbUpdates = {};
+    if (updates.fullName) {
+      const parts = updates.fullName.split(' ');
+      dbUpdates.first_name = parts[0];
+      dbUpdates.last_name = parts.slice(1).join(' ');
+    }
+    if (updates.college) dbUpdates.college = updates.college;
+    if (updates.branch) dbUpdates.branch = updates.branch;
+    if (updates.careerGoal) dbUpdates.career_goal = updates.careerGoal;
+    if (updates.bio) dbUpdates.bio = updates.bio;
+    if (updates.githubUrl) dbUpdates.github_url = updates.githubUrl;
+    if (updates.linkedinUrl) dbUpdates.linkedin_url = updates.linkedinUrl;
+    // We don't save avatar_url here directly if it's file upload, but let's assume it's string
+    if (updates.avatar_url) dbUpdates.avatar_url = updates.avatar_url;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(dbUpdates)
+      .eq('id', userId);
+
+    if (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    }
+
+    set((state) => ({
+      profile: { ...state.profile, ...updates }
+    }));
+  },
+
   // ---- Contribution Score (The Currency) ----
   contributionScore: 0,
   addContribution: (points) => set((s) => ({ contributionScore: s.contributionScore + points })),

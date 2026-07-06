@@ -20,22 +20,37 @@ serve(async (req) => {
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     const twentyOneDaysAgo = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000);
 
+    // Fetch frozen students to exclude them from cohort inactivity checks
+    const { data: frozenProfiles } = await supabase
+      .from('profiles')
+      .select('id')
+      .gt('freeze_until', now.toISOString());
+    const frozenIds = frozenProfiles?.map(p => p.id) || [];
+
     // 2 weeks without commenting -> Yellow Flag
-    const { error: yellowFlagError } = await supabase
+    let yellowQuery = supabase
       .from('cohort_members')
       .update({ status: 'yellow' })
       .lt('last_participation_at', fourteenDaysAgo.toISOString())
       .gte('last_participation_at', twentyOneDaysAgo.toISOString())
       .eq('status', 'active');
       
+    if (frozenIds.length > 0) {
+      yellowQuery = yellowQuery.not('student_id', 'in', `(${frozenIds.join(',')})`);
+    }
+    const { error: yellowFlagError } = await yellowQuery;
     if (yellowFlagError) console.error("Error setting yellow flags:", yellowFlagError);
 
     // 3 weeks without commenting -> Red Flag (Auto-removal)
-    const { error: redFlagError } = await supabase
+    let redQuery = supabase
       .from('cohort_members')
       .update({ status: 'removed' })
       .lt('last_participation_at', twentyOneDaysAgo.toISOString());
       
+    if (frozenIds.length > 0) {
+      redQuery = redQuery.not('student_id', 'in', `(${frozenIds.join(',')})`);
+    }
+    const { error: redFlagError } = await redQuery;
     if (redFlagError) console.error("Error setting red flags:", redFlagError);
 
     // ============================================================
@@ -43,16 +58,49 @@ serve(async (req) => {
     // ============================================================
     console.log("➡️ Checking Dead Projects & Stagnant Tasks...");
     
-    // Tasks: 10 days inactive = Unassign task (7 day warning is usually done via a different cron or DB trigger)
+    // Tasks: 10 days inactive = Unassign task (checks waitlist first)
     const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
-    const { error: unassignError } = await supabase
+    const { data: stagnantTasks } = await supabase
       .from('project_tasks')
-      .update({ assignee_id: null, status: 'Backlog', claimed_at: null })
+      .select('id')
       .lt('last_submission_at', tenDaysAgo.toISOString())
       .not('assignee_id', 'is', null)
       .neq('status', 'Completed');
 
-    if (unassignError) console.error("Error unassigning tasks:", unassignError);
+    if (stagnantTasks && stagnantTasks.length > 0) {
+      for (const task of stagnantTasks) {
+        // Check waitlist for this task
+        const { data: waitlist } = await supabase
+          .from('task_waitlist')
+          .select('user_id')
+          .eq('project_task_id', task.id)
+          .order('joined_at', { ascending: true })
+          .limit(1);
+
+        if (waitlist && waitlist.length > 0) {
+          const nextAssignee = waitlist[0].user_id;
+          // Assign to next person and remove them from waitlist
+          await supabase
+            .from('project_tasks')
+            .update({ assignee_id: nextAssignee, status: 'In Progress', claimed_at: now.toISOString(), last_submission_at: now.toISOString() })
+            .eq('id', task.id);
+          
+          await supabase
+            .from('task_waitlist')
+            .delete()
+            .eq('project_task_id', task.id)
+            .eq('user_id', nextAssignee);
+            
+          console.log(`Reassigned task ${task.id} to user ${nextAssignee} from waitlist.`);
+        } else {
+          // No one on waitlist, unassign
+          await supabase
+            .from('project_tasks')
+            .update({ assignee_id: null, status: 'Backlog', claimed_at: null })
+            .eq('id', task.id);
+        }
+      }
+    }
 
     // Projects: 15 days no submission = Archive
     const fifteenDaysAgo = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000);
@@ -82,14 +130,15 @@ serve(async (req) => {
     // 3. STREAK UPDATES (Increment or Reset)
     // ============================================================
     console.log("➡️ Running Streak Updates...");
-    // Reset streak if last_active_at is older than 48 hours ago
+    // Reset streak if last_active_at is older than 48 hours ago AND not frozen
     const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
     
     const { error: resetStreakError } = await supabase
       .from('profiles')
       .update({ streak: 0 })
       .lt('last_active_at', twoDaysAgo.toISOString())
-      .gt('streak', 0);
+      .gt('streak', 0)
+      .or(`freeze_until.is.null,freeze_until.lt.${now.toISOString()}`);
     
     if (resetStreakError) console.error("Error resetting streaks:", resetStreakError);
 

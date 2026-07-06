@@ -24,50 +24,50 @@ const forgeProjects = [
   {
     title: 'Food Delivery App',
     description: 'Full-stack food delivery platform with real-time order tracking, payment integration, and restaurant management.',
-    mentor_name: 'Dr. Amit Kumar', 
-    mentor_institution: 'IIT Delhi',
-    status: 'active', branch: 'CS/IT',
-    tech_stack: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'Socket.io'],
+    domain: 'Full Stack',
     difficulty: 'Advanced',
-    cover_gradient: 'from-[#FF5722] to-[#FF9800]',
+    creator_id: null,
+    github_url: null,
+    live_url: null,
+    status: 'Active'
   },
   {
     title: 'AI Resume Analyzer',
     description: 'NLP-powered resume parser that grades resumes against JD requirements with actionable feedback.',
-    mentor_name: 'Prof. Meera Sharma', 
-    mentor_institution: 'IIT Bombay',
-    status: 'active', branch: 'CS/IT',
-    tech_stack: ['Python', 'FastAPI', 'React', 'OpenAI', 'spaCy'],
+    domain: 'AI/ML',
     difficulty: 'Advanced',
-    cover_gradient: 'from-[#A855F7] to-[#6366F1]',
+    creator_id: null,
+    github_url: null,
+    live_url: null,
+    status: 'Active'
   },
   {
     title: 'Campus Event Manager',
     description: 'Complete event management platform for college tech fests with registration, ticketing, and live dashboards.',
-    mentor_name: 'Dr. Rajesh Gupta', 
-    mentor_institution: 'IIT Kanpur',
-    status: 'active', branch: 'CS/IT',
-    tech_stack: ['Next.js', 'PostgreSQL', 'Prisma', 'Tailwind'],
+    domain: 'Web Development',
     difficulty: 'Intermediate',
-    cover_gradient: 'from-[#22C55E] to-[#14B8A6]',
+    creator_id: null,
+    github_url: null,
+    live_url: null,
+    status: 'Active'
   }
 ];
 
 const subpartsData = [
-  { title: 'User Authentication & JWT', description: 'Secure registration, login, password reset with JWT.', difficulty: 'Intermediate', estimated_hours: 12, xp_reward: 200 },
-  { title: 'Database Schema & Prisma Setup', description: 'Complete database schema for the platform.', difficulty: 'Intermediate', estimated_hours: 8, xp_reward: 150 },
-  { title: 'Payment Gateway Integration', description: 'Stripe payment with checkout flow, success/failure handling.', difficulty: 'Advanced', estimated_hours: 16, xp_reward: 300 },
-  { title: 'Search & Filter Module', description: 'Restaurant/menu search with cuisine, price, rating filters.', difficulty: 'Intermediate', estimated_hours: 10, xp_reward: 200 },
-  { title: 'Real-time Order Tracking', description: 'WebSocket-based order status with map integration.', difficulty: 'Advanced', estimated_hours: 20, xp_reward: 350 },
-  { title: 'Cart & Checkout Flow', description: 'Shopping cart with multi-step checkout.', difficulty: 'Intermediate', estimated_hours: 14, xp_reward: 250 },
-  { title: 'Restaurant Review System', description: 'Star ratings, text reviews, photo uploads.', difficulty: 'Beginner', estimated_hours: 8, xp_reward: 150 },
-  { title: 'Admin Dashboard', description: 'Restaurant owner dashboard for menus, orders, revenue.', difficulty: 'Advanced', estimated_hours: 18, xp_reward: 300 }
+  { title: 'User Authentication & JWT', description: 'Secure registration, login, password reset with JWT.', difficulty: 'Intermediate', estimated_hours: 12, xp_reward: 200, status: 'Backlog' },
+  { title: 'Database Schema & Prisma Setup', description: 'Complete database schema for the platform.', difficulty: 'Intermediate', estimated_hours: 8, xp_reward: 150, status: 'Backlog' },
+  { title: 'Payment Gateway Integration', description: 'Stripe payment with checkout flow, success/failure handling.', difficulty: 'Advanced', estimated_hours: 16, xp_reward: 300, status: 'Backlog' },
+  { title: 'Search & Filter Module', description: 'Restaurant/menu search with cuisine, price, rating filters.', difficulty: 'Intermediate', estimated_hours: 10, xp_reward: 200, status: 'Backlog' },
+  { title: 'Real-time Order Tracking', description: 'WebSocket-based order status with map integration.', difficulty: 'Advanced', estimated_hours: 20, xp_reward: 350, status: 'Backlog' },
+  { title: 'Cart & Checkout Flow', description: 'Shopping cart with multi-step checkout.', difficulty: 'Intermediate', estimated_hours: 14, xp_reward: 250, status: 'Backlog' },
+  { title: 'Restaurant Review System', description: 'Star ratings, text reviews, photo uploads.', difficulty: 'Beginner', estimated_hours: 8, xp_reward: 150, status: 'Backlog' },
+  { title: 'Admin Dashboard', description: 'Restaurant owner dashboard for menus, orders, revenue.', difficulty: 'Advanced', estimated_hours: 18, xp_reward: 300, status: 'Backlog' }
 ];
 
 async function seed() {
   console.log("Seeding Supabase...");
   // Clear existing
-  await supabase.from('tasks').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  await supabase.from('project_tasks').delete().neq('id', '00000000-0000-0000-0000-000000000000');
   await supabase.from('projects').delete().neq('id', '00000000-0000-0000-0000-000000000000');
   
   for (const proj of forgeProjects) {
@@ -80,7 +80,7 @@ async function seed() {
     
     // Add subparts for this project
     const tasksToInsert = subpartsData.map(s => ({ ...s, project_id: projectId }));
-    const { error: err2 } = await supabase.from('tasks').insert(tasksToInsert);
+    const { error: err2 } = await supabase.from('project_tasks').insert(tasksToInsert);
     if (err2) {
       console.error(err2);
     } else {
@@ -91,3 +91,4 @@ async function seed() {
 }
 
 seed();
+

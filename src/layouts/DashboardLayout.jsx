@@ -11,6 +11,8 @@ import { GlobalSearch } from '../components/shared/GlobalSearch';
 import { NotificationCenter } from '../components/shared/NotificationCenter';
 import useStudentStore from '../store/useStudentStore';
 import useProjectForgeStore from '../store/useProjectForgeStore';
+import useHubStore from '../store/useHubStore';
+import useGamificationStore from '../store/useGamificationStore';
 import { useAuth } from '../contexts/AuthContext';
 
 const sidebarLinks = [
@@ -21,7 +23,6 @@ const sidebarLinks = [
   { icon: <Compass size={20} />, label: "My Journey", path: "/dashboard/journey" },
   { icon: <Users size={20} />, label: "Mentors", path: "/dashboard/mentors" },
   { icon: <Target size={20} />, label: "Opportunities", path: "/dashboard/opportunities" },
-  { icon: <Trophy size={20} />, label: "Hackathons", path: "/dashboard/hackathons" },
   { icon: <Folder size={20} />, label: "Portfolio", path: "/dashboard/portfolio" },
   { icon: <FileText size={20} />, label: "Resume Builder", path: "/dashboard/resume" },
   { icon: <Award size={20} />, label: "Certificates", path: "/dashboard/certificates" },
@@ -38,13 +39,34 @@ export default function DashboardLayout() {
   const location = useLocation();
   const { signOut } = useAuth();
 
+  const profile = useStudentStore((s) => s.profile);
+  const alerts = useStudentStore((s) => s.alerts);
   const fetchProfile = useStudentStore((s) => s.fetchProfile);
+  
+  const subparts = useProjectForgeStore((s) => s.subparts);
+  const projects = useProjectForgeStore((s) => s.projects);
   const fetchProjects = useProjectForgeStore((s) => s.fetchProjects);
+  
+  const posts = useHubStore((s) => s.posts);
+  const fetchCommunity = useHubStore((s) => s.fetchCommunity);
+
+  const fetchGamification = useGamificationStore((s) => s.fetchGamification);
 
   useEffect(() => {
     fetchProfile();
     fetchProjects();
-  }, [fetchProfile, fetchProjects]);
+    fetchCommunity();
+    fetchGamification();
+  }, [fetchProfile, fetchProjects, fetchCommunity, fetchGamification]);
+
+  // Derived state for the sidebar
+  const activeClaims = subparts.filter(t => 
+    (t.status === 'In Progress' || t.status === 'In Review' || t.status === 'claimed') && 
+    (t.assignee_id === profile?.id || t.claimedBy?.id === profile?.id)
+  );
+
+  const trendingPosts = [...posts].sort((a, b) => b.upvotes - a.upvotes).slice(0, 2);
+
 
   const currentPathLabel = sidebarLinks.find(link => link.path === location.pathname)?.label || "Dashboard";
 
@@ -118,11 +140,11 @@ export default function DashboardLayout() {
         <div className="p-4 border-t border-[#E9ECEF]">
           <div className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F1F5F9] transition-colors cursor-pointer mb-2">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-sm shrink-0">
-              S
+              {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#0F172A] truncate">Shray Dobhal</p>
-              <p className="text-xs text-[#64748B] truncate">AI Engineer</p>
+              <p className="text-sm font-bold text-[#0F172A] truncate">{profile?.fullName || 'Student'}</p>
+              <p className="text-xs text-[#64748B] truncate">{profile?.rank || 'Novice'}</p>
             </div>
           </div>
           <button 
@@ -198,7 +220,7 @@ export default function DashboardLayout() {
             </div>
             
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-sm shrink-0 ml-2 cursor-pointer ring-2 ring-transparent hover:ring-[#FF5722]/30 transition-all">
-              S
+              {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S'}
             </div>
           </div>
         </header>
@@ -216,7 +238,7 @@ export default function DashboardLayout() {
         {location.pathname === '/dashboard/cohort' && (
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Cohort Pulse</h3>
+              <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Batch Pulse</h3>
             </div>
             <div className="bg-[#F8FAFC] rounded-xl p-4 border border-[#E9ECEF] shadow-sm">
               <div className="flex items-center justify-between mb-2">
@@ -237,22 +259,21 @@ export default function DashboardLayout() {
             <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider">Active Claims</h3>
           </div>
           <div className="space-y-3">
-            <div className="bg-white rounded-xl p-3 border border-[#E9ECEF] border-l-4 border-l-[#F59E0B] shadow-sm group cursor-pointer hover:border-[#F59E0B] transition-colors">
-              <p className="text-xs font-bold text-[#3B82F6] mb-1">Food Delivery App</p>
-              <p className="text-sm font-bold text-[#0F172A] mb-2">Payment Gateway Integration</p>
-              <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-[#F59E0B] flex items-center gap-1">⚠ 3 days left</span>
-                <span className="text-[#64748B]">In Progress</span>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl p-3 border border-[#E9ECEF] border-l-4 border-l-[#22C55E] shadow-sm group cursor-pointer hover:border-[#22C55E] transition-colors">
-              <p className="text-xs font-bold text-[#3B82F6] mb-1">Spaces Engine</p>
-              <p className="text-sm font-bold text-[#0F172A] mb-2">WebSockets Sync</p>
-              <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-[#22C55E]">5 days left</span>
-                <span className="text-[#64748B]">In Progress</span>
-              </div>
-            </div>
+            {activeClaims.length > 0 ? activeClaims.map(claim => {
+              const proj = projects.find(p => p.id === claim.project_id);
+              return (
+                <Link to="/dashboard/projects" key={claim.id} className="block bg-white rounded-xl p-3 border border-[#E9ECEF] border-l-4 border-l-[#F59E0B] shadow-sm group cursor-pointer hover:border-[#F59E0B] transition-colors">
+                  <p className="text-xs font-bold text-[#3B82F6] mb-1">{proj ? proj.title : 'Project'}</p>
+                  <p className="text-sm font-bold text-[#0F172A] mb-2">{claim.title}</p>
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-[#F59E0B] flex items-center gap-1">In Progress</span>
+                    <span className="text-[#64748B]">{claim.estimated_hours || 8} Hrs</span>
+                  </div>
+                </Link>
+              );
+            }) : (
+              <div className="text-sm text-gray-500 italic p-3 bg-white rounded-xl border border-[#E9ECEF]">No active tasks.</div>
+            )}
           </div>
         </div>
 
@@ -261,33 +282,36 @@ export default function DashboardLayout() {
           <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
             Custodian Bot
           </h3>
-          <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 shadow-sm">
-            <div className="flex items-start gap-2">
-              <div className="mt-0.5 text-[#E11D48]"><AlertTriangle size={16} /></div>
-              <div>
-                <p className="text-sm font-bold text-[#9F1239]">Yellow Flag Warning</p>
-                <p className="text-xs font-semibold text-[#BE123C] mt-1 leading-snug">
-                  You haven't participated in the cohort challenge this week. 2 days remaining.
-                </p>
+          {alerts && alerts.length > 0 ? alerts.map(alert => (
+            <div key={alert.id} className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 shadow-sm mb-2">
+              <div className="flex items-start gap-2">
+                <div className="mt-0.5 text-[#E11D48]"><AlertTriangle size={16} /></div>
+                <div>
+                  <p className="text-sm font-bold text-[#9F1239]">{alert.title}</p>
+                  <p className="text-xs font-semibold text-[#BE123C] mt-1 leading-snug">
+                    {alert.message}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )) : (
+            <div className="text-sm text-gray-500 italic p-3 bg-white rounded-xl border border-[#E9ECEF]">All systems go. No warnings.</div>
+          )}
         </div>
 
         {/* 4. Community Trending */}
         <div className="mb-6">
           <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-3">Trending Discussions</h3>
           <div className="space-y-3">
-            {[
-              { tag: 'React', title: 'Best state management in 2026?', replies: 42 },
-              { tag: 'System Design', title: 'How to scale WebSockets to 1M concurrent users?', replies: 18 },
-            ].map((topic, i) => (
-              <div key={i} className="group cursor-pointer">
+            {trendingPosts.length > 0 ? trendingPosts.map((topic, i) => (
+              <Link to="/dashboard/community" key={topic.id || i} className="block group cursor-pointer">
                 <p className="text-xs font-bold text-[#3B82F6] mb-0.5">#{topic.tag}</p>
                 <p className="text-sm font-semibold text-[#0F172A] leading-snug group-hover:text-[#FF5722] transition-colors line-clamp-2">{topic.title}</p>
-                <p className="text-[10px] text-[#64748B] mt-1">{topic.replies} upvotes</p>
-              </div>
-            ))}
+                <p className="text-[10px] text-[#64748B] mt-1">{topic.upvotes} upvotes</p>
+              </Link>
+            )) : (
+              <div className="text-sm text-gray-500 italic p-3">No active discussions.</div>
+            )}
           </div>
         </div>
 
@@ -295,23 +319,26 @@ export default function DashboardLayout() {
         <div className="flex-1 flex flex-col min-h-[150px]">
           <h3 className="font-heading font-bold text-[#0F172A] text-sm uppercase tracking-wider mb-3 flex items-center justify-between">
             Activity Streak
-            <Flame size={16} className="text-[#F97316]" />
+            <Flame size={16} className={profile?.streak > 0 ? "text-[#F97316]" : "text-gray-300"} />
           </h3>
           <div className="bg-white border border-[#E9ECEF] rounded-xl p-4 shadow-sm">
             <div className="grid grid-cols-7 gap-1">
-              {/* Fake calendar grid for last 14 days */}
-              {Array.from({ length: 14 }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className={cn(
-                    "w-6 h-6 rounded-md m-auto",
-                    i === 4 || i === 9 ? "bg-[#F1F5F9]" : "bg-[#F97316]"
-                  )}
-                  title={i === 4 || i === 9 ? "Missed day" : "Active day"}
-                />
-              ))}
+              {Array.from({ length: 14 }).map((_, i) => {
+                // If streak >= 14 - i, they were active
+                const isActive = (14 - i) <= (profile?.streak || 0);
+                return (
+                  <div 
+                    key={i} 
+                    className={cn(
+                      "w-6 h-6 rounded-md m-auto",
+                      isActive ? "bg-[#F97316]" : "bg-[#F1F5F9]"
+                    )}
+                    title={isActive ? "Active day" : "Missed day"}
+                  />
+                );
+              })}
             </div>
-            <p className="text-center text-xs font-bold text-[#64748B] mt-3">21 Day Streak 🔥</p>
+            <p className="text-center text-xs font-bold text-[#64748B] mt-3">{profile?.streak || 0} Day Streak 🔥</p>
           </div>
         </div>
       </aside>
