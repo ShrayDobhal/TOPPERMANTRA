@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import {
   ChevronLeft, Users, Clock, Hammer, GitMerge, AlertTriangle,
@@ -35,7 +36,7 @@ export default function ProjectForgePage() {
 
   const handleClaim = (subpartId) => {
     const success = claimTask(subpartId, project.id, { id: 'stu-001', name: 'Shray D.' });
-    if (!success) alert('You can only claim a maximum of 2 subparts at the same time.');
+    if (!success) toast.error('You can only claim a maximum of 2 subparts at the same time.');
   };
 
   const handleRequestAid = (subpartId) => {

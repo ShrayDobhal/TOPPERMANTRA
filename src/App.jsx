@@ -50,6 +50,7 @@ import ComingSoon from './components/shared/ComingSoon'
 import ScrollToTop from './components/shared/ScrollToTop'
 import CustomCursor from './components/shared/CustomCursor'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import { Toaster } from 'react-hot-toast'
 
 export default function App() {
   const { getToken } = useAuth();
@@ -61,6 +62,7 @@ export default function App() {
 
   return (
     <Router>
+      <Toaster position="top-right" />
       <ScrollToTop />
       <CustomCursor />
       <Routes>

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
 import { mockProjects } from '../lib/mockProjects';
+import toast from 'react-hot-toast';
 
 const useProjectForgeStore = create((set, get) => ({
   projects: [],
@@ -32,9 +33,8 @@ const useProjectForgeStore = create((set, get) => ({
       claimedBy: task.assignee_id ? { id: task.assignee_id, name: task.profiles?.full_name } : null
     }));
 
-    // Fallback to mock data if empty
     if (!projectsData || projectsData.length === 0) {
-      set({ projects: mockProjects, subparts: mockProjects.flatMap(p => p.tasks || []), loading: false });
+      set({ projects: [], subparts: [], loading: false });
       return;
     }
 
@@ -67,13 +67,13 @@ const useProjectForgeStore = create((set, get) => ({
   claimTask: async (subpartId, projectId, user) => {
     const canClaim = useStudentStore.getState().canClaimTask();
     if (!canClaim) {
-      alert("You have reached the maximum number of active claims.");
+      toast.error("You have reached the maximum number of active claims.");
       return false;
     }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      alert("You must be logged in to claim tasks.");
+      toast.error("You must be logged in to claim tasks.");
       return false;
     }
     const userId = session.user.id;
@@ -91,7 +91,7 @@ const useProjectForgeStore = create((set, get) => ({
 
     if (error) {
       console.error("Error claiming task:", error);
-      alert(error.message || "Could not claim this task. Someone else may have claimed it.");
+      toast.error(error.message || "Could not claim this task. Someone else may have claimed it.");
       return false;
     }
 
@@ -108,7 +108,6 @@ const useProjectForgeStore = create((set, get) => ({
   },
 
   requestAid: async (subpartId, type, description, student) => {
-    console.log("Request aid sent", { subpartId, type, description });
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return false;
 
@@ -124,16 +123,15 @@ const useProjectForgeStore = create((set, get) => ({
 
     if (error) {
       console.error("Error requesting aid:", error);
-      alert("Failed to submit request.");
+      toast.error("Failed to submit request.");
       return false;
     }
     
-    alert("Help request submitted to the mentor.");
+    toast.success("Help request submitted to the mentor.");
     return true;
   },
 
   submitForReview: async (subpartId, codeUrl, student) => {
-    console.log("Submit for review", { subpartId, codeUrl });
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return false;
 
@@ -149,7 +147,7 @@ const useProjectForgeStore = create((set, get) => ({
 
     if (subError) {
       console.error("Error submitting for review:", subError);
-      alert("Failed to submit.");
+      toast.error("Failed to submit.");
       return false;
     }
 
@@ -165,7 +163,7 @@ const useProjectForgeStore = create((set, get) => ({
     if (taskError) console.error("Error updating task status:", taskError);
 
     await get().fetchProjects();
-    alert("Task submitted for review!");
+    toast.success("Task submitted for review!");
     return true;
   },
 

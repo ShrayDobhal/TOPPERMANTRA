@@ -65,31 +65,21 @@ const useGamificationStore = create((set, get) => ({
       // Fetch leaderboard
       const { data: leaderboardData, error: lbError } = await supabase
         .from('profiles')
-        .select('id, full_name, college, xp, streak')
-        .order('xp', { ascending: false })
+        .select('id, full_name, college, contribution_score, streak')
+        .order('contribution_score', { ascending: false })
         .limit(20);
 
       const formattedLeaderboard = (leaderboardData || []).map((p, index) => ({
         rank: index + 1,
         name: p.full_name || 'Anonymous User',
         college: p.college || 'Unknown College',
-        contributionScore: p.xp,
+        contributionScore: p.contribution_score,
         streak: p.streak,
         badges: 0, 
         isCurrentUser: p.id === userId
       }));
 
-      // Fallback to mock data if leaderboard is empty
-      if (!leaderboardData || leaderboardData.length === 0) {
-        set({
-          allBadges: badgeDefinitions,
-          earnedBadges: earnedBadges,
-          portfolio: projectPortfolio,
-          leaderboard: leaderboard,
-          contributionHistory: contributionHistory
-        });
-        return;
-      }
+
 
       // Mocking contribution history for heatmap (until we log daily xp events in DB)
       const mockHistory = Array.from({ length: 30 }).map((_, i) => ({

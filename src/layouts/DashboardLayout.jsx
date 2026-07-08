@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Home, Compass, Map, Briefcase, Users, Target, Users2, Trophy, 
@@ -38,6 +38,7 @@ export default function DashboardLayout() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const location = useLocation();
   const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   const profile = useStudentStore((s) => s.profile);
   const alerts = useStudentStore((s) => s.alerts);
@@ -58,6 +59,14 @@ export default function DashboardLayout() {
     fetchCommunity();
     fetchGamification();
   }, [fetchProfile, fetchProjects, fetchCommunity, fetchGamification]);
+
+  // Check if profile is incomplete and redirect to onboarding
+  useEffect(() => {
+    // If the profile has loaded and it has the default college or no college, redirect
+    if (profile && profile.id && (profile.college === 'Add your college' || !profile.college)) {
+      navigate('/welcome');
+    }
+  }, [profile, navigate]);
 
   // Derived state for the sidebar
   const activeClaims = subparts.filter(t => 

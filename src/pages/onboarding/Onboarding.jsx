@@ -13,6 +13,7 @@ import { useMutation } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { useUser } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
+import toast from 'react-hot-toast';
 
 const TOTAL_STEPS = 5;
 
@@ -43,7 +44,9 @@ export default function Onboarding() {
           college: onboardingData.college || '',
           branch: onboardingData.branch || '',
           year: onboardingData.year || '',
-          career_goal: onboardingData.careerGoal || ''
+          career_goal: onboardingData.careerGoal || '',
+          github_url: onboardingData.githubUrl || '',
+          linkedin_url: onboardingData.linkedinUrl || ''
         })
         .eq('id', user.id);
 
@@ -55,7 +58,7 @@ export default function Onboarding() {
     },
     onError: (error) => {
       console.error("Failed to save onboarding data:", error);
-      alert("There was an issue saving your data. Please try again.");
+      toast.error("There was an issue saving your data. Please try again.");
     }
   });
 

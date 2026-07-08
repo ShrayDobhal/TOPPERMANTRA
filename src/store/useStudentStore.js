@@ -44,37 +44,37 @@ const useStudentStore = create((set, get) => ({
     if (data) {
       // Determine rank based on XP (simple PM logic)
       let rank = 'Novice';
-      if (data.xp > 500) rank = 'Apprentice';
-      if (data.xp > 2000) rank = 'Prodigy';
+      if (data.contribution_score > 500) rank = 'Apprentice';
+      if (data.contribution_score > 2000) rank = 'Prodigy';
 
       set((state) => ({
         profile: {
           ...state.profile,
           id: data.id,
-          fullName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+          fullName: data.full_name || '',
           email: data.email,
           college: data.college || 'Add your college',
           branch: data.branch || 'Add your branch',
           year: data.year || '1st Year',
           careerGoal: data.career_goal || 'Undecided',
           level: data.level || 1,
-          xp: data.xp || 0,
+          xp: data.contribution_score || 0,
           streak: data.streak || 0,
           activeClaims: data.active_claims || 0,
           maxClaims: data.max_claims || 2,
-          contributionScore: data.xp || 0,
+          contributionScore: data.contribution_score || 0,
           rank: rank
         },
-        contributionScore: data.xp || 0,
+        contributionScore: data.contribution_score || 0,
         streak: data.streak || 0,
         activeClaims: data.active_claims || 0,
         maxClaims: data.max_claims || 2,
         
         // No deadlines on Day 1 until they claim tasks
-        deadlines: data.xp === 0 ? [] : state.deadlines,
+        deadlines: data.contribution_score === 0 ? [] : state.deadlines,
 
         // Day 1 Welcome Alert
-        alerts: data.xp === 0 && data.contribution_score === 0 ? [{
+        alerts: data.contribution_score === 0 ? [{
           id: 1,
           type: 'warning',
           title: 'Welcome to Mission Control!',
@@ -115,19 +115,16 @@ const useStudentStore = create((set, get) => ({
     
     // Convert camelCase to snake_case if needed
     const dbUpdates = {};
-    if (updates.fullName) {
-      const parts = updates.fullName.split(' ');
-      dbUpdates.first_name = parts[0];
-      dbUpdates.last_name = parts.slice(1).join(' ');
-    }
-    if (updates.college) dbUpdates.college = updates.college;
-    if (updates.branch) dbUpdates.branch = updates.branch;
-    if (updates.careerGoal) dbUpdates.career_goal = updates.careerGoal;
-    if (updates.bio) dbUpdates.bio = updates.bio;
-    if (updates.githubUrl) dbUpdates.github_url = updates.githubUrl;
-    if (updates.linkedinUrl) dbUpdates.linkedin_url = updates.linkedinUrl;
+    if (updates.fullName !== undefined) dbUpdates.full_name = updates.fullName;
+    if (updates.college !== undefined) dbUpdates.college = updates.college;
+    if (updates.branch !== undefined) dbUpdates.branch = updates.branch;
+    if (updates.year !== undefined) dbUpdates.year = updates.year;
+    if (updates.careerGoal !== undefined) dbUpdates.career_goal = updates.careerGoal;
+    if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
+    if (updates.githubUrl !== undefined) dbUpdates.github_url = updates.githubUrl;
+    if (updates.linkedinUrl !== undefined) dbUpdates.linkedin_url = updates.linkedinUrl;
     // We don't save avatar_url here directly if it's file upload, but let's assume it's string
-    if (updates.avatar_url) dbUpdates.avatar_url = updates.avatar_url;
+    if (updates.avatar_url !== undefined) dbUpdates.avatar_url = updates.avatar_url;
 
     const { error } = await supabase
       .from('profiles')

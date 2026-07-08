@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
+import toast from 'react-hot-toast';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { Mail, ArrowRight } from 'lucide-react';
 import api from '../../lib/api';
@@ -49,7 +50,7 @@ export default function VerifyEmail() {
   const handleResend = async () => {
     try {
       if (isMockMode) {
-        alert("Verification email resent! (Mock)");
+        toast.success("Verification email resent! (Mock)");
         return;
       }
       
@@ -59,7 +60,7 @@ export default function VerifyEmail() {
       });
       
       if (error) throw error;
-      alert("Verification email resent!");
+      toast.success("Verification email resent!");
     } catch (err) {
       console.error(err);
       setError("Failed to resend email.");

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
 import { channels as mockChannels, hubPosts as mockHubPosts } from '../lib/mockHub';
+import toast from 'react-hot-toast';
 
 const useHubStore = create((set, get) => ({
   // ---- Channels ----
@@ -34,15 +35,14 @@ const useHubStore = create((set, get) => ({
         .from('hub_posts')
         .select(`
           *,
-          author:profiles(id, full_name, role, xp)
+          author:profiles(id, full_name, role, contribution_score)
         `)
         .order('created_at', { ascending: false });
 
       if (postsError) throw postsError;
       
-      // Fallback to mock data if empty
       if (!postsData || postsData.length === 0) {
-        set({ channels: mockChannels, posts: mockHubPosts, activeChannelId: 'ch-cs' });
+        set({ channels: channelsData || [], posts: [], activeChannelId: channelsData && channelsData.length > 0 ? channelsData[0].id : null });
         return;
       }
 
@@ -72,8 +72,8 @@ const useHubStore = create((set, get) => ({
           author: {
             id: post.author.id,
             name: post.author.full_name,
-            level: Math.floor((post.author.xp || 0) / 100) + 1,
-            contributionScore: post.author.xp || 0
+            level: Math.floor((post.author.contribution_score || 0) / 100) + 1,
+            contributionScore: post.author.contribution_score || 0
           }
         };
       });
@@ -98,7 +98,7 @@ const useHubStore = create((set, get) => ({
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        alert("Please login to post.");
+        toast.error("Please login to post.");
         return false;
       }
 
@@ -111,7 +111,7 @@ const useHubStore = create((set, get) => ({
           title: postData.title,
           content: postData.content
         }])
-        .select(`*, author:profiles(id, full_name, role, xp)`)
+        .select(`*, author:profiles(id, full_name, role, contribution_score)`)
         .single();
 
       if (error) throw error;
@@ -130,8 +130,8 @@ const useHubStore = create((set, get) => ({
           author: {
             id: data.author.id,
             name: data.author.full_name,
-            level: Math.floor((data.author.xp || 0) / 100) + 1,
-            contributionScore: data.author.xp || 0
+            level: Math.floor((data.author.contribution_score || 0) / 100) + 1,
+            contributionScore: data.author.contribution_score || 0
           }
         };
 

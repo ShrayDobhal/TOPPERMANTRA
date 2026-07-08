@@ -37,7 +37,7 @@ const useCohortStore = create((set, get) => ({
       // Get all members
       const { data: membersData } = await supabase
         .from('cohort_members')
-        .select('*, student:profiles(full_name, avatar_url, xp)')
+        .select('*, student:profiles(full_name, avatar_url, contribution_score)')
         .eq('cohort_id', cohortId);
         
       // Get current challenge
@@ -67,16 +67,16 @@ const useCohortStore = create((set, get) => ({
         ...m,
         name: m.student?.full_name || 'Anonymous',
         avatar: m.student?.avatar_url || null,
-        contributionScore: m.student?.xp || 0,
+        contributionScore: m.student?.contribution_score || 0,
         college: 'Your College',
         isCurrentUser: m.student_id === userId
       }));
 
       set({ 
         cohort: memberData.cohort, 
-        members: mappedMembers.length > 0 ? mappedMembers : cohortMembers,
-        currentChallenge: challenge || currentCohort,
-        challengeResponses: responses.length > 0 ? responses : challengeResponses
+        members: mappedMembers.length > 0 ? mappedMembers : [],
+        currentChallenge: challenge || null,
+        challengeResponses: responses.length > 0 ? responses : []
       });
     } catch (err) {
       console.error('Failed to fetch cohort', err);

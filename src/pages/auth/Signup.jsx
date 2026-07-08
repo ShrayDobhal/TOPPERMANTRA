@@ -41,14 +41,12 @@ export default function Signup() {
         return;
       }
 
-      const [firstName, lastName] = name.split(' ');
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            first_name: firstName,
-            last_name: lastName || '',
+            full_name: name,
           }
         }
       });

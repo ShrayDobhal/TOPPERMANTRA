@@ -1,5 +1,6 @@
 import React from 'react';
 import MentorReviewPanel from '../../projects/components/MentorReviewPanel';
+import toast from 'react-hot-toast';
 
 export default function MentorReviewDashboard() {
   // In a real app, fetch these from Supabase where status = 'pending'
@@ -17,13 +18,12 @@ export default function MentorReviewDashboard() {
   ];
 
   const handleApprove = (id) => {
-    console.log('Approve & Merge:', id);
-    alert('Submission Merged! Student awarded XP.');
+    toast.success('Submission Merged! Student awarded XP.');
   };
 
   const handleReject = (id) => {
     console.log('Request Changes:', id);
-    alert('Changes requested. Notification sent to student.');
+    toast('Changes requested. Notification sent to student.', { icon: '📝' });
   };
 
   return (

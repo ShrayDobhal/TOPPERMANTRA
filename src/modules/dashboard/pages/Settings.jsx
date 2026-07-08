@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Building2, BookOpen, Target, Link as LinkIcon, Camera, Save, Loader2, Shield } from 'lucide-react';
 import useStudentStore from '../../../store/useStudentStore';
+import { cn } from '../../../lib/utils';
+import toast from 'react-hot-toast';
 
 export default function Settings() {
   const profile = useStudentStore((s) => s.profile);
@@ -58,7 +60,7 @@ export default function Settings() {
   };
 
   const handleAvatarClick = () => {
-    alert("Avatar upload will connect to Supabase Storage. (Coming Soon)");
+    toast('Avatar upload will connect to Supabase Storage. (Coming Soon)', { icon: '📸' });
   };
 
   return (
@@ -169,6 +171,23 @@ export default function Settings() {
                 className="w-full bg-[#F8FAFC] border border-[#E9ECEF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
                 placeholder="Software Engineer"
               />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
+                <BookOpen size={16} className="text-[#94A3B8]" /> Year
+              </label>
+              <select
+                name="year"
+                value={formData.year}
+                onChange={handleChange}
+                className="w-full bg-[#F8FAFC] border border-[#E9ECEF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
+              >
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+                <option value="Graduated">Graduated</option>
+              </select>
             </div>
           </div>
 
