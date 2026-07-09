@@ -1,30 +1,62 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2, Circle, Lock, Play, Trophy, Users, Briefcase } from 'lucide-react';
 import { cn } from '../../lib/utils';
-
-const roadmapSteps = [
-  { id: 1, title: 'Profile Complete', type: 'setup', status: 'completed', desc: 'Added details and goals.', xp: 50 },
-  { id: 2, title: 'Career Selected', type: 'setup', status: 'completed', desc: 'AI Engineer track chosen.', xp: 50 },
-  { id: 3, title: 'Python Basics', type: 'learning', status: 'completed', desc: 'Mastered core syntax and data structures.', xp: 200 },
-  { id: 4, title: 'Git & GitHub', type: 'learning', status: 'completed', desc: 'Version control fundamentals.', xp: 150 },
-  { id: 5, title: 'Build Portfolio Website', type: 'project', status: 'in-progress', desc: 'Showcase your skills online.', xp: 300 },
-  { id: 6, title: 'Complete AI Project', type: 'project', status: 'locked', desc: 'Resume Analyzer with NLP.', xp: 500 },
-  { id: 7, title: 'Participate in Hackathon', type: 'community', status: 'locked', desc: 'Test your skills under pressure.', xp: 400 },
-  { id: 8, title: 'Get Mentor Review', type: 'mentorship', status: 'locked', desc: 'Feedback from a senior engineer.', xp: 150 },
-  { id: 9, title: 'Apply Internship', type: 'career', status: 'locked', desc: 'Land your first tech role.', xp: 500 },
-];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } }
-};
+import useStudentStore from '../../store/useStudentStore';
 
 export default function JourneyTimeline() {
+  const profile = useStudentStore((s) => s.profile);
+  const xp = profile?.xp || 0;
+
+  // Dynamically calculate status based on actual XP
+  const getStepStatus = (stepId) => {
+    if (stepId === 1 || stepId === 2) return 'completed';
+    if (stepId === 3) {
+      if (xp >= 200) return 'completed';
+      return 'in-progress';
+    }
+    if (stepId === 4) {
+      if (xp >= 350) return 'completed';
+      if (xp >= 200) return 'in-progress';
+      return 'locked';
+    }
+    if (stepId === 5) {
+      if (xp >= 650) return 'completed';
+      if (xp >= 350) return 'in-progress';
+      return 'locked';
+    }
+    // Rest are locked unless they reach higher thresholds
+    return 'locked';
+  };
+
+  const getLineHeight = () => {
+    if (xp >= 650) return '55%';
+    if (xp >= 350) return '45%';
+    if (xp >= 200) return '33%';
+    return '18%'; // only up to Step 2 when they have 0 XP
+  };
+
+  const roadmapSteps = [
+    { id: 1, title: 'Profile Complete', type: 'setup', status: getStepStatus(1), desc: 'Added details and goals.', xp: 50 },
+    { id: 2, title: 'Career Selected', type: 'setup', status: getStepStatus(2), desc: 'AI Engineer track chosen.', xp: 50 },
+    { id: 3, title: 'Python Basics', type: 'learning', status: getStepStatus(3), desc: 'Mastered core syntax and data structures.', xp: 200 },
+    { id: 4, title: 'Git & GitHub', type: 'learning', status: getStepStatus(4), desc: 'Version control fundamentals.', xp: 150 },
+    { id: 5, title: 'Build Portfolio Website', type: 'project', status: getStepStatus(5), desc: 'Showcase your skills online.', xp: 300 },
+    { id: 6, title: 'Complete AI Project', type: 'project', status: getStepStatus(6), desc: 'Resume Analyzer with NLP.', xp: 500 },
+    { id: 7, title: 'Participate in Hackathon', type: 'community', status: getStepStatus(7), desc: 'Test your skills under pressure.', xp: 400 },
+    { id: 8, title: 'Get Mentor Review', type: 'mentorship', status: getStepStatus(8), desc: 'Feedback from a senior engineer.', xp: 150 },
+    { id: 9, title: 'Apply Internship', type: 'career', status: getStepStatus(9), desc: 'Land your first tech role.', xp: 500 },
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  };
+
   return (
     <div className="bg-white rounded-[32px] p-6 sm:p-10 border border-[#E9ECEF] shadow-sm relative">
       <div className="flex items-center justify-between mb-10">
@@ -46,7 +78,7 @@ export default function JourneyTimeline() {
         {/* Animated Fill for completed steps */}
         <motion.div 
           initial={{ height: 0 }}
-          whileInView={{ height: '45%' }} // Approximation based on 4 completed steps out of 9
+          whileInView={{ height: getLineHeight() }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           viewport={{ once: true }}
           className="absolute left-[27px] top-4 w-1.5 bg-gradient-to-b from-[#22C55E] via-[#22C55E] to-[#FF5722] rounded-full z-0"

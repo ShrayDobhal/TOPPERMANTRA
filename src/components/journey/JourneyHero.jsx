@@ -8,13 +8,15 @@ export default function JourneyHero({ profile }) {
   const firstName = profile?.fullName ? profile.fullName.split(' ')[0] : 'Student';
   
   // Calculate dynamic stats based on XP or defaults for demonstration
-  const baseProgress = Math.min(100, Math.max(0, (profile?.xp || 0) / 100));
+  const xp = profile?.xp || 0;
+  const hasStarted = xp > 0;
+  const baseProgress = Math.min(100, Math.max(0, xp / 100));
   
   const stats = [
-    { label: 'Journey Completion', value: Math.min(100, 10 + baseProgress), color: '#FF5722', secondary: '#FE6D4D', text: `${Math.min(100, Math.floor(10 + baseProgress))}%` },
-    { label: 'Weekly Progress', value: Math.min(100, 40 + (baseProgress * 0.5)), color: '#3B82F6', secondary: '#60A5FA', text: `${Math.min(100, Math.floor(40 + (baseProgress * 0.5)))}%` },
-    { label: 'Monthly Progress', value: Math.min(100, 25 + (baseProgress * 0.8)), color: '#A855F7', secondary: '#C084FC', text: `${Math.min(100, Math.floor(25 + (baseProgress * 0.8)))}%` },
-    { label: 'Yearly Growth', value: Math.min(100, 30 + baseProgress), color: '#22C55E', secondary: '#4ADE80', text: `${Math.min(100, Math.floor(30 + baseProgress))}%` }
+    { label: 'Journey Completion', value: hasStarted ? Math.min(100, 10 + baseProgress) : 0, color: '#FF5722', secondary: '#FE6D4D', text: `${hasStarted ? Math.min(100, Math.floor(10 + baseProgress)) : 0}%` },
+    { label: 'Weekly Progress', value: hasStarted ? Math.min(100, 40 + (baseProgress * 0.5)) : 0, color: '#3B82F6', secondary: '#60A5FA', text: `${hasStarted ? Math.min(100, Math.floor(40 + (baseProgress * 0.5))) : 0}%` },
+    { label: 'Monthly Progress', value: hasStarted ? Math.min(100, 25 + (baseProgress * 0.8)) : 0, color: '#A855F7', secondary: '#C084FC', text: `${hasStarted ? Math.min(100, Math.floor(25 + (baseProgress * 0.8))) : 0}%` },
+    { label: 'Yearly Growth', value: hasStarted ? Math.min(100, 30 + baseProgress) : 0, color: '#22C55E', secondary: '#4ADE80', text: `${hasStarted ? Math.min(100, Math.floor(30 + baseProgress)) : 0}%` }
   ];
 
   return (
@@ -61,7 +63,7 @@ export default function JourneyHero({ profile }) {
                 <Flame size={18} className="text-[#EF4444] fill-[#EF4444]" />
                 <div>
                   <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">Career Health</p>
-                  <p className="text-sm font-bold text-[#0F172A]">{Math.min(100, 70 + (baseProgress * 0.5)).toFixed(0)}%</p>
+                  <p className="text-sm font-bold text-[#0F172A]">{hasStarted ? Math.min(100, 70 + (baseProgress * 0.5)).toFixed(0) : 0}%</p>
                 </div>
               </div>
               <div className="w-px h-8 bg-[#E9ECEF]"></div>

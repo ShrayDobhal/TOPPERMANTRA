@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
-import api from '../../../lib/api';
+import { useEffect } from 'react';
+import useStudentStore from '../../../store/useStudentStore';
 
 import JourneyHero from '../../../components/journey/JourneyHero';
 import CurrentMissionBanner from '../../../components/journey/CurrentMissionBanner';
@@ -14,37 +13,12 @@ import AchievementsBoard from '../../../components/journey/AchievementsBoard';
 import AIRecommendations from '../../../components/journey/AIRecommendations';
 
 export default function Journey() {
-  const { data: dashboardData, isLoading, error } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: async () => {
-      try {
-        const response = await api.get('/dashboard');
-        return response.data.data;
-      } catch (err) {
-        return { profile: { level: 9, streak: 21 } };
-      }
-    },
-    retry: false
-  });
+  const profile = useStudentStore((s) => s.profile);
+  const fetchProfile = useStudentStore((s) => s.fetchProfile);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-10 h-10 text-[#FF5722] animate-spin" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <p className="text-red-500 font-bold mb-2">Error loading journey data</p>
-        <p className="text-gray-500 text-sm">Please try refreshing the page.</p>
-      </div>
-    );
-  }
-
-  const profile = dashboardData?.profile || {};
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-6 sm:space-y-8">
