@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
-import { channels as mockChannels, hubPosts as mockHubPosts } from '../lib/mockHub';
 import toast from 'react-hot-toast';
 
 const useHubStore = create((set, get) => ({

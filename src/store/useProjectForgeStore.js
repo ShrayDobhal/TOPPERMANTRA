@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
-import { mockProjects } from '../lib/mockProjects';
 import toast from 'react-hot-toast';
 
 const useProjectForgeStore = create((set, get) => ({
@@ -78,20 +77,21 @@ const useProjectForgeStore = create((set, get) => ({
     }
     const userId = session.user.id;
 
-    // Supabase claim
-    const { error } = await supabase
-      .from('project_tasks')
-      .update({ 
-        status: 'In Progress', 
-        assignee_id: userId, 
-        claimed_at: new Date().toISOString() 
-      })
-      .eq('id', subpartId)
-      .eq('status', 'Backlog'); 
+    // Use the SECURITY DEFINER RPC function to safely claim an unassigned task.
+    // Direct .update() fails because RLS USING(auth.uid() = assignee_id) blocks
+    // updates when assignee_id IS NULL. The RPC handles this + max-2-tasks check.
+    const { data, error } = await supabase
+      .rpc('claim_task', { p_task_id: subpartId });
 
     if (error) {
       console.error("Error claiming task:", error);
-      toast.error(error.message || "Could not claim this task. Someone else may have claimed it.");
+      toast.error(error.message || "Could not claim this task.");
+      return false;
+    }
+
+    // The RPC returns { success: bool, error?: string, task_id?: string }
+    if (data && !data.success) {
+      toast.error(data.error || "Could not claim this task. Someone else may have claimed it.");
       return false;
     }
 

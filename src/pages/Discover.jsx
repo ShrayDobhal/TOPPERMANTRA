@@ -5,7 +5,7 @@ import DiscoverSearch from '../components/discover/DiscoverSearch';
 import OpportunityCategories from '../components/discover/OpportunityCategories';
 import CompanyShowcase from '../components/discover/CompanyShowcase';
 import DiscoverCta from '../components/discover/DiscoverCta';
-import { mockOpportunities } from '../lib/mockDiscover';
+import { showcaseOpportunities } from '../lib/showcaseDiscover';
 
 export default function Discover() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,7 +51,7 @@ export default function Discover() {
 
   // Apply filters to opportunities
   const filteredOpportunities = useMemo(() => {
-    return mockOpportunities.filter(opp => {
+    return showcaseOpportunities.filter(opp => {
       // Search matching (title, company, skills)
       const matchesSearch = searchQuery === "" || 
         opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Clock, Briefcase, Share2, Bookmark, CheckCircle, Sparkles } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { mockOpportunities } from '../../../lib/mockDiscover';
+import { showcaseOpportunities } from '../../../lib/showcaseDiscover';
 
 export default function OpportunityDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const opportunity = mockOpportunities.find(opp => opp.id === id) || mockOpportunities[0]; // fallback for demo
+  const opportunity = showcaseOpportunities.find(opp => opp.id === id) || showcaseOpportunities[0]; // fallback for demo
 
   useEffect(() => {
     window.scrollTo(0, 0);

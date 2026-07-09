@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import AuthLayout from '../../components/auth/AuthLayout';
+import CaptchaWidget from '../../components/auth/CaptchaWidget';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -11,6 +12,7 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const { isMockMode, user } = useAuth();
   const navigate = useNavigate();
@@ -155,10 +157,12 @@ export default function Signup() {
           </label>
         </div>
 
+        <CaptchaWidget onVerify={setCaptchaVerified} />
+
         <button 
           type="submit" 
-          disabled={isLoading}
-          className="w-full py-3.5 px-4 bg-[#FF5722] hover:bg-[#E64A19] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#FF5722]/20 transition-all hover:-translate-y-0.5 mt-2 disabled:opacity-70 disabled:hover:translate-y-0"
+          disabled={isLoading || !captchaVerified}
+          className="w-full py-3.5 px-4 bg-[#FF5722] hover:bg-[#E64A19] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#FF5722]/20 transition-all hover:-translate-y-0.5 mt-2 disabled:opacity-70 disabled:hover:translate-y-0 cursor-pointer disabled:cursor-not-allowed"
         >
           {isLoading ? 'Creating Account...' : 'Create Account'}
         </button>

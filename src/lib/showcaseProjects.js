@@ -1,4 +1,4 @@
-export const mockProjects = [
+export const showcaseProjects = [
   {
     id: "p1",
     title: "AI Resume Analyzer",

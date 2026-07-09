@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import AuthLayout from '../../components/auth/AuthLayout';
+import CaptchaWidget from '../../components/auth/CaptchaWidget';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   
   const { isMockMode, user } = useAuth();
   const navigate = useNavigate();
@@ -120,10 +122,12 @@ export default function Login() {
           <label htmlFor="remember" className="text-sm text-[#64748B] font-medium">Remember me for 30 days</label>
         </div>
 
+        <CaptchaWidget onVerify={setCaptchaVerified} />
+
         <button 
           type="submit" 
-          disabled={isLoading}
-          className="w-full py-3.5 px-4 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#0F172A]/20 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
+          disabled={isLoading || !captchaVerified}
+          className="w-full py-3.5 px-4 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#0F172A]/20 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 cursor-pointer disabled:cursor-not-allowed"
         >
           {isLoading ? 'Signing in...' : 'Sign In'}
         </button>

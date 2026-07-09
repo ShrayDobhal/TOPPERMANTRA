@@ -14,6 +14,7 @@ import api from '../../lib/api';
 import { useUser } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
+import useStudentStore from '../../store/useStudentStore';
 
 const TOTAL_STEPS = 5;
 
@@ -32,6 +33,7 @@ export default function Onboarding() {
   });
 
   const { user } = useUser();
+  const fetchProfile = useStudentStore(s => s.fetchProfile);
 
   // Mutation to save onboarding data
   const { mutate: saveOnboarding, isPending: isSaving } = useMutation({
@@ -45,15 +47,20 @@ export default function Onboarding() {
           branch: onboardingData.branch || '',
           year: onboardingData.year || '',
           career_goal: onboardingData.careerGoal || '',
-          github_url: onboardingData.githubUrl || '',
-          linkedin_url: onboardingData.linkedinUrl || ''
+          github_url: onboardingData.github || '',
+          linkedin_url: onboardingData.linkedin || ''
         })
         .eq('id', user.id);
 
       if (error) throw error;
       return true;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      try {
+        await fetchProfile();
+      } catch (err) {
+        console.error("Failed to refetch profile after onboarding:", err);
+      }
       setIsCompleted(true);
     },
     onError: (error) => {

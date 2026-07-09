@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Search, Filter, SlidersHorizontal, ChevronDown } from "lucide-react";
-import { projectFilters } from "../../lib/mockProjects";
+import { projectFilters } from "../../lib/showcaseProjects";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProjectSearch({ onSearch, onFilterChange, currentFilters }) {

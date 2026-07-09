@@ -6,7 +6,7 @@ import {
   Users, MapPin, GitBranch as Github, ExternalLink, Calendar, CheckCircle2 
 } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
-import { mockProjects } from "../../../lib/mockProjects";
+import { showcaseProjects } from "../../../lib/showcaseProjects";
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -14,7 +14,7 @@ export default function ProjectDetail() {
   const [activeTab, setActiveTab] = useState("Overview");
   
   // Find project or use first one as fallback for demo
-  const project = mockProjects.find(p => p.id === id) || mockProjects[0];
+  const project = showcaseProjects.find(p => p.id === id) || showcaseProjects[0];
 
   const tabs = ["Overview", "Open Roles", "Team", "Roadmap"];
 

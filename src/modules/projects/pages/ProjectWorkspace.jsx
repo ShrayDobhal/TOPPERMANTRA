@@ -6,7 +6,7 @@ import {
   MessageSquare, FileText, ChevronLeft, Calendar 
 } from "lucide-react";
 import KanbanBoard from "../components/KanbanBoard";
-import { mockProjects } from "../../../lib/mockProjects";
+import { showcaseProjects } from "../../../lib/showcaseProjects";
 import { fadeUp } from "../../../lib/animations";
 
 export default function ProjectWorkspace() {
@@ -16,7 +16,7 @@ export default function ProjectWorkspace() {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   // Fallback to first project for demo
-  const project = mockProjects.find(p => p.id === id) || mockProjects[0];
+  const project = showcaseProjects.find(p => p.id === id) || showcaseProjects[0];
 
   const navItems = [
     { id: "Board", icon: <KanbanSquare className="w-5 h-5" /> },

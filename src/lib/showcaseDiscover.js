@@ -1,6 +1,6 @@
 // Mock Supabase Database Schema for Discover Phase R5
 
-export const mockOpportunities = [
+export const showcaseOpportunities = [
   {
     id: "opp-1",
     title: "Software Engineering Intern",
@@ -204,7 +204,7 @@ export const mockOpportunities = [
   }
 ];
 
-export const mockCompanies = [
+export const showcaseCompanies = [
   { id: "c1", name: "Stripe", logo: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg", openRoles: 12 },
   { id: "c2", name: "Linear", logo: "https://logo.clearbit.com/linear.app", openRoles: 4 },
   { id: "c3", name: "Vercel", logo: "https://assets.vercel.com/image/upload/v1588805858/repositories/vercel/logo.png", openRoles: 8 },
@@ -219,7 +219,7 @@ export const filterOptions = {
 };
 
 // Mock data for Application Tracker
-export const mockApplications = [
+export const showcaseApplications = [
   { id: 1, title: "Software Engineering Intern", company: "Stripe", status: "Interview", dateApplied: "2024-09-15" },
   { id: 2, title: "Frontend Developer", company: "Linear", status: "Applied", dateApplied: "2024-10-01" },
   { id: 3, title: "Smart India Hackathon", company: "MoE", status: "Shortlisted", dateApplied: "2024-08-20" },

@@ -63,7 +63,7 @@ export default function ResumeBuilder() {
         
         <button 
           onClick={handleExport}
-          disabled={isExporting || exportComplete || isSyncing}
+          disabled={isExporting || exportComplete || loading}
           className={cn(
             "px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-sm",
             exportComplete 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Search, Filter, SlidersHorizontal, ChevronDown, MapPin, Briefcase } from "lucide-react";
-import { filterOptions } from "../../lib/mockDiscover";
+import { filterOptions } from "../../lib/showcaseDiscover";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function DiscoverSearch({ onSearch, onFilterChange, currentFilters = {} }) {

@@ -1,4 +1,4 @@
-export const mockMentors = [
+export const showcaseMentors = [
   {
     id: "m1",
     firstName: "Rahul",

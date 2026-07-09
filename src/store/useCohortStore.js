@@ -1,16 +1,15 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { currentCohort, cohortMembers, weeklyChallenge, previousChallenges, challengeResponses } from '../lib/mockCohort';
 
 const useCohortStore = create((set, get) => ({
   // ---- Cohort Data ----
-  cohort: currentCohort,
-  members: cohortMembers,
+  cohort: null,
+  members: [],
   
   // ---- Weekly Challenge ----
-  currentChallenge: weeklyChallenge,
-  previousChallenges: previousChallenges,
-  challengeResponses: challengeResponses,
+  currentChallenge: null,
+  previousChallenges: [],
+  challengeResponses: [],
 
   // ---- Fetch from API ----
   fetchCohort: async () => {

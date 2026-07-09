@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, ExternalLink } from 'lucide-react';
-import { mockCompanies } from '../../lib/mockDiscover';
+import { showcaseCompanies } from '../../lib/showcaseDiscover';
 import { Button } from '../ui/Button';
 
 export default function CompanyShowcase() {
@@ -36,7 +36,7 @@ export default function CompanyShowcase() {
 
         {/* Horizontal Scroll Container */}
         <div className="flex gap-6 overflow-x-auto pb-8 snap-x custom-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-          {mockCompanies.map((company, i) => (
+          {showcaseCompanies.map((company, i) => (
             <motion.div
               key={company.id}
               initial={{ opacity: 0, y: 20 }}

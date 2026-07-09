@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import useStudentStore from './useStudentStore';
-import { badgeDefinitions, earnedBadges, leaderboard, projectPortfolio, contributionHistory } from '../lib/mockGamification';
 
 const useGamificationStore = create((set, get) => ({
   // ---- Badges ----

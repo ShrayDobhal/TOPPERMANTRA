@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import ProjectSearch from '../components/projects/ProjectSearch';
 import ProjectCategories from '../components/projects/ProjectCategories';
 import ProjectsCta from '../components/projects/ProjectsCta';
-import { mockProjects } from '../lib/mockProjects';
+import { showcaseProjects } from '../lib/showcaseProjects';
 
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +49,7 @@ export default function Projects() {
 
   // Apply filters to projects
   const filteredProjects = useMemo(() => {
-    return mockProjects.filter(project => {
+    return showcaseProjects.filter(project => {
       // Search matching
       const matchesSearch = searchQuery === "" || 
         project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

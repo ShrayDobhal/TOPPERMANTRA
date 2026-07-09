@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { mockApplications } from '../../../lib/mockDiscover';
+import { showcaseApplications } from '../../../lib/showcaseDiscover';
 
 export default function ApplicationTracker() {
   
@@ -43,7 +43,7 @@ export default function ApplicationTracker() {
 
         {/* List */}
         <div className="divide-y divide-slate-100">
-          {mockApplications.map((app, i) => (
+          {showcaseApplications.map((app, i) => (
             <motion.div 
               key={app.id}
               initial={{ opacity: 0, y: 10 }}

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Star, Target, Shield, ChevronDown } from "lucide-react";
 import TiltCard from "../components/ui/TiltCard";
 import MentorCard from "../components/mentors/MentorCard";
-import { mockMentors } from "../lib/mockMentors";
+import { showcaseMentors } from "../lib/showcaseMentors";
 
 export default function Mentors() {
   const { scrollY } = useScroll();
@@ -194,7 +194,7 @@ export default function Mentors() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mockMentors.map((mentor) => (
+              {showcaseMentors.map((mentor) => (
                 <MentorCard key={mentor.id} mentor={mentor} onViewProfile={() => window.location.href = '/signup'} />
               ))}
             </div>

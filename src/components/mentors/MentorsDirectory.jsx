@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Search, Filter, X } from "lucide-react";
 import MentorCard from "./MentorCard";
-import { filterOptions } from "../../lib/mockMentors";
+import { filterOptions } from "../../lib/showcaseMentors";
 
 export default function MentorsDirectory({ mentors, onViewProfile, initialCategory }) {
   const [searchQuery, setSearchQuery] = useState("");
