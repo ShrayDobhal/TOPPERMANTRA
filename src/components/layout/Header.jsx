@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -17,6 +18,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,14 +73,24 @@ export default function Header() {
 
         {/* Right Section: Buttons */}
         <div className="hidden xl:flex items-center justify-end space-x-4 flex-1">
-          <Link to="/login" className="text-[15px] font-sans font-bold text-[#64748B] hover:text-[#0F172A] transition-colors px-4 py-2">
-            Login
-          </Link>
-          <Link to="/signup">
-            <Button variant="primary" className="py-2.5 px-6 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] hover:shadow-[0_6px_20px_rgba(255,87,34,0.23)]">
-              Join Ecosystem
-            </Button>
-          </Link>
+          {user ? (
+            <Link to="/dashboard">
+              <Button variant="primary" className="py-2.5 px-6 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] hover:shadow-[0_6px_20px_rgba(255,87,34,0.23)]">
+                Go to Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="text-[15px] font-sans font-bold text-[#64748B] hover:text-[#0F172A] transition-colors px-4 py-2">
+                Login
+              </Link>
+              <Link to="/signup">
+                <Button variant="primary" className="py-2.5 px-6 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] hover:shadow-[0_6px_20px_rgba(255,87,34,0.23)]">
+                  Join Ecosystem
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -115,12 +127,20 @@ export default function Header() {
                 </Link>
               ))}
               <div className="pt-4 border-t border-[#E9ECEF] flex flex-col space-y-3 px-2 mt-2">
-                <Link to="/login" onClick={() => setMobileOpen(false)} className="text-center font-bold text-[#64748B] py-2 hover:text-[#0F172A] transition-colors">
-                  Login
-                </Link>
-                <Link to="/signup" onClick={() => setMobileOpen(false)}>
-                  <Button variant="primary" className="w-full h-12 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)]">Join Ecosystem</Button>
-                </Link>
+                {user ? (
+                  <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                    <Button variant="primary" className="w-full h-12 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)]">Go to Dashboard</Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setMobileOpen(false)} className="text-center font-bold text-[#64748B] py-2 hover:text-[#0F172A] transition-colors">
+                      Login
+                    </Link>
+                    <Link to="/signup" onClick={() => setMobileOpen(false)}>
+                      <Button variant="primary" className="w-full h-12 font-bold shadow-[0_4px_14px_0_rgba(255,87,34,0.39)]">Join Ecosystem</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

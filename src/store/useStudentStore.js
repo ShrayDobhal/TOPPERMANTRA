@@ -63,6 +63,56 @@ const useStudentStore = create((set, get) => ({
     }
 
     if (data) {
+      // ---- Daily Login Streak Logic ----
+      const now = new Date();
+      const todayStr = now.toLocaleDateString('en-US');
+      
+      const yesterday = new Date();
+      yesterday.setDate(now.getDate() - 1);
+      const yesterdayStr = yesterday.toLocaleDateString('en-US');
+
+      let lastActiveStr = '';
+      if (data.last_active_at) {
+        lastActiveStr = new Date(data.last_active_at).toLocaleDateString('en-US');
+      }
+
+      let newStreak = data.streak || 0;
+      let newLongestStreak = data.longest_streak || 0;
+      let shouldUpdateActive = false;
+
+      if (!data.last_active_at) {
+        newStreak = 1;
+        newLongestStreak = Math.max(newLongestStreak, 1);
+        shouldUpdateActive = true;
+      } else if (lastActiveStr !== todayStr) {
+        if (lastActiveStr === yesterdayStr) {
+          newStreak += 1;
+          newLongestStreak = Math.max(newLongestStreak, newStreak);
+        } else {
+          newStreak = 1;
+        }
+        shouldUpdateActive = true;
+      }
+
+      if (shouldUpdateActive) {
+        console.log(`Updating streak in database. Streak: ${newStreak}, Longest: ${newLongestStreak}`);
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            streak: newStreak,
+            longest_streak: newLongestStreak,
+            last_active_at: now.toISOString()
+          })
+          .eq('id', userId);
+          
+        if (!updateError) {
+          data.streak = newStreak;
+          data.longest_streak = newLongestStreak;
+        } else {
+          console.error("Error updating user streak:", updateError);
+        }
+      }
+
       // Determine rank based on XP (simple PM logic)
       let rank = 'Novice';
       if (data.contribution_score > 500) rank = 'Apprentice';

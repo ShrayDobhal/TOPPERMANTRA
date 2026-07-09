@@ -19,7 +19,8 @@ export default function ContributionCalendar() {
       
       // If the day index is less than the current streak, it should be lit up!
       const isActive = dayIndex < streak;
-      const intensity = isActive ? Math.floor(Math.random() * 2) + 2 : (Math.random() > 0.8 ? 1 : 0);
+      // Active streak days get constant high visibility; others get a rare low-intensity dot for aesthetic variety
+      const intensity = isActive ? 3 : (Math.random() > 0.94 ? 1 : 0);
       
       return { intensity };
     })

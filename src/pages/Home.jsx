@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Lock, Code, Zap, Briefcase, ChevronDown, Users } from "lucide-react";
 import TiltCard from "../components/ui/TiltCard";
 import MagneticButton from "../components/ui/MagneticButton";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Home() {
   const { scrollY } = useScroll();
   const [scrollInVh, setScrollInVh] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { user } = useAuth();
 
   useEffect(() => {
     return scrollY.on("change", (latest) => {
@@ -222,10 +224,10 @@ export default function Home() {
                   
                   <MagneticButton>
                     <Link 
-                      to="/signup"
+                      to={user ? "/dashboard" : "/signup"}
                       className="px-8 py-4 bg-[#FF5722] hover:bg-[#FE6D4D] text-white font-bold rounded-xl transition-all duration-300 flex items-center gap-3 shrink-0 shadow-[0_0_20px_rgba(255,87,34,0.3)] hover:shadow-[0_0_30px_rgba(255,87,34,0.6)]"
                     >
-                      Join the Ecosystem
+                      {user ? "Go to Dashboard" : "Join the Ecosystem"}
                       <ArrowRight size={20} />
                     </Link>
                   </MagneticButton>
