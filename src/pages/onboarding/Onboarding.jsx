@@ -48,7 +48,9 @@ export default function Onboarding() {
           year: onboardingData.year || '',
           career_goal: onboardingData.careerGoal || '',
           github_url: onboardingData.github || '',
-          linkedin_url: onboardingData.linkedin || ''
+          linkedin_url: onboardingData.linkedin || '',
+          avatar_url: onboardingData.avatarUrl || '',
+          resume_url: onboardingData.resumeUrl || ''
         })
         .eq('id', user.id);
 

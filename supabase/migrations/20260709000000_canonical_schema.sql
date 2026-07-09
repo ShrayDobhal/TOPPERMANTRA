@@ -32,6 +32,7 @@ CREATE TABLE public.profiles (
   career_goal TEXT,
   github_url TEXT,
   linkedin_url TEXT,
+  resume_url TEXT,
   contribution_score INT DEFAULT 0,
   streak INT DEFAULT 0,
   longest_streak INT DEFAULT 0,
@@ -555,4 +556,70 @@ SELECT cron.schedule(
       )
   ) AS request_id;
   $$
+);
+
+-- ==============================================================================================
+-- 12. STORAGE BUCKETS & POLICIES
+-- ==============================================================================================
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('resumes', 'resumes', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Enable RLS on storage.objects
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- Storage policies for avatars
+CREATE POLICY "Public Access to Avatars"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'avatars');
+
+CREATE POLICY "Users can upload their own avatar"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'avatars' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can update their own avatar"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'avatars' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can delete their own avatar"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'avatars' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Storage policies for resumes
+CREATE POLICY "Public Access to Resumes"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'resumes');
+
+CREATE POLICY "Users can upload their own resume"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'resumes' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can update their own resume"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'resumes' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can delete their own resume"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'resumes' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
 );

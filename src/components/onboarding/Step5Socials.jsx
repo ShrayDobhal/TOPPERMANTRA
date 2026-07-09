@@ -1,8 +1,68 @@
-import { Globe, FileText, Upload } from 'lucide-react';
+import { useState } from 'react';
+import { Globe, FileText, Upload, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { useUser } from '../../contexts/AuthContext';
+import { cn } from '../../lib/utils';
 
 export default function Step5Socials({ data = {}, updateData }) {
+  const { user } = useUser();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [fileName, setFileName] = useState(data.resumeName || null);
+
   const handleChange = (e) => {
     updateData({ ...data, [e.target.name]: e.target.value });
+  };
+
+  const handleFileClick = () => {
+    document.getElementById('resume-upload-input').click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !user) return;
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File size must be less than 5MB");
+      return;
+    }
+
+    // Validate extension
+    const allowedExts = ['pdf', 'doc', 'docx'];
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    if (!allowedExts.includes(fileExt)) {
+      setUploadError("Invalid file type. Only PDF and Word docs are supported.");
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const filePath = `${user.id}/resume_${Date.now()}.${fileExt}`;
+
+      // Upload file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('resumes')
+        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('resumes')
+        .getPublicUrl(filePath);
+
+      setFileName(file.name);
+      // Update state
+      updateData({ ...data, resumeUrl: publicUrl, resumeName: file.name });
+    } catch (err) {
+      console.error("Error uploading resume:", err);
+      setUploadError("Failed to upload file. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -54,13 +114,51 @@ export default function Step5Socials({ data = {}, updateData }) {
         <label className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2 mb-2">
           <FileText size={14} className="text-[#FF5722]" /> Resume Upload
         </label>
-        <div className="w-full border-2 border-dashed border-[#CBD5E1] rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-[#FF5722] hover:bg-[#FF5722]/5 transition-all cursor-pointer group">
-          <div className="w-12 h-12 bg-[#F1F5F9] rounded-full flex items-center justify-center mb-3 group-hover:bg-white group-hover:shadow-sm transition-all">
-            <Upload size={20} className="text-[#64748B] group-hover:text-[#FF5722]" />
-          </div>
-          <p className="text-sm font-bold text-[#0F172A] mb-1">Click to upload or drag and drop</p>
-          <p className="text-xs text-[#94A3B8]">PDF, DOCX up to 5MB</p>
+        
+        <input 
+          type="file" 
+          id="resume-upload-input" 
+          accept=".pdf,.doc,.docx" 
+          className="hidden" 
+          onChange={handleFileChange} 
+        />
+
+        <div 
+          onClick={handleFileClick}
+          className={cn(
+            "w-full border-2 border-dashed border-[#CBD5E1] rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-[#FF5722] hover:bg-[#FF5722]/5 transition-all cursor-pointer group",
+            isUploading && "pointer-events-none opacity-80"
+          )}
+        >
+          {isUploading ? (
+            <div className="flex flex-col items-center">
+              <Loader2 className="w-10 h-10 text-[#FF5722] animate-spin mb-3" />
+              <p className="text-sm font-bold text-[#0F172A] mb-1">Uploading resume...</p>
+            </div>
+          ) : fileName ? (
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-3">
+                <CheckCircle2 size={24} className="text-[#22C55E]" />
+              </div>
+              <p className="text-sm font-bold text-[#0F172A] mb-1">{fileName}</p>
+              <p className="text-xs text-[#64748B]">Click or drag to replace file</p>
+            </div>
+          ) : (
+            <>
+              <div className="w-12 h-12 bg-[#F1F5F9] rounded-full flex items-center justify-center mb-3 group-hover:bg-white group-hover:shadow-sm transition-all">
+                <Upload size={20} className="text-[#64748B] group-hover:text-[#FF5722]" />
+              </div>
+              <p className="text-sm font-bold text-[#0F172A] mb-1">Click to upload or drag and drop</p>
+              <p className="text-xs text-[#94A3B8]">PDF, DOCX up to 5MB</p>
+            </>
+          )}
         </div>
+
+        {uploadError && (
+          <p className="text-xs text-red-500 font-semibold mt-2 flex items-center gap-1">
+            <AlertCircle size={12} /> {uploadError}
+          </p>
+        )}
       </div>
 
     </div>

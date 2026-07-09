@@ -6,6 +6,8 @@ const initialProfile = {
   id: '',
   fullName: '',
   email: '',
+  avatarUrl: '',
+  resumeUrl: '',
   college: '',
   branch: '',
   year: '',
@@ -72,6 +74,8 @@ const useStudentStore = create((set, get) => ({
           id: data.id,
           fullName: data.full_name || '',
           email: data.email,
+          avatarUrl: data.avatar_url || '',
+          resumeUrl: data.resume_url || '',
           college: data.college || 'Add your college',
           branch: data.branch || 'Add your branch',
           year: data.year || '1st Year',
@@ -142,8 +146,8 @@ const useStudentStore = create((set, get) => ({
     if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
     if (updates.githubUrl !== undefined) dbUpdates.github_url = updates.githubUrl;
     if (updates.linkedinUrl !== undefined) dbUpdates.linkedin_url = updates.linkedinUrl;
-    // We don't save avatar_url here directly if it's file upload, but let's assume it's string
-    if (updates.avatar_url !== undefined) dbUpdates.avatar_url = updates.avatar_url;
+    if (updates.avatarUrl !== undefined) dbUpdates.avatar_url = updates.avatarUrl;
+    if (updates.resumeUrl !== undefined) dbUpdates.resume_url = updates.resumeUrl;
 
     const { error } = await supabase
       .from('profiles')
