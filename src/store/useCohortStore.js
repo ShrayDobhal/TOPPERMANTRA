@@ -20,15 +20,72 @@ const useCohortStore = create((set, get) => ({
       const userId = session.user.id;
       
       // Get the student's cohort
-      const { data: memberData } = await supabase
+      let { data: memberData } = await supabase
         .from('cohort_members')
         .select('cohort_id, status, cohort:cohorts(*)')
         .eq('student_id', userId)
-        .single();
+        .maybeSingle();
         
       if (!memberData) {
-        // Fallback to mock if not in a cohort
-        return;
+        console.log("User not in a cohort, executing self-healing auto-join...");
+        // 1. Fetch user's profile to get their branch/major
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('branch')
+          .eq('id', userId)
+          .maybeSingle();
+
+        const branch = profile?.branch || 'Engineering';
+
+        // 2. Search for an existing cohort for this branch
+        const { data: existingCohorts } = await supabase
+          .from('cohorts')
+          .select('*')
+          .eq('branch', branch)
+          .limit(1);
+
+        let targetCohortId;
+
+        if (existingCohorts && existingCohorts.length > 0) {
+          targetCohortId = existingCohorts[0].id;
+          console.log(`Found existing cohort for ${branch}:`, existingCohorts[0].name);
+        } else {
+          // 3. Create a default cohort for this branch
+          console.log(`No cohort found for ${branch}. Creating default cohort...`);
+          const { data: newCohort, error: createError } = await supabase
+            .from('cohorts')
+            .insert([{
+              name: `${branch} Alpha Cohort`,
+              branch: branch,
+              max_size: 50,
+              current_week: 1
+            }])
+            .select()
+            .single();
+
+          if (createError) throw createError;
+          targetCohortId = newCohort.id;
+        }
+
+        // 4. Join the user to this cohort
+        const { error: joinError } = await supabase
+          .from('cohort_members')
+          .insert([{
+            cohort_id: targetCohortId,
+            student_id: userId,
+            status: 'active'
+          }]);
+
+        if (joinError) throw joinError;
+
+        // 5. Refetch memberData
+        const { data: refetchedMemberData } = await supabase
+          .from('cohort_members')
+          .select('cohort_id, status, cohort:cohorts(*)')
+          .eq('student_id', userId)
+          .single();
+
+        memberData = refetchedMemberData;
       }
       
       const cohortId = memberData.cohort_id;
