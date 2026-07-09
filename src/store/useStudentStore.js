@@ -30,13 +30,32 @@ const useStudentStore = create((set, get) => ({
     if (!session) return;
 
     const userId = session.user.id;
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
 
-    if (error) {
+    // If profile doesn't exist (PGRST116), create it manually
+    if (error && error.code === 'PGRST116') {
+      console.log("Profile not found, auto-creating it...");
+      const { data: newProfile, error: insertError } = await supabase
+        .from('profiles')
+        .insert([{ 
+          id: userId, 
+          full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'New Student',
+          avatar_url: session.user.user_metadata?.avatar_url || ''
+        }])
+        .select()
+        .single();
+        
+      if (insertError) {
+        console.error("Error creating missing profile:", insertError);
+        return;
+      }
+      data = newProfile;
+      error = null;
+    } else if (error) {
       console.error("Error fetching profile from Supabase:", error);
       return;
     }

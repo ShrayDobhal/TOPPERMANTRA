@@ -24,11 +24,16 @@ const useHubStore = create((set, get) => ({
   fetchCommunity: async () => {
     try {
       // Fetch Channels
-      const { data: channelsData, error: channelsError } = await supabase
+      let { data: channelsData, error: channelsError } = await supabase
         .from('channels')
         .select('*');
         
       if (channelsError) throw channelsError;
+
+      // Since RLS prevents inserting channels from the client, use a fallback if empty
+      if (!channelsData || channelsData.length === 0) {
+        channelsData = [{ id: 'default-global', name: 'Global', type: 'global', postsToday: 0 }];
+      }
 
       // Fetch Posts
       const { data: postsData, error: postsError } = await supabase
@@ -41,16 +46,11 @@ const useHubStore = create((set, get) => ({
 
       if (postsError) throw postsError;
       
-      if (!postsData || postsData.length === 0) {
-        set({ channels: channelsData || [], posts: [], activeChannelId: channelsData && channelsData.length > 0 ? channelsData[0].id : null });
-        return;
-      }
-
       // Calculate today's posts by current user
       const { data: { session } } = await supabase.auth.getSession();
       let todayCount = 0;
       
-      const formattedPosts = postsData.map(post => {
+      const formattedPosts = (postsData || []).map(post => {
         if (session && post.user_id === session.user.id) {
           const postDate = new Date(post.created_at);
           const today = new Date();
@@ -61,7 +61,8 @@ const useHubStore = create((set, get) => ({
         
         return {
           id: post.id,
-          channelId: post.channel_id,
+          // Map null channel_id back to default-global so UI filters work
+          channelId: post.channel_id || 'default-global',
           tag: post.tag,
           title: post.title,
           content: post.content,
@@ -79,7 +80,7 @@ const useHubStore = create((set, get) => ({
       });
 
       set({ 
-        channels: channelsData || [], 
+        channels: channelsData, 
         posts: formattedPosts,
         postsToday: todayCount,
         activeChannelId: channelsData.length > 0 ? channelsData[0].id : null
@@ -90,22 +91,53 @@ const useHubStore = create((set, get) => ({
     }
   },
 
-  // ---- Create Post (with mandatory tag) ----
   createPost: async (postData) => {
-    if (!get().canPost()) return false;
-    if (!postData.tag) return false;
+    if (!get().canPost()) {
+      toast.error("Daily limit reached.");
+      return false;
+    }
+    if (!postData.tag) {
+      toast.error("Tag is required.");
+      return false;
+    }
     
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      
       if (!session) {
         toast.error("Please login to post.");
         return false;
       }
 
+      if (!get().activeChannelId) {
+        toast.error("No active channel selected. Please try again.");
+        return false;
+      }
+
+      // Safety net: Ensure user has a profile record to prevent foreign key constraint violations
+      const { error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profileCheckError && profileCheckError.code === 'PGRST116') {
+        console.log("Profile missing before post. Auto-creating...");
+        await supabase.from('profiles').insert([{ 
+          id: session.user.id, 
+          full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'New Student',
+          avatar_url: session.user.user_metadata?.avatar_url || ''
+        }]);
+      }
+
+      // Map 'default-global' back to null so we don't violate foreign key constraint
+      const dbChannelId = get().activeChannelId === 'default-global' ? null : get().activeChannelId;
+
       const { data, error } = await supabase
         .from('hub_posts')
         .insert([{
-          channel_id: get().activeChannelId,
+          channel_id: dbChannelId,
           user_id: session.user.id,
           tag: postData.tag,
           title: postData.title,
@@ -114,12 +146,16 @@ const useHubStore = create((set, get) => ({
         .select(`*, author:profiles(id, full_name, role, contribution_score)`)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase createPost error:", error);
+        toast.error(error.message || "Failed to create post.");
+        throw error;
+      }
 
       if (data) {
         const newPost = {
           id: data.id,
-          channelId: data.channel_id,
+          channelId: data.channel_id || 'default-global',
           tag: data.tag,
           title: data.title,
           content: data.content,
@@ -139,12 +175,108 @@ const useHubStore = create((set, get) => ({
           posts: [newPost, ...s.posts], 
           postsToday: s.postsToday + 1 
         }));
+        toast.success("Discussion posted successfully!");
         return true;
       }
     } catch (err) {
-      console.error('Failed to create post', err);
+      console.error('Failed to create post catch block', err);
+      if (!err.message) {
+         toast.error("An unexpected error occurred");
+      } else {
+         toast.error(err.message);
+      }
     }
     return false;
+  },
+
+  // ---- Comments ----
+  fetchComments: async (postId) => {
+    try {
+      const { data, error } = await supabase
+        .from('hub_comments')
+        .select('*, author:profiles(id, full_name, role, contribution_score)')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+        
+      if (error) throw error;
+      
+      const formattedComments = data.map(c => ({
+        id: c.id,
+        postId: c.post_id,
+        content: c.content,
+        upvotes: c.upvotes,
+        createdAt: c.created_at,
+        author: {
+          id: c.author.id,
+          name: c.author.full_name,
+          level: Math.floor((c.author.contribution_score || 0) / 100) + 1
+        }
+      }));
+      
+      set((s) => ({
+        comments: { ...s.comments, [postId]: formattedComments }
+      }));
+    } catch (err) {
+      console.error('Failed to fetch comments', err);
+    }
+  },
+
+  createComment: async (postId, content) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please login to comment.");
+        return false;
+      }
+      
+      // Ensure profile exists
+      const { error: profileCheckError } = await supabase.from('profiles').select('id').eq('id', session.user.id).single();
+      if (profileCheckError && profileCheckError.code === 'PGRST116') {
+        await supabase.from('profiles').insert([{ 
+          id: session.user.id, 
+          full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'New Student'
+        }]);
+      }
+
+      const { data, error } = await supabase
+        .from('hub_comments')
+        .insert([{
+          post_id: postId,
+          user_id: session.user.id,
+          content: content
+        }])
+        .select('*, author:profiles(id, full_name, role, contribution_score)')
+        .single();
+        
+      if (error) throw error;
+      
+      const newComment = {
+        id: data.id,
+        postId: data.post_id,
+        content: data.content,
+        upvotes: data.upvotes,
+        createdAt: data.created_at,
+        author: {
+          id: data.author.id,
+          name: data.author.full_name,
+          level: Math.floor((data.author.contribution_score || 0) / 100) + 1
+        }
+      };
+      
+      set((s) => ({
+        comments: {
+          ...s.comments,
+          [postId]: [...(s.comments[postId] || []), newComment]
+        },
+        posts: s.posts.map(p => p.id === postId ? { ...p, comments: p.comments + 1 } : p)
+      }));
+      
+      return true;
+    } catch (err) {
+      console.error('Failed to create comment', err);
+      toast.error(err.message || "Failed to post comment.");
+      return false;
+    }
   },
 
   // ---- Upvote ----
