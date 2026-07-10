@@ -32,6 +32,7 @@ CREATE TABLE public.profiles (
   career_goal TEXT,
   github_url TEXT,
   linkedin_url TEXT,
+  portfolio_url TEXT,
   resume_url TEXT,
   contribution_score INT DEFAULT 0,
   streak INT DEFAULT 0,

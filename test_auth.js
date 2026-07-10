@@ -16,41 +16,16 @@ envContent.split('\n').forEach(line => {
 const supabase = createClient(envVars.VITE_SUPABASE_URL, envVars.VITE_SUPABASE_ANON_KEY);
 
 async function testAuth() {
-  console.log("Testing Auth...");
-  
-  const testEmail = `test_${Date.now()}@example.com`;
-  console.log(`Signing up with ${testEmail}...`);
-  
-  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-    email: testEmail,
-    password: 'password123',
-    options: {
-      data: {
-        first_name: 'Test',
-        last_name: 'User'
-      }
-    }
-  });
-
-  if (signUpError) {
-    console.error("Signup failed:", signUpError.message);
-    return;
-  }
-  
-  console.log("Signup success! User ID:", signUpData.user?.id);
-  console.log("Session:", !!signUpData.session ? "Active session returned!" : "NO SESSION RETURNED (Email confirmation might still be on!)");
-  
-  // Try to login right away
-  console.log("Attempting to login...");
-  const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-    email: testEmail,
-    password: 'password123',
-  });
-  
-  if (loginError) {
-    console.error("Login failed:", loginError.message);
+  console.log("Checking columns of profiles table...");
+  const { data, error } = await supabase.from('profiles').select('*').limit(1);
+  if (error) {
+    console.error("Error:", error);
   } else {
-    console.log("Login success! Session active.");
+    if (data && data.length > 0) {
+      console.log("Columns present in Supabase:", Object.keys(data[0]));
+    } else {
+      console.log("No profiles found to check columns.");
+    }
   }
 }
 

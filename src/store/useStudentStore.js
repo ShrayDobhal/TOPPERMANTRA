@@ -126,6 +126,7 @@ const useStudentStore = create((set, get) => ({
           email: data.email,
           avatarUrl: data.avatar_url || '',
           resumeUrl: data.resume_url || '',
+          portfolioUrl: data.portfolio_url || '',
           college: data.college || 'Add your college',
           branch: data.branch || 'Add your branch',
           year: data.year || '1st Year',
@@ -196,6 +197,7 @@ const useStudentStore = create((set, get) => ({
     if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
     if (updates.githubUrl !== undefined) dbUpdates.github_url = updates.githubUrl;
     if (updates.linkedinUrl !== undefined) dbUpdates.linkedin_url = updates.linkedinUrl;
+    if (updates.portfolioUrl !== undefined) dbUpdates.portfolio_url = updates.portfolioUrl;
     if (updates.avatarUrl !== undefined) dbUpdates.avatar_url = updates.avatarUrl;
     if (updates.resumeUrl !== undefined) dbUpdates.resume_url = updates.resumeUrl;
 

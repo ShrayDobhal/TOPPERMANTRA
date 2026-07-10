@@ -49,6 +49,7 @@ export default function Onboarding() {
           career_goal: onboardingData.careerGoal || '',
           github_url: onboardingData.github || '',
           linkedin_url: onboardingData.linkedin || '',
+          portfolio_url: onboardingData.portfolio || '',
           avatar_url: onboardingData.avatarUrl || '',
           resume_url: onboardingData.resumeUrl || ''
         })
