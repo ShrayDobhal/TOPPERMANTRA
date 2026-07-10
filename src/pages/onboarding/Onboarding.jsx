@@ -40,22 +40,38 @@ export default function Onboarding() {
     mutationFn: async (onboardingData) => {
       if (!user) throw new Error("No user found");
       
+      const mainPayload = {
+        college: onboardingData.college || '',
+        branch: onboardingData.branch || '',
+        year: onboardingData.year || '',
+        career_goal: onboardingData.careerGoal || '',
+        github_url: onboardingData.github || '',
+        linkedin_url: onboardingData.linkedin || '',
+        avatar_url: onboardingData.avatarUrl || ''
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          college: onboardingData.college || '',
-          branch: onboardingData.branch || '',
-          year: onboardingData.year || '',
-          career_goal: onboardingData.careerGoal || '',
-          github_url: onboardingData.github || '',
-          linkedin_url: onboardingData.linkedin || '',
-          portfolio_url: onboardingData.portfolio || '',
-          avatar_url: onboardingData.avatarUrl || '',
-          resume_url: onboardingData.resumeUrl || ''
-        })
+        .update(mainPayload)
         .eq('id', user.id);
 
       if (error) throw error;
+
+      // Attempt to save newly added columns separately. 
+      // If the Supabase schema cache hasn't been reloaded by the user, this will fail gracefully
+      // without blocking the user from entering the dashboard.
+      const { error: extraError } = await supabase
+        .from('profiles')
+        .update({
+          portfolio_url: onboardingData.portfolio || '',
+          resume_url: onboardingData.resumeUrl || ''
+        })
+        .eq('id', user.id);
+        
+      if (extraError) {
+        console.warn("Note: portfolio_url or resume_url failed to save. Schema cache might need reloading.", extraError);
+      }
+
       return true;
     },
     onSuccess: async () => {

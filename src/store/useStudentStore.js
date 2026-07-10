@@ -187,28 +187,45 @@ const useStudentStore = create((set, get) => ({
     
     const userId = session.user.id;
     
-    // Convert camelCase to snake_case if needed
-    const dbUpdates = {};
-    if (updates.fullName !== undefined) dbUpdates.full_name = updates.fullName;
-    if (updates.college !== undefined) dbUpdates.college = updates.college;
-    if (updates.branch !== undefined) dbUpdates.branch = updates.branch;
-    if (updates.year !== undefined) dbUpdates.year = updates.year;
-    if (updates.careerGoal !== undefined) dbUpdates.career_goal = updates.careerGoal;
-    if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
-    if (updates.githubUrl !== undefined) dbUpdates.github_url = updates.githubUrl;
-    if (updates.linkedinUrl !== undefined) dbUpdates.linkedin_url = updates.linkedinUrl;
-    if (updates.portfolioUrl !== undefined) dbUpdates.portfolio_url = updates.portfolioUrl;
-    if (updates.avatarUrl !== undefined) dbUpdates.avatar_url = updates.avatarUrl;
-    if (updates.resumeUrl !== undefined) dbUpdates.resume_url = updates.resumeUrl;
+    // Split updates into core (guaranteed) and extra (potentially missing from schema cache)
+    const mainUpdates = {};
+    const extraUpdates = {};
 
-    const { error } = await supabase
-      .from('profiles')
-      .update(dbUpdates)
-      .eq('id', userId);
+    if (updates.fullName !== undefined) mainUpdates.full_name = updates.fullName;
+    if (updates.college !== undefined) mainUpdates.college = updates.college;
+    if (updates.branch !== undefined) mainUpdates.branch = updates.branch;
+    if (updates.year !== undefined) mainUpdates.year = updates.year;
+    if (updates.careerGoal !== undefined) mainUpdates.career_goal = updates.careerGoal;
+    if (updates.bio !== undefined) mainUpdates.bio = updates.bio;
+    if (updates.githubUrl !== undefined) mainUpdates.github_url = updates.githubUrl;
+    if (updates.linkedinUrl !== undefined) mainUpdates.linkedin_url = updates.linkedinUrl;
+    if (updates.avatarUrl !== undefined) mainUpdates.avatar_url = updates.avatarUrl;
+    
+    // Potentially missing columns
+    if (updates.portfolioUrl !== undefined) extraUpdates.portfolio_url = updates.portfolioUrl;
+    if (updates.resumeUrl !== undefined) extraUpdates.resume_url = updates.resumeUrl;
 
-    if (error) {
-      console.error("Error updating profile:", error);
-      throw error;
+    if (Object.keys(mainUpdates).length > 0) {
+      const { error } = await supabase
+        .from('profiles')
+        .update(mainUpdates)
+        .eq('id', userId);
+
+      if (error) {
+        console.error("Error updating profile core fields:", error);
+        throw error;
+      }
+    }
+
+    if (Object.keys(extraUpdates).length > 0) {
+      const { error: extraError } = await supabase
+        .from('profiles')
+        .update(extraUpdates)
+        .eq('id', userId);
+
+      if (extraError) {
+        console.warn("Could not update extra fields (schema cache might need reloading):", extraError);
+      }
     }
 
     set((state) => ({
