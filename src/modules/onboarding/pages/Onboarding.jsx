@@ -57,6 +57,38 @@ export default function Onboarding() {
   });
 
   const nextStep = () => {
+    // Validation Logic
+    if (currentStep === 1) {
+      if (!data.basicInfo.college || !data.basicInfo.university || !data.basicInfo.branch || !data.basicInfo.year || !data.basicInfo.city || !data.basicInfo.state) {
+        toast.error("Please fill all mandatory fields to continue.");
+        return;
+      }
+    }
+    if (currentStep === 2) {
+      if (!data.careerGoal) {
+        toast.error("Please select a career goal to continue.");
+        return;
+      }
+    }
+    if (currentStep === 3) {
+      if (!data.skills || data.skills.length === 0) {
+        toast.error("Please select at least one skill to continue.");
+        return;
+      }
+    }
+    if (currentStep === 4) {
+      if (!data.interests || data.interests.length === 0) {
+        toast.error("Please select at least one interest to continue.");
+        return;
+      }
+    }
+    if (currentStep === 5) {
+      if (!data.socials.linkedin || !data.socials.github || !data.socials.portfolio) {
+        toast.error("Please provide your LinkedIn, GitHub, and Portfolio URLs to continue.");
+        return;
+      }
+    }
+
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(curr => curr + 1);
     } else {

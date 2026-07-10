@@ -112,7 +112,7 @@ export default function Step5Socials({ data = {}, updateData }) {
 
       <div className="pt-4">
         <label className="text-xs font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-2 mb-2">
-          <FileText size={14} className="text-[#FF5722]" /> Resume Upload
+          <FileText size={14} className="text-[#FF5722]" /> Resume Upload <span className="text-[#64748B] lowercase normal-case text-[10px]">(Optional)</span>
         </label>
         
         <input 
