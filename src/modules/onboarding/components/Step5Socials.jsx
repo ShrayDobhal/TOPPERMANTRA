@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Globe, FileText, Upload, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-import { useUser } from '../../contexts/AuthContext';
-import { cn } from '../../lib/utils';
+import { supabase } from '../../../lib/supabase';
+import { useUser } from '../../../contexts/AuthContext';
+import { cn } from '../../../lib/utils';
 
 export default function Step5Socials({ data = {}, updateData }) {
   const { user } = useUser();

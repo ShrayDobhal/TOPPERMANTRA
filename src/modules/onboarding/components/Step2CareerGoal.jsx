@@ -3,7 +3,7 @@ import {
   Code, Cpu, Database, Shield, Cloud, Briefcase, 
   PenTool, Rocket, BookOpen, GraduationCap 
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../../lib/utils';
 
 const goals = [
   { id: 'swe', title: 'Software Engineer', icon: <Code size={24} />, color: 'from-blue-500 to-cyan-400', shadow: 'shadow-blue-500/20' },

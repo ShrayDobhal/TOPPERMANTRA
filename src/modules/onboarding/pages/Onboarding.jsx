@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import Step1BasicInfo from '../../components/onboarding/Step1BasicInfo';
-import Step2CareerGoal from '../../components/onboarding/Step2CareerGoal';
-import Step3Skills from '../../components/onboarding/Step3Skills';
-import Step4Interests from '../../components/onboarding/Step4Interests';
-import Step5Socials from '../../components/onboarding/Step5Socials';
-import AILoadingScreen from '../../components/onboarding/AILoadingScreen';
+import Step1BasicInfo from '../components/Step1BasicInfo';
+import Step2CareerGoal from '../components/Step2CareerGoal';
+import Step3Skills from '../components/Step3Skills';
+import Step4Interests from '../components/Step4Interests';
+import Step5Socials from '../components/Step5Socials';
+import AILoadingScreen from '../components/AILoadingScreen';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../../lib/utils';
 import { useMutation } from '@tanstack/react-query';
-import api from '../../lib/api';
-import { useUser } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
+import api from '../../../lib/api';
+import { useUser } from '../../../contexts/AuthContext';
+import { ProfileService } from '../../../services/profileService';
 import toast from 'react-hot-toast';
-import useStudentStore from '../../store/useStudentStore';
+import useStudentStore from '../../../store/useStudentStore';
 
 const TOTAL_STEPS = 5;
 
@@ -40,39 +40,7 @@ export default function Onboarding() {
     mutationFn: async (onboardingData) => {
       if (!user) throw new Error("No user found");
       
-      const mainPayload = {
-        college: onboardingData.college || '',
-        branch: onboardingData.branch || '',
-        year: onboardingData.year || '',
-        career_goal: onboardingData.careerGoal || '',
-        github_url: onboardingData.github || '',
-        linkedin_url: onboardingData.linkedin || '',
-        avatar_url: onboardingData.avatarUrl || ''
-      };
-
-      const { error } = await supabase
-        .from('profiles')
-        .update(mainPayload)
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      // Attempt to save newly added columns separately. 
-      // If the Supabase schema cache hasn't been reloaded by the user, this will fail gracefully
-      // without blocking the user from entering the dashboard.
-      const { error: extraError } = await supabase
-        .from('profiles')
-        .update({
-          portfolio_url: onboardingData.portfolio || '',
-          resume_url: onboardingData.resumeUrl || ''
-        })
-        .eq('id', user.id);
-        
-      if (extraError) {
-        console.warn("Note: portfolio_url or resume_url failed to save. Schema cache might need reloading.", extraError);
-      }
-
-      return true;
+      return await ProfileService.updateOnboardingProfile(user.id, onboardingData);
     },
     onSuccess: async () => {
       try {
