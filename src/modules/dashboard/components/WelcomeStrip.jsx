@@ -17,7 +17,11 @@ export default function WelcomeStrip({ profile }) {
           <div className="relative group">
             <div className="absolute inset-0 bg-[#FF5722] rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
             <div className="relative w-20 h-20 rounded-full bg-[#FFFFFF] border border-[#E9ECEF] flex items-center justify-center overflow-hidden shadow-sm">
-              <span className="text-3xl font-bold text-[#FF5722]">{profile.fullName.charAt(0)}</span>
+              {profile?.avatarUrl ? (
+                <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-3xl font-bold text-[#FF5722]">{profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S'}</span>
+              )}
             </div>
           </div>
           <div>

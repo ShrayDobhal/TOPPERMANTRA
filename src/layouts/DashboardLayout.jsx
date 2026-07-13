@@ -112,7 +112,7 @@ export default function DashboardLayout() {
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar" data-lenis-prevent="true">
           <div className="space-y-1">
             {sidebarLinks.map((link) => {
               const isActive = link.path === '/dashboard' 
@@ -148,9 +148,13 @@ export default function DashboardLayout() {
         {/* Bottom Profile Area */}
         <div className="p-4 border-t border-[#E9ECEF]">
           <div className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F1F5F9] transition-colors cursor-pointer mb-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-sm shrink-0">
-              {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S'}
-            </div>
+            {profile?.avatarUrl ? (
+              <img src={profile.avatarUrl} alt="Avatar" className="w-9 h-9 rounded-full object-cover shrink-0" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S'}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-[#0F172A] truncate">{profile?.fullName || 'Student'}</p>
               <p className="text-xs text-[#64748B] truncate">{profile?.rank || 'Novice'}</p>
@@ -206,17 +210,17 @@ export default function DashboardLayout() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
-            <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-[#FF5722]/10 text-[#FF5722] rounded-lg text-sm font-bold hover:bg-[#FF5722] hover:text-white transition-colors">
+            <Link to="/dashboard/projects/create" className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-[#FF5722]/10 text-[#FF5722] rounded-lg text-sm font-bold hover:bg-[#FF5722] hover:text-white transition-colors">
               <Plus size={16} />
               <span>Create</span>
-            </button>
+            </Link>
             
             <div className="h-6 w-px bg-[#E9ECEF] hidden sm:block mx-1"></div>
 
-            <button className="w-9 h-9 flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] rounded-full transition-colors relative">
+            <Link to="/dashboard/messages" className="w-9 h-9 flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] rounded-full transition-colors relative">
               <MessageSquare size={18} />
               <span className="absolute top-1 right-1 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
-            </button>
+            </Link>
             <div className="relative">
               <button 
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
@@ -228,20 +232,24 @@ export default function DashboardLayout() {
               <NotificationCenter isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
             </div>
             
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-sm shrink-0 ml-2 cursor-pointer ring-2 ring-transparent hover:ring-[#FF5722]/30 transition-all">
-              {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S'}
-            </div>
+            {profile?.avatarUrl ? (
+              <img src={profile.avatarUrl} alt="Avatar" className="w-9 h-9 rounded-full object-cover shrink-0 ml-2 cursor-pointer ring-2 ring-transparent hover:ring-[#FF5722]/30 transition-all" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-sm shrink-0 ml-2 cursor-pointer ring-2 ring-transparent hover:ring-[#FF5722]/30 transition-all">
+                {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : 'S'}
+              </div>
+            )}
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8" data-lenis-prevent="true">
           <Outlet />
         </main>
       </div>
 
       {/* Right Utility Panel (Desktop) */}
-      <aside className="hidden xl:flex flex-col w-[300px] bg-white border-l border-[#E9ECEF] h-screen sticky top-0 z-40 p-5 overflow-y-auto custom-scrollbar">
+      <aside className="hidden xl:flex flex-col w-[300px] bg-white border-l border-[#E9ECEF] h-screen sticky top-0 z-40 p-5 overflow-y-auto custom-scrollbar" data-lenis-prevent="true">
         
         {/* 1. Cohort Activity (Only visible on Cohort page) */}
         {location.pathname === '/dashboard/cohort' && (

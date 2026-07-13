@@ -39,7 +39,8 @@ export default function Signup() {
       if (isMockMode) {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 800));
-        navigate('/welcome');
+        localStorage.setItem('signup_email', email);
+        navigate('/verify-email');
         return;
       }
 
@@ -56,8 +57,9 @@ export default function Signup() {
       if (error) {
         setError(error.message);
       } else {
-        // Since Email Confirmations are off, we can bypass the verify-email page
-        navigate('/welcome');
+        // Email confirmations enabled: send to verify page
+        localStorage.setItem('signup_email', email);
+        navigate('/verify-email');
       }
     } catch (err) {
       console.error(err);

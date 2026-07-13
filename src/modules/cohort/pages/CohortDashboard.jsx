@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Users, Shield, Clock, Paperclip, MoreVertical, CheckCircle2 } from 'lucide-react';
+import { Send, Users, Shield, Clock, Paperclip, MoreVertical, CheckCircle2, Play, Lock } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import useCohortStore from '../../../store/useCohortStore';
 import useStudentStore from '../../../store/useStudentStore';
@@ -44,12 +44,39 @@ export default function CohortDashboard() {
     setNewMessage('');
   };
 
-  if (!cohort) {
-    return <div className="flex h-full items-center justify-center p-8 text-gray-500">Loading your batch...</div>;
-  }
+  // === DUMMY DATA FALLBACK ===
+  const displayCohort = cohort || {
+    id: 'dummy-cohort-1',
+    name: "Software Engineering Batch '26",
+    mentor: { name: 'Priya Sharma' }
+  };
 
-  const mentor = members.find(m => m.user?.role === 'Mentor' || m.status === 'mentor') || { name: cohort.mentor?.name || 'Mentor', role: 'Mentor' };
-  const activeMembers = members.filter(m => m.status === 'active' || m.status === 'yellow');
+  const displayMembers = (members && members.length > 0) ? members : [
+    { id: '1', name: profile?.fullName || 'Aman Gupta', status: 'active', contributionScore: 450, isCurrentUser: true },
+    { id: '2', name: 'Riya Verma', status: 'yellow', contributionScore: 320 },
+    { id: '3', name: 'Karan Singh', status: 'active', contributionScore: 410 },
+    { id: '4', name: 'Neha Reddy', status: 'active', contributionScore: 390 },
+    { id: '5', name: 'Priya Sharma', status: 'mentor', user: { role: 'Mentor' } }
+  ];
+
+  const displayMessages = (messages && messages.length > 0) ? messages : [
+    {
+      id: 1,
+      user: { id: 'mentor-1', name: 'Priya Sharma', role: 'Mentor', avatar: null },
+      content: "Welcome everyone! I'll be guiding you through this cohort. Let me know if you have any questions regarding Week 1 syllabus.",
+      createdAt: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+      id: 2,
+      user: { id: profile?.id || 'me', name: profile?.fullName || 'Me', role: 'Student', avatar: profile?.avatarUrl },
+      content: "Thanks Priya! I'm super excited to start building.",
+      createdAt: new Date(Date.now() - 1800000).toISOString()
+    }
+  ];
+  // ============================
+
+  const mentor = displayMembers.find(m => m.user?.role === 'Mentor' || m.status === 'mentor') || { name: displayCohort.mentor?.name || 'Mentor', role: 'Mentor' };
+  const activeMembers = displayMembers.filter(m => m.status === 'active' || m.status === 'yellow');
 
   // Hardcoded cohort curriculum timeline matching the user's attachment style
   const cohortCurriculum = [
@@ -73,7 +100,7 @@ export default function CohortDashboard() {
               <Shield size={20} className="text-white" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-[#0F172A]">{cohort.name}</h2>
+              <h2 className="text-base font-bold text-[#0F172A]">{displayCohort.name}</h2>
               <p className="text-xs font-semibold text-[#22C55E] flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span> Mentor Online
               </p>
@@ -113,17 +140,21 @@ export default function CohortDashboard() {
         {activeTab === 'chat' ? (
           <>
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#F8FAFC]">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#F8FAFC]" data-lenis-prevent="true">
               {/* Welcome Banner */}
-              <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-4 text-center max-w-lg mx-auto">
-                <p className="text-sm font-bold text-[#9F1239] mb-1">Welcome to your Mentor Room</p>
-                <p className="text-xs font-medium text-[#BE123C]">
-                  All technical discussions and doubts should be posted here. Do not DM the mentor directly. Your participation is tracked.
+              <div className="bg-gradient-to-r from-[#EFF6FF] to-[#F8FAFC] border border-[#BFDBFE] rounded-2xl p-5 text-center max-w-lg mx-auto shadow-sm">
+                <div className="w-10 h-10 mx-auto bg-[#3B82F6]/10 rounded-full flex items-center justify-center mb-3">
+                  <Shield size={20} className="text-[#3B82F6]" />
+                </div>
+                <p className="text-sm font-bold text-[#1E3A8A] mb-1.5">Welcome to your Mentor Room</p>
+                <p className="text-xs font-medium text-[#475569] leading-relaxed">
+                  All technical discussions and doubts should be posted here. Please avoid DMing the mentor directly. <br className="hidden sm:block" />
+                  <span className="text-[#3B82F6] font-semibold">Your participation is tracked for XP.</span>
                 </p>
               </div>
 
-              {messages.map((msg, idx) => {
-                const isMe = msg.user.id === profile.id;
+              {displayMessages.map((msg, idx) => {
+                const isMe = msg.user.id === profile?.id;
                 const isMentor = msg.user.role === 'Mentor';
                 
                 return (
@@ -183,7 +214,7 @@ export default function CohortDashboard() {
           </>
         ) : (
           /* Curriculum Timeline Tab */
-          <div className="flex-1 overflow-y-auto p-6 sm:p-10 bg-[#F8FAFC] relative">
+          <div className="flex-1 overflow-y-auto p-6 sm:p-10 bg-[#F8FAFC] relative" data-lenis-prevent="true">
             <div className="absolute left-[37px] sm:left-[53px] top-10 bottom-10 w-1 bg-[#E2E8F0] rounded-full z-0"></div>
             <motion.div 
               initial={{ height: 0 }}
@@ -280,8 +311,8 @@ export default function CohortDashboard() {
               {activeMembers.length}
             </span>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
-            {members.filter(m => m.status !== 'mentor').map(member => (
+          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2" data-lenis-prevent="true">
+            {displayMembers.filter(m => m.status !== 'mentor').map(member => (
               <div key={member.id} className="flex items-center justify-between group">
                 <div className="flex items-center gap-3">
                   <div className="relative">

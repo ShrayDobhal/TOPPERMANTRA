@@ -101,13 +101,25 @@ const useStudentStore = create((set, get) => ({
           .update({
             streak: newStreak,
             longest_streak: newLongestStreak,
-            last_active_at: now.toISOString()
+            last_active_at: now.toISOString(),
+            // +5 XP streak bonus per PRD §5.1 (only on first login of the day)
+            contribution_score: (data.contribution_score || 0) + 5
           })
           .eq('id', userId);
           
         if (!updateError) {
           data.streak = newStreak;
           data.longest_streak = newLongestStreak;
+          data.contribution_score = (data.contribution_score || 0) + 5;
+
+          // Log the streak XP award to activity feed
+          await supabase.from('activity_logs').insert({
+            user_id: userId,
+            action_type: 'daily_streak_bonus',
+            entity_id: null,
+            entity_name: `Day ${newStreak} Streak Bonus`,
+            xp_earned: 5,
+          });
         } else {
           console.error("Error updating user streak:", updateError);
         }
@@ -127,6 +139,8 @@ const useStudentStore = create((set, get) => ({
           avatarUrl: data.avatar_url || '',
           resumeUrl: data.resume_url || '',
           portfolioUrl: data.portfolio_url || '',
+          githubUrl: data.github_url || '',
+          linkedinUrl: data.linkedin_url || '',
           college: data.college || 'Add your college',
           branch: data.branch || 'Add your branch',
           year: data.year || '1st Year',

@@ -4,10 +4,14 @@ import { User, Mail, Building2, BookOpen, Target, Link as LinkIcon, Camera, Save
 import useStudentStore from '../../../store/useStudentStore';
 import { cn } from '../../../lib/utils';
 import toast from 'react-hot-toast';
+import { supabase } from '../../../lib/supabase';
+import { useUser } from '../../../contexts/AuthContext';
 
 export default function Settings() {
+  const { user } = useUser();
   const profile = useStudentStore((s) => s.profile);
   const updateProfile = useStudentStore((s) => s.updateProfile);
+  const fetchProfile = useStudentStore((s) => s.fetchProfile);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -23,6 +27,7 @@ export default function Settings() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -60,7 +65,47 @@ export default function Settings() {
   };
 
   const handleAvatarClick = () => {
-    toast('Avatar upload will connect to Supabase Storage. (Coming Soon)', { icon: '📸' });
+    document.getElementById('avatar-upload').click();
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !user) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File size must be less than 2MB");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    const toastId = toast.loading("Uploading avatar...");
+
+    try {
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      const filePath = `${user.id}/avatar_${Date.now()}.${fileExt}`;
+
+      // Upload file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update user profile with avatarUrl
+      await updateProfile({ avatarUrl: publicUrl });
+      await fetchProfile();
+      toast.success("Avatar updated successfully!", { id: toastId });
+    } catch (err) {
+      console.error("Error uploading avatar:", err);
+      toast.error(`Failed to upload: ${err.message || "Unknown error"}`, { id: toastId });
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   return (
@@ -75,15 +120,21 @@ export default function Settings() {
         
         {/* Profile Picture Section */}
         <div className="p-8 border-b border-[#E9ECEF] flex flex-col sm:flex-row items-center gap-6">
+          <input type="file" id="avatar-upload" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={isUploadingAvatar} />
           <div className="relative group">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF9800] flex items-center justify-center text-white text-3xl font-bold shadow-md">
-              {profile?.fullName ? profile.fullName.charAt(0) : 'S'}
-            </div>
+            {profile?.avatarUrl ? (
+              <img src={profile.avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white" />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF5722] to-[#FF9800] flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                {profile?.fullName ? profile.fullName.charAt(0) : 'S'}
+              </div>
+            )}
             <button 
               onClick={handleAvatarClick}
-              className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              disabled={isUploadingAvatar}
+              className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:opacity-50"
             >
-              <Camera className="text-white" size={24} />
+              {isUploadingAvatar ? <Loader2 className="text-white animate-spin" size={24} /> : <Camera className="text-white" size={24} />}
             </button>
           </div>
           <div className="text-center sm:text-left">
@@ -91,9 +142,10 @@ export default function Settings() {
             <p className="text-sm text-[#64748B] mb-3">Upload a square image, max 2MB.</p>
             <button 
               onClick={handleAvatarClick}
-              className="px-4 py-2 bg-[#F1F5F9] text-[#0F172A] text-sm font-bold rounded-xl hover:bg-[#E2E8F0] transition-colors"
+              disabled={isUploadingAvatar}
+              className="px-4 py-2 bg-[#F1F5F9] text-[#0F172A] text-sm font-bold rounded-xl hover:bg-[#E2E8F0] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Change Picture
+              {isUploadingAvatar ? <><Loader2 size={16} className="animate-spin"/> Uploading...</> : 'Change Picture'}
             </button>
           </div>
         </div>

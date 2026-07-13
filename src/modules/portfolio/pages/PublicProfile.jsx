@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Avatar } from '../../../components/ui/Avatar';
 import { cn } from '../../../lib/utils';
+import useStudentStore from '../../../store/useStudentStore';
 
 const navLinks = [
   { id: 'about', label: 'About' },
@@ -20,6 +21,7 @@ const navLinks = [
 export default function PublicProfile() {
   const { username } = useParams();
   const [activeSection, setActiveSection] = useState('about');
+  const profile = useStudentStore((s) => s.profile);
 
   // Smooth scroll helper
   const scrollTo = (id) => {
@@ -80,25 +82,37 @@ export default function PublicProfile() {
           <div className="px-4 sm:px-8 relative -mt-20 sm:-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-6">
               <div className="p-2 bg-[#F8FAFC] rounded-[32px] inline-block shadow-sm">
-                <Avatar size="2xl" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Shray" className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl border-4 border-white shadow-md" />
+                <Avatar size="2xl" src={profile?.avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Shray"} className="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl border-4 border-white shadow-md" />
               </div>
               <div className="flex items-center gap-3 mb-2 sm:mb-4">
-                <a href="#" className="w-10 h-10 rounded-full bg-white border border-[#E9ECEF] flex items-center justify-center text-[#0F172A] hover:text-[#3B82F6] hover:border-[#3B82F6] transition-colors shadow-sm"><Globe size={18} /></a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white border border-[#E9ECEF] flex items-center justify-center text-[#0F172A] hover:text-[#3B82F6] hover:border-[#3B82F6] transition-colors shadow-sm"><Github size={18} /></a>
-                <a href="#" className="w-10 h-10 rounded-full bg-white border border-[#E9ECEF] flex items-center justify-center text-[#0F172A] hover:text-[#3B82F6] hover:border-[#3B82F6] transition-colors shadow-sm"><ExternalLink size={18} /></a>
+                {profile?.portfolioUrl && (
+                  <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-[#E9ECEF] flex items-center justify-center text-[#0F172A] hover:text-[#3B82F6] hover:border-[#3B82F6] transition-colors shadow-sm">
+                    <Globe size={18} />
+                  </a>
+                )}
+                {profile?.githubUrl && (
+                  <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-[#E9ECEF] flex items-center justify-center text-[#0F172A] hover:text-[#3B82F6] hover:border-[#3B82F6] transition-colors shadow-sm">
+                    <Github size={18} />
+                  </a>
+                )}
+                {profile?.linkedinUrl && (
+                  <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-[#E9ECEF] flex items-center justify-center text-[#0F172A] hover:text-[#3B82F6] hover:border-[#3B82F6] transition-colors shadow-sm">
+                    <ExternalLink size={18} />
+                  </a>
+                )}
               </div>
             </div>
             
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Shray Dobhal</h1>
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">{profile?.fullName || 'Shray Dobhal'}</h1>
                 <span className="bg-[#22C55E]/10 text-[#22C55E] p-1 rounded-full"><CheckCircle2 size={20} /></span>
               </div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#3B82F6] mb-4">Software Engineer • Open Source Contributor</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-[#3B82F6] mb-4">{profile?.careerGoal || 'Software Engineer'}</h2>
               
               <div className="flex flex-wrap items-center gap-4 text-sm font-semibold text-[#64748B]">
-                <span className="flex items-center gap-1.5"><GraduationCap size={16}/> B.Tech CSE (2027)</span>
-                <span className="flex items-center gap-1.5"><Building size={16}/> Topper Mantra University</span>
+                <span className="flex items-center gap-1.5"><GraduationCap size={16}/> {profile?.branch || 'B.Tech CSE'} ({profile?.year || '2027'})</span>
+                <span className="flex items-center gap-1.5"><Building size={16}/> {profile?.college || 'Topper Mantra University'}</span>
                 <span className="flex items-center gap-1.5"><MapPin size={16}/> Remote, India</span>
               </div>
             </div>

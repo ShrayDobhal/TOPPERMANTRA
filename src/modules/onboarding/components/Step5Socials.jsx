@@ -9,9 +9,38 @@ export default function Step5Socials({ data = {}, updateData }) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const [fileName, setFileName] = useState(data.resumeName || null);
+  const [errors, setErrors] = useState({});
+
+  const validateUrl = (name, value) => {
+    if (!value) return null;
+    
+    try {
+      const url = new URL(value);
+      if (name === 'linkedin' && !url.hostname.includes('linkedin.com')) {
+        return "Must be a valid LinkedIn URL";
+      }
+      if (name === 'github' && !url.hostname.includes('github.com')) {
+        return "Must be a valid GitHub URL";
+      }
+      if (name === 'portfolio' && !url.protocol.includes('http')) {
+        return "Must be a valid URL with http:// or https://";
+      }
+      return null;
+    } catch (err) {
+      return "Invalid URL format";
+    }
+  };
 
   const handleChange = (e) => {
-    updateData({ ...data, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    updateData({ ...data, [name]: value });
+    
+    if (value) {
+      const error = validateUrl(name, value);
+      setErrors(prev => ({ ...prev, [name]: error }));
+    } else {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleFileClick = () => {
@@ -78,8 +107,12 @@ export default function Step5Socials({ data = {}, updateData }) {
           value={data.linkedin || ''}
           onChange={handleChange}
           placeholder="https://linkedin.com/in/username" 
-          className="w-full px-4 py-3 bg-white border border-[#E9ECEF] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF5722]/20 focus:border-[#FF5722] transition-all shadow-sm"
+          className={cn(
+            "w-full px-4 py-3 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all shadow-sm",
+            errors.linkedin ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" : "border-[#E9ECEF] focus:ring-[#FF5722]/20 focus:border-[#FF5722]"
+          )}
         />
+        {errors.linkedin && <p className="text-xs text-red-500 font-medium mt-1">{errors.linkedin}</p>}
       </div>
 
       <div className="space-y-1">
@@ -92,8 +125,12 @@ export default function Step5Socials({ data = {}, updateData }) {
           value={data.github || ''}
           onChange={handleChange}
           placeholder="https://github.com/username" 
-          className="w-full px-4 py-3 bg-white border border-[#E9ECEF] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF5722]/20 focus:border-[#FF5722] transition-all shadow-sm"
+          className={cn(
+            "w-full px-4 py-3 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all shadow-sm",
+            errors.github ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" : "border-[#E9ECEF] focus:ring-[#FF5722]/20 focus:border-[#FF5722]"
+          )}
         />
+        {errors.github && <p className="text-xs text-red-500 font-medium mt-1">{errors.github}</p>}
       </div>
 
       <div className="space-y-1">
@@ -106,8 +143,12 @@ export default function Step5Socials({ data = {}, updateData }) {
           value={data.portfolio || ''}
           onChange={handleChange}
           placeholder="https://yourwebsite.com" 
-          className="w-full px-4 py-3 bg-white border border-[#E9ECEF] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF5722]/20 focus:border-[#FF5722] transition-all shadow-sm"
+          className={cn(
+            "w-full px-4 py-3 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all shadow-sm",
+            errors.portfolio ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" : "border-[#E9ECEF] focus:ring-[#FF5722]/20 focus:border-[#FF5722]"
+          )}
         />
+        {errors.portfolio && <p className="text-xs text-red-500 font-medium mt-1">{errors.portfolio}</p>}
       </div>
 
       <div className="pt-4">
@@ -164,3 +205,4 @@ export default function Step5Socials({ data = {}, updateData }) {
     </div>
   );
 }
+

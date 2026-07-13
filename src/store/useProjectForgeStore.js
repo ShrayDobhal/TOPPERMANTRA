@@ -169,7 +169,40 @@ const useProjectForgeStore = create((set, get) => ({
 
   getProjectsByStatus: (status) => {
     return get().projects.filter(p => p.status === status);
-  }
+  },
+
+  // ---- Mentor Actions ----
+  fetchPendingSubmissions: async () => {
+    const { data, error } = await supabase.rpc('fetch_pending_submissions');
+    if (error) {
+      console.error('Error fetching submissions:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  approveTask: async (submissionId, feedback = '') => {
+    const { data, error } = await supabase.rpc('approve_task', {
+      p_submission_id: submissionId,
+      p_feedback: feedback,
+    });
+    if (error) { toast.error(error.message); return false; }
+    if (data && !data.success) { toast.error(data.error); return false; }
+    toast.success('Submission merged! Student awarded XP.');
+    await get().fetchProjects();
+    return true;
+  },
+
+  rejectTask: async (submissionId, feedback = '') => {
+    const { data, error } = await supabase.rpc('reject_task', {
+      p_submission_id: submissionId,
+      p_feedback: feedback,
+    });
+    if (error) { toast.error(error.message); return false; }
+    if (data && !data.success) { toast.error(data.error); return false; }
+    toast('Changes requested. Student will be notified.', { icon: '📝' });
+    return true;
+  },
 }));
 
 export default useProjectForgeStore;
