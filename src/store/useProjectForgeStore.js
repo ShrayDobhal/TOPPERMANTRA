@@ -40,15 +40,31 @@ const useProjectForgeStore = create((set, get) => ({
     // Attach task summary stats to projects
     const formattedProjects = (projectsData || []).map(proj => {
       const projTasks = formattedTasks.filter(t => t.project_id === proj.id);
+      const completedCount = projTasks.filter(t => t.status === 'Completed').length;
       return {
         ...proj,
         techStack: proj.tech_stack || ['React', 'Node.js'],
         mentor: { name: proj.mentor_name || 'Mentor', institution: proj.mentor_institution || 'IIT' },
         coverGradient: proj.cover_gradient,
         totalSubparts: projTasks.length,
-        completedSubparts: projTasks.filter(t => t.status === 'Completed').length,
+        completedSubparts: completedCount,
         claimedSubparts: projTasks.filter(t => t.status === 'In Progress' || t.status === 'In Review').length,
         availableSubparts: projTasks.filter(t => t.status === 'Backlog').length,
+        bannerUrl: proj.banner_url || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80',
+        shortDescription: proj.description,
+        organization: proj.mentor_institution || 'IIT',
+        teamSize: { current: projTasks.filter(t => t.status !== 'Backlog').length, max: projTasks.length || 5 },
+        openRoles: projTasks.filter(t => t.status === 'Backlog').slice(0,2).map(t => 'Contributor'),
+        progress: projTasks.length > 0 ? Math.round((completedCount / projTasks.length) * 100) : 0,
+        metrics: { stars: Math.floor(Math.random() * 100) + 10, views: Math.floor(Math.random() * 500) + 50, bookmarks: Math.floor(Math.random() * 20) + 2 },
+        tasks: projTasks.map(t => ({
+          id: t.id.substring(0, 8),
+          title: t.title,
+          status: t.status === 'In Review' ? 'Review' : t.status,
+          assignee: t.claimedBy?.name || 'Unassigned',
+          difficulty: t.difficulty || 'Medium'
+        })),
+        members: projTasks.filter(t => t.claimedBy).map(t => ({ name: t.claimedBy.name, role: 'Contributor', avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.claimedBy.name}` }))
       };
     });
 

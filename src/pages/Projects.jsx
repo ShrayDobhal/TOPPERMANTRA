@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import ProjectSearch from '../components/projects/ProjectSearch';
 import ProjectCategories from '../components/projects/ProjectCategories';
 import ProjectsCta from '../components/projects/ProjectsCta';
-import { showcaseProjects } from '../lib/showcaseProjects';
+import useProjectForgeStore from '../store/useProjectForgeStore';
 
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,14 +47,21 @@ export default function Projects() {
     }));
   };
 
+  const { projects, fetchProjects, loading } = useProjectForgeStore();
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
   // Apply filters to projects
   const filteredProjects = useMemo(() => {
-    return showcaseProjects.filter(project => {
+    return projects.filter(project => {
       // Search matching
+      const searchStr = (project.title + ' ' + (project.shortDescription || project.description || '')).toLowerCase();
+      const techStr = (project.techStack || []).join(' ').toLowerCase();
       const matchesSearch = searchQuery === "" || 
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.techStack.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+        searchStr.includes(searchQuery.toLowerCase()) ||
+        techStr.includes(searchQuery.toLowerCase());
 
       // Filter matching
       const matchesDomain = filters.domains.length === 0 || filters.domains.includes(project.domain);
@@ -63,7 +70,7 @@ export default function Projects() {
 
       return matchesSearch && matchesDomain && matchesDifficulty && matchesStatus;
     });
-  }, [searchQuery, filters]);
+  }, [searchQuery, filters, projects]);
 
   return (
     <div style={{ minHeight: "400vh" }} className="bg-[#FFFFFF] text-[#0F172A] relative selection:bg-[#FF5722] selection:text-white font-sans overflow-x-hidden">

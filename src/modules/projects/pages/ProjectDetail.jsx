@@ -6,15 +6,24 @@ import {
   Users, MapPin, GitBranch as Github, ExternalLink, Calendar, CheckCircle2 
 } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
-import { showcaseProjects } from "../../../lib/showcaseProjects";
+import useProjectForgeStore from "../../../store/useProjectForgeStore";
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Overview");
   
-  // Find project or use first one as fallback for demo
-  const project = showcaseProjects.find(p => p.id === id) || showcaseProjects[0];
+  const { projects, fetchProjects, loading } = useProjectForgeStore();
+
+  React.useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const project = projects.find(p => p.id === id) || projects[0];
+
+  if (loading || !project) {
+    return <div className="h-screen w-full flex items-center justify-center bg-slate-50 text-slate-500 font-bold">Loading Project Details...</div>;
+  }
 
   const tabs = ["Overview", "Open Roles", "Team", "Roadmap"];
 
@@ -173,15 +182,20 @@ export default function ProjectDetail() {
 
                 {activeTab === "Team" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.members.map((member, idx) => (
+                    {(project.members || []).map((member, idx) => (
                       <div key={idx} className="flex items-center gap-4 p-4 border border-slate-200 rounded-2xl bg-white hover:border-[#FF5722]/30 transition-colors">
-                        <img src={member.avatar} alt={member.name} className="w-12 h-12 rounded-full object-cover" />
+                        <img src={member.avatar} alt={member.name} className="w-12 h-12 rounded-full object-cover bg-slate-100" />
                         <div>
                           <h4 className="font-bold text-[#0F172A]">{member.name}</h4>
                           <p className="text-xs text-slate-500">{member.role}</p>
                         </div>
                       </div>
                     ))}
+                    {(!project.members || project.members.length === 0) && (
+                      <div className="col-span-2 text-center py-10 text-slate-500">
+                        No team members yet. Be the first to join!
+                      </div>
+                    )}
                   </div>
                 )}
                 
@@ -234,10 +248,10 @@ export default function ProjectDetail() {
                 <Shield className="w-4 h-4" /> Mentored By
               </h3>
               <div className="flex items-center gap-4">
-                <img src={project.mentor.avatar} alt={project.mentor.name} className="w-14 h-14 rounded-xl object-cover" />
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${project.mentor.name}`} alt={project.mentor.name} className="w-14 h-14 rounded-xl object-cover bg-slate-100" />
                 <div>
                   <h4 className="font-bold text-[#0F172A]">{project.mentor.name}</h4>
-                  <p className="text-xs text-slate-500">{project.mentor.role}</p>
+                  <p className="text-xs text-slate-500">{project.mentor.institution}</p>
                 </div>
               </div>
             </div>

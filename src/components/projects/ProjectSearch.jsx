@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { Search, Filter, SlidersHorizontal, ChevronDown } from "lucide-react";
-import { projectFilters } from "../../lib/showcaseProjects";
 import { motion, AnimatePresence } from "framer-motion";
+
+const projectFilters = {
+  domains: ["Web Development", "AI / Bots", "IoT / Hardware", "Mobile App", "Data Science", "Web3 / Crypto"],
+  difficulties: ["Beginner", "Intermediate", "Advanced"],
+  statuses: ["Recruiting", "In Progress", "Completed"]
+};
 
 export default function ProjectSearch({ onSearch, onFilterChange, currentFilters }) {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);

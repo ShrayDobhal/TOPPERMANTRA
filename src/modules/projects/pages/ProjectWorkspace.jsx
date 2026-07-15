@@ -6,7 +6,7 @@ import {
   MessageSquare, FileText, ChevronLeft, Calendar 
 } from "lucide-react";
 import KanbanBoard from "../components/KanbanBoard";
-import { showcaseProjects } from "../../../lib/showcaseProjects";
+import useProjectForgeStore from "../../../store/useProjectForgeStore";
 import { fadeUp } from "../../../lib/animations";
 
 export default function ProjectWorkspace() {
@@ -15,8 +15,17 @@ export default function ProjectWorkspace() {
   const [activeTab, setActiveTab] = useState("Board");
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
-  // Fallback to first project for demo
-  const project = showcaseProjects.find(p => p.id === id) || showcaseProjects[0];
+  const { projects, fetchProjects, loading } = useProjectForgeStore();
+
+  React.useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const project = projects.find(p => p.id === id) || projects[0];
+
+  if (loading || !project) {
+    return <div className="h-screen w-full flex items-center justify-center bg-slate-50 text-slate-500 font-bold">Loading Workspace...</div>;
+  }
 
   const navItems = [
     { id: "Board", icon: <KanbanSquare className="w-5 h-5" /> },
@@ -153,12 +162,14 @@ export default function ProjectWorkspace() {
             </button>
 
             <div className="flex -space-x-2 mr-2">
-              {project.members.slice(0, 3).map((m, i) => (
-                <img key={i} src={m.avatar} alt="member" className="w-8 h-8 rounded-full border-2 border-white" />
+              {(project.members || []).slice(0, 3).map((m, i) => (
+                <img key={i} src={m.avatar} alt="member" className="w-8 h-8 rounded-full border-2 border-white bg-slate-200" />
               ))}
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
-                +2
-              </div>
+              {(project.members?.length || 0) > 3 && (
+                <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
+                  +{(project.members?.length || 0) - 3}
+                </div>
+              )}
             </div>
           </div>
         </header>
