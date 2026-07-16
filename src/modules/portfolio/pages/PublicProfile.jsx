@@ -60,7 +60,16 @@ export default function PublicProfile() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="bg-[#F8FAFC] border border-[#E9ECEF] text-[#0F172A] px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#F1F5F9] transition-colors flex items-center gap-2">
+            <button 
+              onClick={() => {
+                if (profile?.resumeUrl) {
+                  window.open(profile.resumeUrl, '_blank');
+                } else {
+                  alert('Resume not uploaded yet.');
+                }
+              }}
+              className="bg-[#F8FAFC] border border-[#E9ECEF] text-[#0F172A] px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#F1F5F9] transition-colors flex items-center gap-2"
+            >
               <Download size={16} /> Resume
             </button>
             <button className="bg-[#3B82F6] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#2563EB] transition-colors shadow-sm">

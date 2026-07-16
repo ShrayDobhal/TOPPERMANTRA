@@ -41,7 +41,8 @@ import SessionDashboard from './modules/mentors/pages/SessionDashboard'
 import MentorProfile from './modules/mentors/pages/MentorProfile'
 import MentorReviewDashboard from './modules/mentors/pages/MentorReviewDashboard'
 import PortfolioDashboard from './modules/portfolio/pages/PortfolioDashboard'
-import ResumeBuilder from './modules/portfolio/pages/ResumeBuilder'
+import ResumeLanding from './modules/resume/pages/ResumeLanding'
+import ResumeDashboard from './modules/resume/pages/ResumeDashboard'
 import PublicProfile from './modules/portfolio/pages/PublicProfile'
 import CohortLayout from './modules/cohort/layouts/CohortLayout'
 import CohortDashboard from './modules/cohort/pages/CohortDashboard'
@@ -159,7 +160,10 @@ export default function App() {
             </Route>
             <Route path="hackathons" element={<ComingSoon />} />
             <Route path="portfolio" element={<PortfolioDashboard />} />
-            <Route path="resume" element={<ResumeBuilder />} />
+            <Route path="resume">
+              <Route index element={<ResumeLanding />} />
+              <Route path="dashboard" element={<ResumeDashboard />} />
+            </Route>
             <Route path="certificates" element={<ComingSoon />} />
             <Route path="events" element={<ComingSoon />} />
             <Route path="messages" element={<ComingSoon />} />

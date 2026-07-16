@@ -109,6 +109,36 @@ const useGamificationStore = create((set, get) => ({
   },
 
   getUserRank: () => get().leaderboard.find(l => l.isCurrentUser)?.rank || 0,
+
+  awardXP: async (actionName, amount) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      
+      // Update locally
+      const studentStore = useStudentStore.getState();
+      if (studentStore.profile) {
+        studentStore.setProfile({
+          ...studentStore.profile,
+          contributionScore: (studentStore.profile.contributionScore || 0) + amount
+        });
+      }
+
+      // Update in DB (or let trigger handle it, but here we insert activity log)
+      await supabase.from('activity_logs').insert({
+        user_id: session.user.id,
+        action_type: 'resume_action',
+        entity_name: actionName,
+        xp_earned: amount
+      });
+
+      // And we can update the profile explicitly
+      await supabase.rpc('award_xp', { amount, action_name: actionName });
+      
+    } catch (e) {
+      console.error("Failed to award XP:", e);
+    }
+  },
 }));
 
 export default useGamificationStore;
