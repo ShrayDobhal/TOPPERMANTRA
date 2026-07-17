@@ -16,7 +16,7 @@ const useDiscoverStore = create((set, get) => ({
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
+    if (!error && data && data.length > 0) {
       // Basic mock matching logic (In production, use AI/Edge function)
       const enhancedData = data.map(opp => ({
         ...opp,
@@ -32,7 +32,29 @@ const useDiscoverStore = create((set, get) => ({
         loading: false 
       });
     } else {
-      set({ loading: false });
+      // DUMMY DATA FALLBACK
+      const dummyOpps = [
+        {
+          id: 'o1', title: 'Software Engineering Intern', company: 'Google', location: 'Remote',
+          type: 'Internship', stipend: '$8,000/mo', match: 96, isMatch: true,
+          skills: ['C++', 'Python', 'DSA'], created_at: new Date().toISOString()
+        },
+        {
+          id: 'o2', title: 'Frontend Developer (React)', company: 'Stripe', location: 'San Francisco, CA',
+          type: 'Full Time', stipend: '$120k - $150k', match: 92, isMatch: true,
+          skills: ['React', 'TypeScript', 'Tailwind'], created_at: new Date().toISOString()
+        },
+        {
+          id: 'o3', title: 'Open Source Contributor', company: 'Vercel', location: 'Remote',
+          type: 'Freelance', stipend: '$50/hr', match: 85, isMatch: false,
+          skills: ['Next.js', 'Node.js', 'Git'], created_at: new Date().toISOString()
+        }
+      ];
+      set({ 
+        opportunities: dummyOpps,
+        featured: dummyOpps.slice(0, 2),
+        loading: false 
+      });
     }
   },
 

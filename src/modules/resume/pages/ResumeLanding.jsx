@@ -8,7 +8,11 @@ import { fadeUp } from '../../../lib/animations';
 
 export default function ResumeLanding() {
   const navigate = useNavigate();
-  const { uploadResume, stage, progress } = useResumeStore();
+  const { uploadResume, stage, progress, reset } = useResumeStore();
+
+  React.useEffect(() => {
+    reset();
+  }, [reset]);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     if (acceptedFiles.length > 0) {

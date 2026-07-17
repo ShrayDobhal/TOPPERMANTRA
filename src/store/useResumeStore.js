@@ -3,66 +3,30 @@ import { supabase } from '../lib/supabase';
 import useGamificationStore from './useGamificationStore';
 import toast from 'react-hot-toast';
 
-// Mock AI Data for Resume Analysis
-const MOCK_AI_ANALYSIS = {
-  overallScore: 82,
-  atsScore: 78,
-  qualityScore: {
-    grammar: 95,
-    formatting: 80,
-    achievements: 70,
-    leadership: 60,
-    projects: 85,
-    technicalSkills: 90,
-    communication: 85,
-    experienceQuality: 75
-  },
-  careerReadiness: 80,
-  interviewReadiness: {
-    score: 75,
-    weakTopics: ["System Design", "Behavioral"],
-    strongTopics: ["React", "JavaScript", "Frontend Architecture"],
-    likelyQuestions: [
-      "Tell me about a time you optimized a React application.",
-      "How did you measure the impact of your projects?"
-    ]
-  },
-  atsAnalysis: {
-    formatting: { score: 92, reason: "Good spacing but inconsistent bullet indentation.", suggestion: "Use a single bullet style throughout the resume." },
-    keywordOptimization: { score: 70, reason: "Missing key industry buzzwords.", suggestion: "Add keywords like 'Microservices', 'GraphQL'." },
-    structure: { score: 85, reason: "Standard layout used.", suggestion: "Move education below experience since you have 2+ years of experience." }
-  },
-  sectionReviews: [
-    { section: "Projects", strength: "Strong technical stack.", weakness: "No measurable outcomes.", suggestion: "Add metrics such as users served, latency improvement, revenue generated, downloads, accuracy, etc.", priority: "High", impact: "+10 ATS Score" },
-    { section: "Experience", strength: "Good action verbs.", weakness: "Too many bullet points per role.", suggestion: "Limit to 4-5 high-impact bullet points.", priority: "Medium", impact: "+5 Quality Score" }
-  ],
-  missingSections: [
-    { section: "Portfolio", suggestion: "Add a link to your live projects." },
-    { section: "Open Source", suggestion: "Highlight any open-source contributions to stand out." }
-  ],
-  keywordIntelligence: {
-    present: ["React", "Node.js", "MongoDB", "TailwindCSS"],
-    missing: ["TypeScript", "AWS", "Docker", "System Design"],
-    overused: ["Developed", "Created"],
-    suggested: ["Architected", "Engineered", "Orchestrated"],
-    densityScore: 65
-  },
-  salaryEstimate: {
-    current: "₹12,00,000 - ₹15,00,000",
-    potential: "₹18,00,000 - ₹24,00,000",
-    confidence: "85%"
-  },
-  suitableRoles: [
-    { role: "Software Engineer", match: 90 },
-    { role: "Frontend Developer", match: 95 },
-    { role: "Full Stack Engineer", match: 80 },
-    { role: "Product Manager", match: 40 }
-  ],
-  skillCategories: {
-    "Programming Languages": ["JavaScript", "Python", "Java"],
-    "Frameworks": ["React", "Express.js", "Next.js"],
-    "Tools": ["Git", "Postman", "Figma"]
+import * as pdfjsLib from 'pdfjs-dist';
+import mammoth from 'mammoth';
+
+// Set up PDF.js worker (use CDN to avoid build configuration issues)
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+
+const extractTextFromFile = async (file) => {
+  if (file.type === 'application/pdf') {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+    return fullText;
+  } else if (file.name.endsWith('.docx')) {
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value;
   }
+  throw new Error("Unsupported file type");
 };
 
 const useResumeStore = create((set, get) => ({
@@ -96,25 +60,46 @@ const useResumeStore = create((set, get) => ({
     
     set({ progress: 30, stage: 'parsing' });
 
-    // 2. Parse Resume (Mocking the parsing delay for PDF.js / Mammoth)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // 2. Parse Resume Text
+    let parsedText = '';
+    try {
+      parsedText = await extractTextFromFile(file);
+    } catch (e) {
+      console.error("Parsing failed:", e);
+      toast.error("Failed to parse resume document.");
+      set({ stage: 'idle', progress: 0 });
+      return;
+    }
+    
     set({ progress: 60, stage: 'analyzing' });
 
-    // 3. AI Analysis via Edge Function (Mocking the response)
-    // In production: await supabase.functions.invoke('resume-analyzer', { body: { text: parsedText }})
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // 3. AI Analysis via Edge Function
+    let aiResults = null;
+    try {
+      const { data, error } = await supabase.functions.invoke('resume-analyzer', {
+        body: { text: parsedText }
+      });
+
+      if (error) throw error;
+      aiResults = data;
+    } catch (e) {
+      console.error("AI Analysis failed:", e);
+      toast.error("AI analysis failed. Please ensure GEMINI_API_KEY is configured.");
+      set({ stage: 'idle', progress: 0 });
+      return;
+    }
     
     set({ 
       progress: 100, 
       stage: 'complete',
       resumeData: {
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "+91 9876543210",
-        education: "B.Tech Computer Science",
-        experience: "2 Years at Tech Startup"
+        name: "Parsed User",
+        email: "user@example.com",
+        phone: "-",
+        education: "-",
+        experience: "-"
       },
-      analysisResults: MOCK_AI_ANALYSIS
+      analysisResults: aiResults
     });
     
     toast.success("Resume Analyzed Successfully!");

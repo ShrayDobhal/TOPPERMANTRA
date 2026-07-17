@@ -80,7 +80,7 @@ export default function DashboardLayout() {
   const currentPathLabel = sidebarLinks.find(link => link.path === location.pathname)?.label || "Dashboard";
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] flex font-sans print:block">
       
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
@@ -92,7 +92,7 @@ export default function DashboardLayout() {
 
       {/* Left Sidebar */}
       <aside className={cn(
-        "fixed lg:sticky top-0 left-0 h-screen w-[260px] bg-white border-r border-[#E9ECEF] flex flex-col z-50 transition-transform duration-300 ease-in-out",
+        "fixed lg:sticky top-0 left-0 h-screen w-[260px] bg-white border-r border-[#E9ECEF] flex flex-col z-50 transition-transform duration-300 ease-in-out print:hidden",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Logo Area */}
@@ -171,10 +171,10 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 print:block">
         
         {/* Top Navbar */}
-        <header className="h-16 bg-white border-b border-[#E9ECEF] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30">
+        <header className="h-16 bg-white border-b border-[#E9ECEF] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 print:hidden">
           
           {/* Left: Mobile Toggle & Breadcrumb */}
           <div className="flex items-center gap-4">
@@ -243,13 +243,13 @@ export default function DashboardLayout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8" data-lenis-prevent="true">
+        <main className="flex-1 overflow-x-hidden print:overflow-visible overflow-y-auto print:h-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 print:p-0" data-lenis-prevent="true">
           <Outlet />
         </main>
       </div>
 
       {/* Right Utility Panel (Desktop) */}
-      <aside className="hidden xl:flex flex-col w-[300px] bg-white border-l border-[#E9ECEF] h-screen sticky top-0 z-40 p-5 overflow-y-auto custom-scrollbar" data-lenis-prevent="true">
+      <aside className="hidden xl:flex flex-col w-[300px] bg-white border-l border-[#E9ECEF] h-screen sticky top-0 z-40 p-5 overflow-y-auto custom-scrollbar print:hidden" data-lenis-prevent="true">
         
         {/* 1. Cohort Activity (Only visible on Cohort page) */}
         {location.pathname === '/dashboard/cohort' && (
@@ -361,7 +361,7 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E9ECEF] z-40 flex items-center justify-around py-2 px-4 pb-safe">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E9ECEF] z-40 flex items-center justify-around py-2 px-4 pb-safe print:hidden">
         {[
           { icon: <Home size={24} />, path: "/dashboard", id: "home" },
           { icon: <Shield size={24} />, path: "/dashboard/cohort", id: "cohort" },
@@ -384,7 +384,7 @@ export default function DashboardLayout() {
       </div>
 
       {/* Mobile FAB */}
-      <button className="lg:hidden fixed bottom-20 right-4 w-14 h-14 bg-[#FF5722] rounded-full shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] flex items-center justify-center text-white z-40 active:scale-95 transition-transform">
+      <button className="lg:hidden fixed bottom-20 right-4 w-14 h-14 bg-[#FF5722] rounded-full shadow-[0_4px_14px_0_rgba(255,87,34,0.39)] flex items-center justify-center text-white z-40 active:scale-95 transition-transform print:hidden">
         <Plus size={24} />
       </button>
 

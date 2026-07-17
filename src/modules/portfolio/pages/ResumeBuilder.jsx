@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import * as htmlToImage from 'html-to-image';
+import { jsPDF } from 'jspdf';
 import { 
   ChevronLeft, Download, FileText, CheckCircle2, LayoutTemplate, 
   Settings2, Sparkles, Wand2
@@ -30,15 +32,48 @@ export default function ResumeBuilder() {
   });
 
   const [activeTemplate, setActiveTemplate] = useState('Harvard Minimal');
-
-  const handleExport = () => {
+  const handleExport = async () => {
     setIsExporting(true);
-    // Simulate PDF generation delay
-    setTimeout(() => {
+    const element = document.getElementById('resume-builder-content');
+    if (!element) {
       setIsExporting(false);
+      return;
+    }
+    
+    try {
+      const dataUrl = await htmlToImage.toJpeg(element, { quality: 1, backgroundColor: '#FFFFFF' });
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      let heightLeft = pdfHeight;
+      let position = 0;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      pdf.addImage(dataUrl, 'JPEG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(dataUrl, 'JPEG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save(`${profile?.fullName || 'Student'}_Resume.pdf`);
       setExportComplete(true);
       setTimeout(() => setExportComplete(false), 3000);
-    }, 2000);
+    } catch (err) {
+      console.error("PDF Export error:", err);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const toggleSection = (section) => {
@@ -49,7 +84,7 @@ export default function ResumeBuilder() {
     <div className="flex flex-col h-full bg-[#F8FAFC]">
       
       {/* Header */}
-      <div className="p-4 lg:px-10 border-b border-[#E9ECEF] bg-white flex items-center justify-between shrink-0">
+      <div className="p-4 lg:px-10 border-b border-[#E9ECEF] bg-white flex items-center justify-between shrink-0 print:hidden">
         <div className="flex items-center gap-4">
           <Link to="/dashboard/portfolio" className="p-2 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-xl transition-colors">
             <ChevronLeft size={20} />
@@ -64,21 +99,14 @@ export default function ResumeBuilder() {
         <button 
           onClick={handleExport}
           disabled={isExporting || exportComplete || loading}
-          className={cn(
-            "px-6 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-sm",
-            exportComplete 
-              ? "bg-[#22C55E] text-white" 
-              : (isExporting || loading)
-              ? "bg-[#E2E8F0] text-[#64748B] cursor-not-allowed"
-              : "bg-[#0F172A] text-white hover:bg-[#1E293B]"
-          )}
+          className={`flex flex-1 items-center justify-center gap-2 px-6 py-3 text-white rounded-xl font-bold transition-all shadow-md ${isExporting ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#0F172A] hover:bg-[#1E293B] hover:shadow-lg'}`}
         >
-          {exportComplete ? (
-            <><CheckCircle2 size={18} /> Downloaded</>
-          ) : isExporting ? (
-            <><div className="w-4 h-4 border-2 border-[#64748B] border-t-transparent rounded-full animate-spin"></div> Generating PDF...</>
+          {isExporting ? (
+            <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Generating...</>
+          ) : exportComplete ? (
+            <><CheckCircle2 className="w-5 h-5 text-green-400" /> Done!</>
           ) : (
-            <><Download size={18} /> Export PDF</>
+            <><Download className="w-5 h-5" /> Download PDF</>
           )}
         </button>
       </div>
@@ -87,7 +115,7 @@ export default function ResumeBuilder() {
       <div className="flex-1 flex overflow-hidden relative">
         
         {/* Left Sidebar - Controls */}
-        <div className="w-80 shrink-0 bg-white border-r border-[#E9ECEF] flex flex-col overflow-y-auto custom-scrollbar z-10 relative">
+        <div className="w-80 shrink-0 bg-white border-r border-[#E9ECEF] flex flex-col overflow-y-auto custom-scrollbar z-10 relative print:hidden">
           
           <div className="p-6 border-b border-[#E9ECEF]">
             <h3 className="text-sm font-extrabold text-[#0F172A] mb-4 flex items-center gap-2">
@@ -147,10 +175,10 @@ export default function ResumeBuilder() {
         </div>
 
         {/* Right Pane - Live Preview */}
-        <div className="flex-1 bg-[#F1F5F9] p-8 overflow-y-auto custom-scrollbar flex justify-center items-start">
+        <div className="flex-1 bg-[#F1F5F9] print:bg-white p-8 print:p-0 overflow-y-auto custom-scrollbar flex justify-center items-start">
           
           {/* A4 Paper Preview */}
-          <div className="relative w-[800px] min-h-[1131px] bg-white shadow-xl flex flex-col p-12 shrink-0 transition-all">
+          <div id="resume-builder-content" className="relative w-[800px] print:w-[210mm] min-h-[1131px] print:min-h-[297mm] bg-white shadow-xl print:shadow-none flex flex-col p-12 print:p-0 shrink-0 transition-all">
             
             {/* Auto Generate Overlay */}
             {loading && (

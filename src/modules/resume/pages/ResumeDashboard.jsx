@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as htmlToImage from 'html-to-image';
+import { jsPDF } from 'jspdf';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Download, RefreshCw, FileText, CheckCircle2, 
@@ -15,6 +17,48 @@ import { fadeUp } from '../../../lib/animations';
 export default function ResumeDashboard() {
   const navigate = useNavigate();
   const { analysisResults, resumeData, reset } = useResumeStore();
+  const [isExporting, setIsExporting] = useState(false);
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    const element = document.getElementById('resume-report-content');
+    if (!element) {
+      setIsExporting(false);
+      return;
+    }
+    
+    try {
+      const dataUrl = await htmlToImage.toJpeg(element, { quality: 0.95, backgroundColor: '#F8FAFC' });
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      let heightLeft = pdfHeight;
+      let position = 0;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      pdf.addImage(dataUrl, 'JPEG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(dataUrl, 'JPEG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save('Resume_Intelligence_Report.pdf');
+    } catch (err) {
+      console.error("PDF Export error:", err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   if (!analysisResults) {
     return (
@@ -52,9 +96,9 @@ export default function ResumeDashboard() {
     const colorClass = score >= 80 ? "stroke-green-500" : score >= 60 ? "stroke-amber-500" : "stroke-red-500";
 
     return (
-      <div className="flex flex-col items-center">
-        <div className="relative w-24 h-24 flex items-center justify-center">
-          <svg className="w-full h-full transform -rotate-90 absolute">
+      <div className="flex flex-col items-center shrink-0">
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
+          <svg viewBox="0 0 96 96" className="w-full h-full transform -rotate-90 absolute inset-0">
             <circle cx="48" cy="48" r={radius} fill="none" stroke="#F1F5F9" strokeWidth="6" />
             <circle 
               cx="48" cy="48" r={radius} 
@@ -73,9 +117,9 @@ export default function ResumeDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-24">
+    <div className="min-h-screen bg-[#F8FAFC] print:bg-white pb-24 print:pb-0">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 print:hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button 
@@ -93,48 +137,60 @@ export default function ResumeDashboard() {
             <button className="hidden sm:flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
               <RefreshCw className="w-4 h-4" /> Re-Analyze
             </button>
-            <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg">
-              <Download className="w-4 h-4" /> Export PDF
+            <button 
+              onClick={handleExportPDF} 
+              disabled={isExporting}
+              className={`flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold transition-all shadow-md ${isExporting ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#0F172A] hover:bg-[#1E293B] hover:shadow-lg'}`}
+            >
+              {isExporting ? (
+                <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Exporting...</>
+              ) : (
+                <><Download className="w-4 h-4" /> Export PDF</>
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8">
+      <div id="resume-report-content" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row print:flex-col print:block gap-8 print:gap-4 print:py-0 bg-[#F8FAFC]">
         
         {/* Left Column - Main Analysis */}
         <div className="flex-1 space-y-8">
           
           {/* Top Scores */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center text-center gap-4">
+              <CircularScore score={overallScore} label="" />
               <div>
                 <h3 className="text-slate-500 font-bold mb-1">Overall Match</h3>
-                <p className="text-3xl font-black text-[#0F172A]">{overallScore}/100</p>
-                <p className="text-sm text-green-500 font-semibold mt-1 flex items-center gap-1">
-                  <Target className="w-4 h-4" /> Top 15% of candidates
+                <p className="text-3xl font-black text-[#0F172A] break-words">{overallScore}/100</p>
+                <p className="text-sm text-green-500 font-semibold mt-2 flex items-center justify-center gap-1 bg-green-50 px-3 py-1.5 rounded-xl text-balance">
+                  <Target className="w-4 h-4" /> Top 15%
                 </p>
               </div>
-              <CircularScore score={overallScore} label="" />
             </motion.div>
             
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center text-center gap-4">
+              <CircularScore score={atsScore} label="" />
               <div>
                 <h3 className="text-slate-500 font-bold mb-1">ATS Compatibility</h3>
-                <p className="text-3xl font-black text-[#0F172A]">{atsScore}/100</p>
-                <p className="text-sm text-amber-500 font-semibold mt-1">Needs minor formatting tweaks</p>
+                <p className="text-3xl font-black text-[#0F172A] break-words">{atsScore}/100</p>
+                <p className="text-sm text-amber-500 font-semibold mt-2 bg-amber-50 px-3 py-1.5 rounded-xl text-balance">
+                  Minor formatting tweaks
+                </p>
               </div>
-              <CircularScore score={atsScore} label="" />
             </motion.div>
 
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.2 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ delay: 0.2 }} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center text-center gap-4">
+              <div className="w-24 h-24 rounded-full bg-orange-50 border-[6px] border-orange-100 flex items-center justify-center text-[#FF5722] shrink-0">
+                <IndianRupee className="w-10 h-10" />
+              </div>
               <div>
                 <h3 className="text-slate-500 font-bold mb-1">AI Salary Estimate</h3>
-                <p className="text-2xl font-black text-[#0F172A]">{salaryEstimate.current}</p>
-                <p className="text-sm text-[#FF5722] font-semibold mt-1">Potential: {salaryEstimate.potential}</p>
-              </div>
-              <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
-                <IndianRupee className="w-8 h-8" />
+                <p className="text-2xl font-black text-[#0F172A] break-words text-balance">{salaryEstimate.current}</p>
+                <p className="text-sm text-[#FF5722] font-semibold mt-2 bg-[#FF5722]/10 px-3 py-1.5 rounded-xl text-balance">
+                  Potential: {salaryEstimate.potential}
+                </p>
               </div>
             </motion.div>
           </section>
@@ -146,7 +202,7 @@ export default function ResumeDashboard() {
             </h2>
             <div className="space-y-6">
               {sectionReviews.map((review, i) => (
-                <div key={i} className="p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-[#FF5722]/30 transition-all group">
+                <div key={i} className="p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-[#FF5722]/30 transition-all group print:break-inside-avoid">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-lg text-[#0F172A]">{review.section}</h3>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
@@ -178,9 +234,6 @@ export default function ResumeDashboard() {
                     <div>
                       <p className="text-xs font-bold text-[#FF5722] uppercase tracking-wider mb-1">AI Suggestion ({review.impact})</p>
                       <p className="text-sm text-slate-800 font-medium">{review.suggestion}</p>
-                      <button className="mt-3 text-xs font-bold text-white bg-[#FF5722] hover:bg-[#E64A19] px-4 py-2 rounded-lg transition-colors">
-                        Auto-Rewrite Bullet Points
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -213,7 +266,7 @@ export default function ResumeDashboard() {
         </div>
 
         {/* Right Column - Charts & Keywords */}
-        <div className="w-full lg:w-[400px] shrink-0 space-y-6">
+        <div className="w-full lg:w-[400px] print:w-full shrink-0 space-y-6 print:space-y-4">
           
           {/* Quality Radar Chart */}
           <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">

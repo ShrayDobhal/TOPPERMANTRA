@@ -14,9 +14,7 @@ const useMentorStore = create((set) => ({
       .select('*')
       .eq('role', 'Mentor');
 
-    if (!error && data) {
-      // Map profile fields to mentor UI needs. 
-      // If the backend doesn't have rating/company yet, we provide fallbacks for the UI.
+    if (!error && data && data.length > 0) {
       const mappedMentors = data.map(mentor => ({
         id: mentor.id,
         name: mentor.full_name || 'Anonymous Mentor',
@@ -34,7 +32,27 @@ const useMentorStore = create((set) => ({
 
       set({ mentors: mappedMentors, loading: false });
     } else {
-      set({ loading: false });
+      // DUMMY DATA FALLBACK
+      set({ 
+        mentors: [
+          {
+            id: 'm1', name: 'Sarah Drasner', role: 'VP of Engineering', company: 'Netlify', experience: '10 YOE',
+            type: 'Professional', rating: 4.9, education: 'MIT • Computer Science', achievement: 'Top Open Source Contributor',
+            status: 'Available', avatar: 'Sarah', skills: ['Vue', 'Leadership', 'System Design']
+          },
+          {
+            id: 'm2', name: 'Guillermo Rauch', role: 'CEO', company: 'Vercel', experience: '12 YOE',
+            type: 'Professional', rating: 5.0, education: 'Self Taught', achievement: 'Creator of Next.js',
+            status: 'Booked', avatar: 'Guillermo', skills: ['React', 'Next.js', 'Startups']
+          },
+          {
+            id: 'm3', name: 'Dan Abramov', role: 'Software Engineer', company: 'Meta', experience: '8 YOE',
+            type: 'Professional', rating: 4.8, education: 'University of Engineering', achievement: 'Co-author of Redux',
+            status: 'Available', avatar: 'Dan', skills: ['React', 'Redux', 'Frontend']
+          }
+        ], 
+        loading: false 
+      });
     }
   }
 }));

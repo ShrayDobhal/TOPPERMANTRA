@@ -48,7 +48,7 @@ import CohortLayout from './modules/cohort/layouts/CohortLayout'
 import CohortDashboard from './modules/cohort/pages/CohortDashboard'
 import ProjectForgePage from './modules/projects/pages/ProjectForgePage'
 import Settings from './modules/dashboard/pages/Settings'
-import ComingSoon from './components/shared/ComingSoon'
+import MockDashboard from './components/shared/MockDashboard'
 import ScrollToTop from './components/shared/ScrollToTop'
 import CustomCursor from './components/shared/CustomCursor'
 import ProtectedRoute from './components/auth/ProtectedRoute'
@@ -158,16 +158,16 @@ export default function App() {
               <Route path="tracker" element={<ApplicationTracker />} />
               <Route path=":id" element={<OpportunityDetail />} />
             </Route>
-            <Route path="hackathons" element={<ComingSoon />} />
+            <Route path="hackathons" element={<MockDashboard />} />
             <Route path="portfolio" element={<PortfolioDashboard />} />
             <Route path="resume">
               <Route index element={<ResumeLanding />} />
               <Route path="dashboard" element={<ResumeDashboard />} />
             </Route>
-            <Route path="certificates" element={<ComingSoon />} />
-            <Route path="events" element={<ComingSoon />} />
-            <Route path="messages" element={<ComingSoon />} />
-            <Route path="notifications" element={<ComingSoon />} />
+            <Route path="certificates" element={<MockDashboard />} />
+            <Route path="events" element={<MockDashboard />} />
+            <Route path="messages" element={<MockDashboard />} />
+            <Route path="notifications" element={<MockDashboard />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Route>
