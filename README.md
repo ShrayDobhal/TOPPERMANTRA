@@ -1,37 +1,58 @@
 # Topper Mantra - The Operating System for Students
 
-Topper Mantra is a premium, high-performance ecosystem designed to bridge the gap between Tier 2/3 college students and top-tier career opportunities. It acts as an operating system for student builders, providing mentorship, curated projects, startup exposure, hackathons, and a community of ambitious peers.
+Topper Mantra is a premium, high-performance ecosystem designed to bridge the gap between Tier 2/3 college students and top-tier career opportunities. It acts as an operating system for student builders, providing mentorship, curated projects, startup exposure, hackathons, an AI-powered resume intelligence engine, and a community of ambitious peers.
 
-## 🚀 Features
-- **Modern UI Architecture:** Built with a scalable, minimalist, and dynamic design language inspired by top-tier SaaS platforms (Stripe, Linear, Vercel).
-- **Interactive Visualizations:** Premium React/Framer Motion-driven animations that explain the "Opportunity Gap" dynamically without heavy static assets.
-- **Responsive Layout:** Perfectly engineered to look beautiful on any device, from ultrawide desktops to mobile screens.
+## 🚀 Features & Production Status
+
+Topper Mantra has transitioned into a robust, domain-driven SaaS application architecture capable of serving high-scale traffic with real-time data integrations.
+
+### 🧠 Core Modules
+- **AI Resume Intelligence:** Upload, parse, and score resumes via OpenAI GPT-4o-mini edge functions. Provides actionable feedback, ATS compatibility scores, and personalized career roadmaps.
+- **Project Forge:** A Kanban-style project management environment with full live Supabase data integration.
+- **Gamification Engine:** PostgreSQL-driven XP points, automated daily streaks, heatmap tracking, and real-time badge assignments.
+- **Mentorship Hub:** Integrated matching, peer-review cycles, and session dashboards.
+- **Domain-Driven Onboarding:** Strict URL validations, dynamic daily streak tracking, and resilient state persistence.
+
+### 🎨 Frontend Architecture
+- **Modern UI:** Built with a scalable, minimalist, and dynamic design language inspired by top-tier SaaS platforms.
+- **Interactive Visualizations:** Premium React/Framer Motion-driven animations.
 - **Component-Driven:** A strictly organized atomic structure separating UI elements, layout components, and major page sections.
+- **Global State Management:** Powered by Zustand for lightweight and fast state distribution.
+
+### ⚙️ Backend Architecture (Supabase Edge & Postgres)
+The platform uses an extensive microservices backend:
+- **Canonical DB Schema:** A massive, production-patched schema incorporating real-time PostgreSQL triggers.
+- **11 Edge Functions:**
+  - `resume-analyzer` & `resume-generator`
+  - `mentor-matching` & `opportunity-matching`
+  - `custodian-bot` (Automated moderation)
+  - `growth-recommendations`, `portfolio-generator`
+  - `emails`, `notifications`, `payments`, `ai`
 
 ## 🛠 Tech Stack
-- **Framework:** React 18
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS
-- **Animations:** Framer Motion
-- **Icons:** Lucide React
-- **Routing:** React Router v6
+- **Frontend Framework:** React 18, Vite
+- **Styling:** Tailwind CSS, PostCSS, Framer Motion
+- **Icons & Visualization:** Lucide React, Recharts
+- **State & Data Fetching:** Zustand, TanStack React Query, Axios
+- **Backend & Auth:** Supabase (Auth, Postgres, Edge Functions, Storage)
+- **Document Processing:** pdfjs-dist, mammoth, html2pdf.js
 
 ## 📂 Project Structure
-The `src/` directory has been organized for scalable production maintenance:
 ```
-src/
-├── assets/         # Static visual assets and branding
-├── components/     # Reusable building blocks
-│   ├── common/     # Shared features (e.g., Hero visualizations)
-│   ├── layout/     # Structural components (Nav, Header, Footer)
-│   ├── sections/   # Major page blocks (OpportunityGap, Ecosystem, Roadmap)
-│   └── ui/         # Base design system primitives (Buttons, Badges)
-├── layouts/        # Page wrappers and layout contexts
-├── lib/            # Utilities and configuration functions
-├── pages/          # Top-level routing components
-├── App.jsx         # Main router and component registry
-├── main.jsx        # Application entry point
-└── index.css       # Global styles and Tailwind directives
+toppr-mantra/
+├── src/
+│   ├── modules/        # Domain-driven features (onboarding, projects, spaces, resume)
+│   ├── components/     # Reusable building blocks and UI primitives
+│   ├── contexts/       # React contexts (e.g., AuthContext)
+│   ├── store/          # Zustand global state stores
+│   ├── lib/            # Utilities, API integrations, and Supabase client
+│   ├── pages/          # Top-level routing components
+│   ├── App.jsx         # Main router and component registry
+│   └── main.jsx        # Application entry point
+├── supabase/
+│   ├── functions/      # Deno-based Edge Functions microservices
+│   └── migrations/     # PostgreSQL schema migrations and PRD patches
+└── package.json
 ```
 
 ## 💻 Local Development
@@ -40,7 +61,9 @@ src/
    ```bash
    npm install
    ```
-3. Start the development server:
+3. Set up environment variables:
+   Create a `.env` file and configure your Supabase credentials (`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`).
+4. Start the development server:
    ```bash
    npm run dev
    ```
